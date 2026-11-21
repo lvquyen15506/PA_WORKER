@@ -5,7 +5,8 @@ Web app quản lý hồ sơ công nhân cho doanh nghiệp sản xuất. Đơn v
 ## Nguồn sự thật
 
 - `docs/yeu-cau.md`: tài liệu yêu cầu **đã được khách hàng duyệt**. Mọi chức năng, trường dữ liệu, trạng thái, phân quyền và tiêu chí nghiệm thu lấy từ đây. Không tự thêm chức năng ngoài tài liệu; thấy chỗ mâu thuẫn hoặc chưa rõ thì **hỏi lại**, không đoán.
-- `docs/lam-ro-yeu-cau.md`: các quyết định làm rõ yêu cầu đã chốt với khách hàng (Phase 0). **Khi `docs/lam-ro-yeu-cau.md` khác `docs/yeu-cau.md` thì theo `docs/lam-ro-yeu-cau.md`.** Không sửa `docs/yeu-cau.md` (bản đã ký).
+- `docs/lam-ro-yeu-cau.md`: các quyết định làm rõ; câu gắn [Nội bộ] là quyết định nội bộ chưa xác nhận với khách hàng, vẫn áp dụng khi code. **Khi `docs/lam-ro-yeu-cau.md` khác `docs/yeu-cau.md` thì theo `docs/lam-ro-yeu-cau.md`.** Không sửa `docs/yeu-cau.md` (bản đã ký).
+- `docs/thiet-ke/` (`erd.md`, `models.md`, `trang.md`, `kien-truc.md`): thiết kế đã duyệt. Tên model, trường, quan hệ, URL, quyền phải đúng như các file này; muốn đổi thì sửa thiết kế trước.
 - `docs/phases.md`: kế hoạch từng phase và điều kiện "xong".
 - `docs/tien-do.md`: nhật ký tiến độ. Cập nhật cuối mỗi phase (làm gì, còn gì, quyết định nào đã chốt).
 - Giao diện: **luôn dùng skill `pa-ui`** (`.claude/skills/pa-ui/SKILL.md`) khi tạo hoặc sửa bất kỳ template, CSS, trang, form, bảng, nút nào.
