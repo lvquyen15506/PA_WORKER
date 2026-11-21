@@ -74,3 +74,16 @@ docker compose logs -f web
 - Mỗi chức năng có test: phân quyền (vai trò được/không được), sinh mã, kiểm tra trùng, chuyển trạng thái, ghi audit log.
 - 17 kịch bản nghiệm thu ở mục X của `docs/yeu-cau.md` là thước đo cuối cùng; phase nào liên quan kịch bản nào thì phải chạy kịch bản đó.
 - Thay đổi giao diện: chụp màn hình bằng skill `webapp-testing` và so với trang `/ui-kit`.
+
+## Vòng lặp tự kiểm thử và sửa lỗi
+
+Áp dụng cho mọi phase. Sau mỗi phần code (một tính năng, một trang, hoặc một nhóm model), tự chạy vòng lặp:
+
+a. **Logic:** chạy `docker compose exec web pytest` và `ruff check .`. Mỗi quy tắc nghiệp vụ mới phải có test (phân quyền đúng/sai vai trò, chuyển trạng thái, sinh mã, kiểm tra trùng, ghi audit log).
+b. **Giao diện:** dùng skill `webapp-testing` đăng nhập bằng từng tài khoản mẫu liên quan, mở các trang vừa làm, bấm thử các nút và form chính (cả trường hợp nhập sai), đọc lỗi console trình duyệt, chụp màn hình ở 1366x768 và 390x844 lưu vào `docs/screenshots/<phase>/`. Đối chiếu với checklist mục 10 của skill `pa-ui` và với trang `/ui-kit` (khi đã có).
+c. **Nếu có lỗi:** tìm nguyên nhân gốc, sửa, rồi chạy lại cả a và b. Lặp tối đa 3 lần cho cùng một lỗi; quá 3 lần thì dừng và báo: lỗi gì, đã thử gì, đề xuất hướng xử lý.
+d. **Cấm** để test "xanh" bằng cách: xóa hoặc nới test, thêm skip, bắt ngoại lệ rồi bỏ qua, sửa dữ liệu mong đợi cho khớp kết quả sai, đổi giao diện chuẩn `/ui-kit` hoặc quy tắc `pa-ui`.
+e. Chỉ khi a và b đều đạt mới commit (thông điệp tiếng Việt, mô tả việc đã làm) và push lên `origin`.
+f. **Cuối phase:** chạy lại toàn bộ test, chạy các kịch bản nghiệm thu liên quan ở mục X của `docs/yeu-cau.md`, cập nhật `docs/tien-do.md` (đã làm gì, kết quả test, ảnh chụp, việc tồn), commit + push, rồi dừng chờ duyệt.
+
+Ghi chú môi trường máy phát triển (Windows): Playwright cài cho Python 3.12 64-bit, chạy script kiểm thử giao diện bằng `py -3.12 ...` (bản Python 3.15 32-bit mặc định không cài được Playwright).
