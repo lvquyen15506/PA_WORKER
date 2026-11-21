@@ -508,7 +508,7 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Bị từ chối | Không ai | Không ai | Không ai | Không ai |
 | Lưu trữ | Không ai (chỉ xem) | Không ai | Không ai | Không ai |
 
-Đổi trạng thái xác minh tài liệu chỉ QL, Admin (câu 34). Bị từ chối chỉ xem (câu 35). Bảng này chỉ khóa phần được duyệt; tab Tuyển dụng và Quá trình làm việc vẫn thao tác được ở mọi trạng thái trừ Lưu trữ (câu 36).
+Đổi trạng thái xác minh tài liệu chỉ QL, Admin (câu 34). Bị từ chối chỉ xem (câu 35). Bảng này chỉ khóa phần được duyệt; tab Tuyển dụng và Quá trình làm việc vẫn thao tác được ở mọi trạng thái trừ Bị từ chối và Lưu trữ (câu 36).
 
 ### 4.5 Kiểm tra dữ liệu
 | Quy tắc | Nơi kiểm tra | Mức |
@@ -521,6 +521,9 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Ngày cấp sau ngày sinh | form `IdentityDocument` | Lỗi |
 | Email đúng định dạng | `EmailField` | Lỗi |
 | Tệp: định dạng thật, ≤ 10 MB | `apps.documents.validators` | Lỗi |
+| **Nhập Excel – ô công thức:** chỉ báo lỗi khi ô là **công thức Excel thật** (ô có `data_type == "f"`) → "Ô không được chứa công thức Excel." Mở file bằng `openpyxl.load_workbook(..., data_only=False)`; nếu `data_only=True` thì openpyxl trả về giá trị đã tính, không phát hiện được công thức. Chữ thường bắt đầu bằng `=` `+` `-` `@` (ví dụ gạch đầu dòng "- " trong Kỹ năng, Ghi chú) vẫn nhận bình thường | `apps.reports.importer` | Lỗi dòng |
+| **Nhập Excel – ô ngày kiểu Excel:** cột ngày mong đợi chuỗi `dd/mm/yyyy`; ô kiểu ngày vẫn đọc được | `apps.reports.importer` | Cảnh báo "Ô ngày của Excel có thể bị đảo ngày/tháng; kiểm tra lại" |
+| **Mọi chức năng xuất Excel (Phase 7):** luôn thêm dấu `'` trước giá trị chữ bắt đầu bằng `=` `+` `-` `@`, tab hoặc xuống dòng, qua một hàm dùng chung. Đây là **lớp bảo vệ chính** chống chèn công thức, áp dụng cho dữ liệu từ mọi nguồn (form, Excel, OCR, CV) | `apps.core.excel.safe_cell()` (xuất danh sách, báo cáo, file mẫu, biên bản) | Bắt buộc |
 
 ### 4.6 Các quy tắc khác
 | Quy tắc | Nơi kiểm tra |
