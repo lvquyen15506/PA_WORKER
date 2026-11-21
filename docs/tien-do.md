@@ -27,4 +27,6 @@
 ## Việc còn tồn
 
 - Phase 1 còn 4 file chưa viết: `docs/thiet-ke/kien-truc.md` (gồm mục cất giữ khóa mã hóa, câu 31), `phac-thao-trang.md`, `mau-dong-y.md`, `excel-mau.md`. CLAUDE.md đã tham chiếu `kien-truc.md` như thiết kế đã duyệt, nên phải viết và duyệt file này trước Phase 2.
-- Xác nhận với khách hàng các câu [Sửa]/[Nội bộ] ở mục E của `docs/lam-ro-yeu-cau.md` (ưu tiên: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi).
+- Gửi khách hàng mục E của `docs/lam-ro-yeu-cau.md` để xác nhận các câu [Sửa]/[Nội bộ] (ưu tiên: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi).
+- Khách hàng (và pháp chế) duyệt `docs/thiet-ke/mau-dong-y.md` (sau khi viết).
+- Cấu trúc QR CCCD là giả định (câu 20), cần kiểm chứng bằng thẻ thật tại chỗ khách khi triển khai.
