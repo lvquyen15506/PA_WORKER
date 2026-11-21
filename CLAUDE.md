@@ -24,7 +24,8 @@ Web app quản lý hồ sơ công nhân cho doanh nghiệp sản xuất. Đơn v
 - Python 3.12, Django 5.2 LTS, Gunicorn
 - PostgreSQL 16 (trong Docker); SQLite chỉ dùng khi chạy thử không có Docker
 - Django templates + Bootstrap 5 + Bootstrap Icons + HTMX + Chart.js — **tất cả để trong `static/vendor/`, không dùng CDN** (hệ thống phải chạy offline)
-- QR: OpenCV + pyzbar. OCR: Tesseract (gói `vie`). CV: pdfplumber, python-docx. Excel: openpyxl
+- QR: OpenCV + pyzbar. OCR: Tesseract (gói `vie`). CV: pdfplumber, python-docx, `antiword` (gói apt, đọc `.doc`). Excel: openpyxl
+- Mã hóa trường nhạy cảm: `cryptography` (Fernet). Phục vụ tệp tĩnh: `whitenoise` (duyệt 21/11/2026, `docs/thiet-ke/kien-truc.md` mục 8)
 - Docker + Docker Compose. Test: pytest + pytest-django. Lint/format: ruff
 
 ## Cấu trúc thư mục dự kiến

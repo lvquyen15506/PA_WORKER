@@ -214,6 +214,8 @@ Danh mục chung: mọi danh mục có `is_active = BooleanField(default=True)`.
 | `intake_ttl_hours` | `PositiveSmallIntegerField` | `24` | Phiên nhận diện bỏ dở tự xóa |
 | `external_ocr_enabled` | `BooleanField` | `False` | Tắt mặc định (mục V.4) |
 | `external_ocr_url` | `URLField(blank)` | rỗng | Khóa API nằm trong `.env` (`EXTERNAL_OCR_API_KEY`) |
+| `key_check_enc` | `EncryptedTextField(null)` | rỗng | Chuỗi cố định `PA-WORKER-KEY-CHECK` mã hóa bằng `FIELD_ENCRYPTION_KEY`. **Ghi một lần ở lần khởi động đầu, không sửa**; không hiện trên giao diện (câu 31, `kien-truc.md` mục 7) |
+| `key_check_hash` | `CharField(64, null)` | rỗng | HMAC-SHA256 của cùng chuỗi bằng `HASH_KEY`. **Ghi một lần ở lần khởi động đầu, không sửa**; không hiện trên giao diện |
 | `updated_by` | `FK(User, null)` | | |
 | `updated_at` | `DateTimeField(auto_now)` | | |
 

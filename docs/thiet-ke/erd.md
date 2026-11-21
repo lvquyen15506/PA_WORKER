@@ -474,6 +474,8 @@ erDiagram
         int intake_ttl_hours "24"
         bool external_ocr_enabled "false"
         varchar external_ocr_url "khóa API nằm trong .env"
+        text key_check_enc "chuỗi cố định mã hóa bằng FIELD_ENCRYPTION_KEY; ghi một lần ở lần khởi động đầu, không sửa"
+        varchar key_check_hash "HMAC chuỗi cố định bằng HASH_KEY; ghi một lần ở lần khởi động đầu, không sửa"
         bigint updated_by_id FK
         datetime updated_at
     }
@@ -548,8 +550,8 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 Mã đã cấp không bao giờ cấp lại cho người khác, kể cả sau ẩn danh hóa: `worker_code`, `employee_code` không bị xóa khi ẩn danh; `CodeSequences.last_number` chỉ tăng; bộ sinh mã kiểm tra mã chưa tồn tại trước khi cấp, tồn tại thì tăng tiếp (câu 27). `employee_code` nhận mã cũ từ Excel: tối đa 20 ký tự, chữ/số/gạch ngang.
 
 ### Mã hóa và băm
-- Mã hóa: `IdentityDocuments.id_number_enc`, `old_id_number_enc`, `permanent_address_enc`; `IntakeSessions.result_enc`; `AuditPersonalValues.old_value_enc`, `new_value_enc`.
-- Băm: `IdentityDocuments.id_number_hash`. Hai khóa khác nhau: lộ khóa băm không giải mã được dữ liệu, và dùng HMAC có khóa nên không dò ngược được từ 12 chữ số.
+- Mã hóa: `IdentityDocuments.id_number_enc`, `old_id_number_enc`, `permanent_address_enc`; `IntakeSessions.result_enc`; `AuditPersonalValues.old_value_enc`, `new_value_enc`; `Settings.key_check_enc`.
+- Băm: `IdentityDocuments.id_number_hash`; `Settings.key_check_hash`. Hai khóa khác nhau: lộ khóa băm không giải mã được dữ liệu, và dùng HMAC có khóa nên không dò ngược được từ 12 chữ số.
 - Hai khóa sinh một lần khi cài, không nằm trong file sao lưu; thiếu khóa thì ứng dụng không khởi động (câu 31, `kien-truc.md`).
 - `AuditLogs.changes` không bao giờ chứa giá trị của trường cá nhân: chỉ ghi tên trường và "(xem giá trị chi tiết)"; giá trị nằm ở `AuditPersonalValues` (câu 30). `AuditLogs.object_repr` và lý do hệ thống tự điền ở `StatusChanges.reason` chỉ dùng mã hồ sơ, không họ tên.
 
