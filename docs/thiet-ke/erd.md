@@ -1,6 +1,6 @@
 # Sơ đồ ERD – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Căn cứ: `docs/yeu-cau.md` mục VI, `docs/lam-ro-yeu-cau.md` câu 1–37.
+Phase 1 · Ngày 21/11/2026 · Căn cứ: `docs/yeu-cau.md` mục VI, `docs/lam-ro-yeu-cau.md` câu 1–38.
 
 Tài liệu này là **nguồn gốc** cho `models.md` và `trang.md`: tên bảng, tên cột và quan hệ ở hai tài liệu đó phải khớp với tài liệu này.
 
@@ -244,10 +244,12 @@ erDiagram
     AnonymizationRecords {
         bigint id PK
         varchar record_no UK "BBH-2026-001"
+        varchar kind "AnonymizationKind: hết hạn lưu trữ, theo yêu cầu của chủ thể; mặc định hết hạn"
+        varchar request_ref "số/ngày đơn yêu cầu; bắt buộc khi theo yêu cầu"
         bigint performed_by_id FK "Admin"
         datetime performed_at
         int worker_count
-        text note
+        text note "lý do; không ghi họ tên"
     }
     AnonymizationItems {
         bigint id PK
@@ -256,7 +258,7 @@ erDiagram
         varchar worker_code "chụp lại mã tại thời điểm hủy"
         varchar employee_code
         varchar retention_basis "RetentionBasis: 6 căn cứ, câu 2"
-        date retention_expired_on
+        date retention_expired_on "NOT NULL; ngày hết hạn tính theo câu 2; với ẩn danh theo yêu cầu là ngày lẽ ra hết hạn (luôn có giá trị)"
     }
     IntakeSessions {
         uuid id PK "khó đoán, dùng trên URL"
@@ -509,7 +511,7 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 | `CodeSequences` | Bộ đếm mã hồ sơ và mã NV, khóa dòng khi cấp mã; chỉ tăng nên không cấp lại mã cũ (câu 6), và được đẩy lên số lớn nhất khi nhập mã NV cũ từ Excel (câu 27) |
 | `QrFormats` | Câu 20: thứ tự trường và ký tự phân cách QR cấu hình theo từng mẫu thẻ, không hard-code |
 | `IntakeSessions` | Mục V: kết quả QR/OCR/CV chưa được HR xác nhận thì không được ghi vào `Workers`. Bảng này giữ tạm (xem mục 6) |
-| `AnonymizationRecords`, `AnonymizationItems` | Câu 2: mỗi lần hủy (ẩn danh hóa) sinh biên bản ghi ai, khi nào, những hồ sơ nào |
+| `AnonymizationRecords`, `AnonymizationItems` | Câu 2, 38: mỗi lần hủy (ẩn danh hóa hết hạn hoặc theo yêu cầu của chủ thể) sinh biên bản ghi loại, ai, khi nào, những hồ sơ nào |
 | `AuditPersonalValues` | Câu 30: giá trị trước/sau của trường cá nhân tách khỏi `AuditLogs` và mã hóa, để ẩn danh hóa xóa được mà `AuditLogs` vẫn chỉ thêm |
 
 **Điều chỉnh:**
@@ -561,7 +563,7 @@ Mã đã cấp không bao giờ cấp lại cho người khác, kể cả sau �
 - `WorkerDocuments`: thay thế thì giữ bản cũ (`is_current = false`).
 - `Users`: khóa bằng `is_active = false`.
 - `AuditLogs`, `LoginHistory`, `StatusChanges`, `EmploymentHistory`: **chỉ thêm**. Ứng dụng chặn sửa/xóa ở model; CSDL PostgreSQL có trigger chặn `UPDATE`/`DELETE` trên `AuditLogs`.
-- `AuditPersonalValues`: không sửa (trigger chặn `UPDATE`); chỉ bị xóa khi ẩn danh hóa hồ sơ tương ứng, kèm một dòng `AuditLogs` `ANONYMIZE` (câu 30).
+- `AuditPersonalValues`: không sửa (trigger chặn `UPDATE`); chỉ bị xóa khi ẩn danh hóa hồ sơ tương ứng, kèm một dòng `AuditLogs` `ANONYMIZE` (câu 30, 38).
 - Bản ghi được xóa cứng: `IntakeSessions` (bản ghi tạm, không có bảng nào trỏ tới, xem mục 6) và `AuditPersonalValues` khi ẩn danh hóa (trên).
 
 ### Kiểm tra ở tầng ứng dụng (không biểu diễn được bằng khóa)

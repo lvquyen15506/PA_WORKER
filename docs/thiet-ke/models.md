@@ -1,6 +1,6 @@
 # Danh sách model Django – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/lam-ro-yeu-cau.md` câu 1–37. Tên bảng, cột, quan hệ phải **khớp** với ERD; khi sửa một bên phải sửa bên kia.
+Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/lam-ro-yeu-cau.md` câu 1–38. Tên bảng, cột, quan hệ phải **khớp** với ERD; khi sửa một bên phải sửa bên kia.
 
 ## 1. Quy ước
 
@@ -87,6 +87,7 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `EmploymentChangeType` | `ONBOARD` Tiếp nhận vào làm · `TRANSFER` Điều chuyển · `POSITION_CHANGE` Đổi chức danh · `SHIFT_CHANGE` Đổi ca · `STATUS_CHANGE` Đổi trạng thái làm việc · `IMPORT` Nhập từ Excel |
 | `RetentionBasis` | `RESIGNED` Công nhân đã nghỉ · `EMPLOYEE_OTHER` Công nhân lưu trữ khác · `FAILED_CANDIDATE` Ứng viên không được tuyển · `REJECTED` Hồ sơ bị từ chối · `ABANDONED` Hồ sơ bỏ dở · `CANDIDATE_OTHER` Ứng viên lưu trữ khác (thứ tự xét theo câu 2) |
 | `CodeType` | `WORKER` Mã hồ sơ · `EMPLOYEE` Mã nhân viên |
+| `AnonymizationKind` | `EXPIRED` Hết hạn lưu trữ · `SUBJECT_REQUEST` Theo yêu cầu của chủ thể (câu 38) |
 | `AuditAction` | `CREATE` Tạo · `UPDATE` Sửa · `STATUS_CHANGE` Đổi trạng thái · `REOPEN` Mở lại hồ sơ · `VIEW_FULL_ID` Xem số CCCD đầy đủ · `VIEW_FILE` Xem tài liệu · `DOWNLOAD_FILE` Tải tài liệu · `UPLOAD_FILE` Tải lên tài liệu · `REPLACE_FILE` Thay thế tài liệu · `EXPORT` Xuất Excel · `PRINT` In báo cáo · `IMPORT` Nhập Excel · `ANONYMIZE` Ẩn danh hóa · `INTAKE_CREATE` Tạo phiên nhận diện · `INTAKE_SAVE` Lưu từ phiên nhận diện · `INTAKE_CANCEL` Hủy phiên nhận diện · `INTAKE_EXPIRE` Phiên nhận diện hết hạn · `EXTERNAL_OCR_SEND` Gửi ảnh tới API OCR · `ACCOUNT_LOCK` Khóa tài khoản · `ACCOUNT_UNLOCK` Mở khóa tài khoản · `PASSWORD_RESET` Đặt lại mật khẩu |
 
 ## 3. Model theo app
@@ -155,7 +156,7 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `old_value_enc` | `EncryptedTextField(null)` | Fernet |
 | `new_value_enc` | `EncryptedTextField(null)` | Fernet |
 
-- Không có thao tác sửa. Xóa **chỉ** qua `apps.workers.retention.anonymize` (xóa mọi dòng của hồ sơ). Trigger PostgreSQL của `AuditLog` giữ nguyên; `AuditPersonalValue` có trigger chặn `UPDATE`.
+- Không có thao tác sửa. Xóa **chỉ** qua `apps.workers.retention.anonymize` (xóa mọi dòng của hồ sơ; câu 2, 30, 38). Trigger PostgreSQL của `AuditLog` giữ nguyên; `AuditPersonalValue` có trigger chặn `UPDATE`.
 - Khi xem (tab Lịch sử chi tiết, trang Nhật ký; chỉ A, Q): giải mã rồi hiển thị; số định danh và CMND cũ luôn hiện dạng che; hồ sơ đã ẩn danh hiện "(đã ẩn danh)".
 
 **Danh sách trường cá nhân** (`PERSONAL_FIELDS`, khai báo một chỗ trong `apps/audit/personal_fields.py`):
@@ -342,8 +343,8 @@ Unique (`worker`, `field_name`).
 
 | Model | Trường |
 | --- | --- |
-| `AnonymizationRecord` | `record_no CharField(20, unique)` dạng `BBH-2026-001`; `performed_by FK(User)`; `performed_at DateTimeField(auto_now_add)`; `worker_count PositiveIntegerField`; `note TextField(blank)` |
-| `AnonymizationItem` | `record FK(AnonymizationRecord, related_name="items")`; `worker OneToOneField(Worker)` (ERD: `worker_id FK,UK`); `worker_code`, `employee_code` (chụp lại); `retention_basis CharField(choices=RetentionBasis)`; `retention_expired_on DateField` |
+| `AnonymizationRecord` | `record_no CharField(20, unique)` dạng `BBH-2026-001`; `kind CharField(20, choices=AnonymizationKind, default=EXPIRED)`; `request_ref CharField(100, blank)` (số/ngày đơn yêu cầu, **bắt buộc** khi `kind = SUBJECT_REQUEST`); `performed_by FK(User)`; `performed_at DateTimeField(auto_now_add)`; `worker_count PositiveIntegerField`; `note TextField(blank)` (lý do; bắt buộc khi `SUBJECT_REQUEST`; không ghi họ tên) |
+| `AnonymizationItem` | `record FK(AnonymizationRecord, related_name="items")`; `worker OneToOneField(Worker)` (ERD: `worker_id FK,UK`); `worker_code`, `employee_code` (chụp lại); `retention_basis CharField(choices=RetentionBasis)`; `retention_expired_on DateField` (NOT NULL, lấy từ `retention_info()`; với `SUBJECT_REQUEST` là ngày lẽ ra hết hạn, có thể ở tương lai) |
 
 ### 3.5 `apps/documents`
 
@@ -535,7 +536,8 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Tự động Lưu trữ (câu 9), 4 quy tắc: (1) Đã nghỉ việc quá `auto_archive_resigned_days` ngày kể từ `resign_date`; (2) chưa có mã NV, lần ứng tuyển gần nhất Không đạt/Ứng viên từ chối quá `auto_archive_failed_days` ngày kể từ `result_date`; (3) Bị từ chối quá `auto_archive_failed_days` ngày kể từ `StatusChange` sang Bị từ chối; (4) Nháp/Cần bổ sung có `updated_at` cũ hơn `stale_draft_months` tháng, lý do "Hồ sơ bỏ dở". Quy tắc 1–2 áp dụng cho Nháp, Cần bổ sung, Đã xác minh. Không bao giờ áp dụng cho Chờ duyệt, và **không áp dụng** khi `employment.work_status` là Thử việc hoặc Đang làm việc | `run_daily_jobs` → `apps.workers.jobs.auto_archive` |
 | Hạn lưu trữ (câu 2): `retention_info(worker) -> (RetentionBasis, ngày hết hạn)` xét 6 căn cứ theo thứ tự; mốc "ngày chuyển Lưu trữ" lấy từ `StatusChange` gần nhất sang Lưu trữ. Hồ sơ Lưu trữ mà không tính được thì báo lỗi. **Test** tạo hồ sơ Lưu trữ theo đủ 6 căn cứ và qua mọi đường chuyển vào Lưu trữ (thủ công từng trạng thái, 4 quy tắc tự động, mở lại rồi lưu trữ lại), khẳng định ngày hết hạn luôn khác rỗng | `apps.workers.retention.retention_info` |
 | Danh sách chờ hủy (câu 2): hồ sơ Lưu trữ, chưa ẩn danh, ngày hết hạn đã qua; có cột căn cứ lưu trữ | `apps.workers.retention.expired_queryset` |
-| Ẩn danh hóa (câu 2, 30): xem 4.7 | `apps.workers.retention.anonymize` |
+| Ẩn danh hóa (câu 2, 30, 38): xem 4.7; xóa mọi `AuditPersonalValue` của hồ sơ, ghi 1 dòng `AuditLog` `ANONYMIZE` | `apps.workers.retention.anonymize` |
+| Ẩn danh hóa theo yêu cầu (câu 38): chỉ Admin; hồ sơ `ARCHIVED`, chưa ẩn danh; bắt buộc lý do + `request_ref`; **kiểm tra mã hồ sơ gõ lại ở máy chủ**; gọi `anonymize()` với `kind = SUBJECT_REQUEST`, sinh biên bản 1 hồ sơ; biên bản ghi "Xóa sớm theo yêu cầu – lẽ ra lưu đến dd/mm/yyyy" (`AnonymizationItem.retention_expired_on`). Test: vai trò khác bị chặn, hồ sơ chưa Lưu trữ hoặc đã ẩn danh bị chặn, thiếu lý do/số đơn bị chặn, mã gõ lại sai bị chặn | `apps.workers.retention.anonymize_on_request` |
 | Khóa tạm do sai mật khẩu, tự đăng xuất, buộc đổi mật khẩu | `apps.accounts` (backend + middleware) |
 | Admin khóa / mở khóa (câu 28): khóa đặt `is_active = False`; mở khóa đặt `is_active = True`, `locked_until = None`, `failed_login_count = 0` | `apps.accounts.services.lock_user`, `unlock_user` |
 | Bảo vệ quyền quản trị (câu 29): Admin không tự khóa, không tự đổi vai trò; không ai khóa hoặc hạ vai trò Admin cuối cùng đang hoạt động (`role = ADMIN`, `is_active = True`). Test cho từng trường hợp | `apps.accounts.services` |
@@ -559,3 +561,5 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | `AuditPersonalValue` | **Xóa mọi dòng của hồ sơ** (câu 30) | — |
 | `AuditLog` | Không đổi; thêm một dòng `ANONYMIZE` (`object_repr` = mã hồ sơ, `note` = số biên bản) | Toàn bộ dòng cũ: ai, khi nào, hành động, tên trường thay đổi |
 | `StatusChange`, `LoginHistory` | Giữ nguyên | Toàn bộ |
+
+Bảng này áp dụng như nhau cho cả hai loại ẩn danh hóa: hết hạn lưu trữ (`EXPIRED`, Admin duyệt từ danh sách chờ hủy) và theo yêu cầu của chủ thể (`SUBJECT_REQUEST`, câu 38). Dòng `AuditLog` `ANONYMIZE` ghi loại và số biên bản trong `note`.

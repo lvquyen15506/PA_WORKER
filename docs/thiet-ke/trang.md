@@ -1,6 +1,6 @@
 # Danh sách URL và trang – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/thiet-ke/models.md`. Quyền theo `docs/yeu-cau.md` mục III, sửa bởi `docs/lam-ro-yeu-cau.md` câu 1–37.
+Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/thiet-ke/models.md`. Quyền theo `docs/yeu-cau.md` mục III, sửa bởi `docs/lam-ro-yeu-cau.md` câu 1–38.
 
 ## 1. Quy ước
 
@@ -103,8 +103,8 @@ Trang admin của Django không được bật.
 | `/cai-dat/ocr-qr/` | G, P | ✓ | `UPDATE` | Ngưỡng tin cậy OCR, `QrFormat` theo mẫu thẻ, API OCR ngoài (tắt mặc định, bật thì hiện cảnh báo gửi ảnh ra ngoài) |
 | `/cai-dat/cho-huy/` | G | ✓ | | Trang phụ: hồ sơ Lưu trữ quá hạn lưu trữ; cột "Căn cứ lưu trữ" (6 căn cứ, câu 2) và "Hết hạn lưu trữ" |
 | `/cai-dat/cho-huy/huy/` | P | ✓ | `ANONYMIZE` (mỗi hồ sơ) | Chọn nhiều hồ sơ, hộp xác nhận; sinh `AnonymizationRecord` |
-| `/cai-dat/bien-ban-huy/` | G | ✓ | | Danh sách biên bản |
-| `/cai-dat/bien-ban-huy/<id>/` | G | ✓ | `PRINT` khi in | Xem và in biên bản |
+| `/cai-dat/bien-ban-huy/` | G | ✓ | | Danh sách biên bản, cột Loại (Hết hạn lưu trữ / Theo yêu cầu của chủ thể) và Số đơn |
+| `/cai-dat/bien-ban-huy/<id>/` | G | ✓ | `PRINT` khi in | Xem và in biên bản: loại, người duyệt, thời điểm, danh sách mã hồ sơ / mã NV, căn cứ lưu trữ. Biên bản loại "Theo yêu cầu của chủ thể" hiện thêm số đơn và dòng "Xóa sớm theo yêu cầu – lẽ ra lưu đến dd/mm/yyyy" |
 
 ### 5.3 Dashboard (`apps/reports`)
 
@@ -148,6 +148,7 @@ Bộ lọc của 9 thẻ:
 | `/ho-so/<id>/tu-choi/` | P | ✓ | ✓ | | | `STATUS_CHANGE` | Bắt buộc lý do; gợi ý như trên |
 | `/ho-so/<id>/luu-tru/` | P | ✓ | ✓ | ✓* | | `STATUS_CHANGE` | *H chỉ từ Nháp, Cần bổ sung, Bị từ chối. Từ Đã xác minh: chỉ A, Q, bắt buộc lý do, chặn khi Thử việc/Đang làm việc (câu 9) |
 | `/ho-so/<id>/mo-lai/` | G, P | ✓ | ✓ | ✓ | | `REOPEN` | Lưu trữ → Nháp + ứng tuyển mới; chặn khi đã ẩn danh |
+| `/ho-so/<id>/an-danh-theo-yeu-cau/` | P | ✓ | | | | `ANONYMIZE` | Câu 38. Nút "Ẩn danh hóa theo yêu cầu" (nút nguy hiểm) chỉ hiện với Admin khi hồ sơ **Lưu trữ** và chưa ẩn danh. Mở `_confirm_modal` gồm: lý do (bắt buộc, gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"), số/ngày đơn yêu cầu (bắt buộc), ô gõ lại mã hồ sơ để xác nhận (máy chủ kiểm tra lại). Hộp ghi rõ: "Thao tác này không hoàn tác được. Thông tin cá nhân, giấy tờ và giá trị chi tiết trong nhật ký của hồ sơ sẽ bị xóa." Sinh biên bản hủy loại "Theo yêu cầu của chủ thể" |
 | `/ho-so/<id>/lich-su/chi-tiet/` | H | ✓ | ✓ | | | | Giá trị trước/sau từng trường trong tab Lịch sử (câu 11), giải mã từ `AuditPersonalValue` (câu 30); số CCCD/CMND hiện dạng che; hồ sơ đã ẩn danh hiện "(đã ẩn danh)". H, V chỉ thấy dòng thời gian trạng thái |
 
 ### 5.5 Tài liệu (`apps/documents`)

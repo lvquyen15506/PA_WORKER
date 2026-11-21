@@ -225,7 +225,7 @@ Câu 16 cho lưu người từ 15 đến dưới 18 tuổi, nên Dashboard và b
 ### 30. Nhật ký và dữ liệu cá nhân [Nội bộ]
 - Thêm bảng `AuditPersonalValue` (dòng nhật ký, hồ sơ, tên trường, giá trị cũ, giá trị mới); giá trị cũ/mới **mã hóa** như trường nhạy cảm.
 - Với trường cá nhân (họ tên, ngày sinh, giới tính, SĐT, email, nơi ở, giấy tờ, liên hệ khẩn cấp, ghi chú, kỹ năng, mức lương mong muốn…), dòng nhật ký chỉ ghi tên trường và "(xem giá trị chi tiết)"; giá trị trước/sau nằm ở `AuditPersonalValue`, chỉ Admin và QL xem (câu 11).
-- Nhật ký vẫn chỉ thêm, không sửa, không xóa. Ngoại lệ duy nhất: ẩn danh hóa (câu 2) xóa mọi `AuditPersonalValue` của hồ sơ đó và ghi một dòng nhật ký "Ẩn danh hóa".
+- Nhật ký vẫn chỉ thêm, không sửa, không xóa. Ngoại lệ duy nhất: ẩn danh hóa (câu 2, 38) xóa mọi `AuditPersonalValue` của hồ sơ đó và ghi một dòng nhật ký "Ẩn danh hóa".
 - Phần mô tả đối tượng của nhật ký và lý do do hệ thống tự điền **không chứa họ tên**, chỉ dùng mã hồ sơ. Ô lý do hiện gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"; không chặn lưu.
 
 ### 31. Cất giữ khóa mã hóa [Nội bộ]
@@ -252,6 +252,13 @@ Khi hồ sơ Chờ duyệt, chỉ khóa phần được duyệt: thông tin cá 
 ### 37. Giới tính [Nội bộ]
 Giới tính chỉ có hai giá trị Nam, Nữ, khớp thông tin trên CCCD.
 
+### 38. Ẩn danh hóa theo yêu cầu của chủ thể dữ liệu [Nội bộ]
+- Để đáp ứng quyền yêu cầu xóa trong văn bản đồng ý (`docs/thiet-ke/mau-dong-y.md` mục 6, 7), **Admin** được ẩn danh hóa sớm một hồ sơ **Lưu trữ** chưa hết hạn lưu trữ khi chủ thể dữ liệu yêu cầu xóa.
+- Bắt buộc ghi **lý do** (không ghi họ tên, chỉ dùng mã hồ sơ) và **số/ngày đơn yêu cầu**.
+- Dùng chung hàm ẩn danh hóa và sinh **biên bản hủy** như ẩn danh hóa hết hạn (câu 2). Biên bản ghi "Xóa sớm theo yêu cầu – lẽ ra lưu đến dd/mm/yyyy" (ngày hết hạn tính theo câu 2) và số đơn.
+- Hồ sơ chưa Lưu trữ phải chuyển Lưu trữ trước, theo đúng câu 9 (không chuyển được khi trạng thái làm việc là Thử việc hoặc Đang làm việc).
+- Thao tác không hoàn tác được; hộp xác nhận yêu cầu gõ lại mã hồ sơ, máy chủ kiểm tra lại.
+
 ## E. Cần xác nhận với khách hàng
 
 Ưu tiên cao (ảnh hưởng trực tiếp tới dữ liệu của khách):
@@ -259,6 +266,7 @@ Giới tính chỉ có hai giá trị Nam, Nữ, khớp thông tin trên CCCD.
 2. **Tự Lưu trữ** (câu 9): 30 ngày sau nghỉ việc; 30 ngày sau kết quả Không đạt/Ứng viên từ chối; 30 ngày sau Bị từ chối; hồ sơ Nháp/Cần bổ sung bỏ dở 6 tháng.
 3. **Chặn nhập người dưới 15 tuổi** (câu 16); 15 đến dưới 18 chỉ cảnh báo.
 4. **Hồ sơ nhập Excel phải do người khác người nhập duyệt** từng hồ sơ, không có duyệt hàng loạt (câu 8, 27).
+5. **Ẩn danh hóa theo yêu cầu** (câu 38): Admin xóa sớm dữ liệu cá nhân khi người lao động yêu cầu; chỉ với hồ sơ Lưu trữ, không hoàn tác được.
 
 Các điểm khác:
 - Câu 5: Nháp chỉ cần họ tên + SĐT; điều kiện gửi duyệt; cảnh báo trùng theo SĐT, họ tên + ngày sinh.
@@ -267,7 +275,8 @@ Các điểm khác:
 - Câu 15: dữ liệu mẫu có bộ phận "Văn phòng" và ít nhất 1 tài khoản QL.
 - Câu 25: kỹ năng là một trường văn bản.
 - Câu 26: 5 nhóm tuổi (thêm Dưới 18) và nhóm "Chưa có ngày sinh".
-- Câu 27: file Excel 2 phần; nhận mã NV cũ (tối đa 20 ký tự, chữ/số/gạch ngang).- Câu 28: hai cơ chế khóa tài khoản.
+- Câu 27: file Excel 2 phần; nhận mã NV cũ (tối đa 20 ký tự, chữ/số/gạch ngang).
+- Câu 28: hai cơ chế khóa tài khoản.
 - Câu 29: bảo vệ Admin cuối cùng.
 - Câu 31: khóa mã hóa không nằm trong file sao lưu, phải cất riêng; chưa hỗ trợ đổi khóa.
 - Câu 32: hợp đồng hiển thị bản tài liệu hiện hành.

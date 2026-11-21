@@ -1,6 +1,6 @@
 # Kiến trúc hệ thống – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md`, `models.md`, `trang.md` và `docs/lam-ro-yeu-cau.md` câu 1–37.
+Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md`, `models.md`, `trang.md` và `docs/lam-ro-yeu-cau.md` câu 1–38.
 
 ## 1. Tổng quan
 
