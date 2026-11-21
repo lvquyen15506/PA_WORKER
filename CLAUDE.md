@@ -61,13 +61,14 @@ docker compose logs -f web
 
 - **Ngôn ngữ:** mọi chữ hiển thị cho người dùng bằng tiếng Việt có dấu. Tên biến, hàm, model, bảng bằng tiếng Anh. Chú thích nghiệp vụ bằng tiếng Việt.
 - **Định dạng:** ngày dd/mm/yyyy, múi giờ Asia/Ho_Chi_Minh, `LANGUAGE_CODE = "vi"`.
-- **Dữ liệu cá nhân:** không bao giờ dùng số CCCD, ảnh CCCD hay thông tin người thật trong code, test, dữ liệu mẫu. Số định danh, CMND cũ, địa chỉ thường trú được mã hóa khi lưu; kiểm tra trùng bằng giá trị băm riêng.
+- **Dữ liệu cá nhân:** không bao giờ dùng số CCCD, ảnh CCCD hay thông tin người thật trong code, test, dữ liệu mẫu. Số CCCD giả trong dữ liệu mẫu và test **luôn bắt đầu bằng `999`** (không trùng mã tỉnh nào); tên người là tên hư cấu. Số định danh, CMND cũ, địa chỉ thường trú được mã hóa khi lưu; kiểm tra trùng bằng giá trị băm riêng.
 - **Phân quyền:** kiểm tra ở phía máy chủ cho mọi view, API và lượt tải tệp. Ẩn nút trên giao diện chỉ là phần phụ.
-- **Nhật ký:** mọi thao tác tạo, sửa, đổi trạng thái, xem đầy đủ CCCD, tải tệp, xuất báo cáo đều ghi vào audit log (giá trị trước/sau). Audit log chỉ thêm, không sửa, không xóa.
-- **Không xóa cứng** bản ghi có liên kết; dùng trạng thái Lưu trữ hoặc cờ ngừng sử dụng.
+- **Nhật ký:** mọi thao tác tạo, sửa, đổi trạng thái, xem đầy đủ CCCD, tải tệp, xuất báo cáo đều ghi vào audit log qua **`apps.audit.services.log()`** (không tạo `AuditLog` trực tiếp). Trường cá nhân (`PERSONAL_FIELDS`, `docs/thiet-ke/models.md` mục 3.2) **không** ghi giá trị rõ vào `AuditLog.changes` (chỉ ghi "(xem giá trị chi tiết)"); giá trị trước/sau lưu mã hóa ở `AuditPersonalValue`. `object_repr` và lý do hệ thống tự điền chỉ dùng mã hồ sơ, không họ tên (`docs/lam-ro-yeu-cau.md` câu 30). `AuditLog` chỉ thêm, không sửa, không xóa; `AuditPersonalValue` chỉ bị xóa khi ẩn danh hóa hồ sơ.
+- **Không xóa cứng** bản ghi có liên kết; dùng trạng thái Lưu trữ hoặc cờ ngừng sử dụng. Ngoại lệ: `IntakeSession` (bản ghi tạm), `AuditPersonalValue` khi ẩn danh hóa, và dòng con học vấn / chứng chỉ / kinh nghiệm (không bảng nào trỏ tới, giá trị cũ ghi nhật ký; xem `docs/thiet-ke/trang.md`).
 - **Kết quả OCR/QR** không bao giờ tự lưu vào hồ sơ khi HR chưa xác nhận. Không đoán chữ mờ hoặc thiếu.
 - **Tệp tải lên:** lưu ngoài thư mục public, tên ngẫu nhiên, kiểm tra định dạng thật của tệp, tối đa 10 MB, chỉ tải qua view có kiểm tra quyền.
 - **Bí mật:** SECRET_KEY, mật khẩu CSDL, khóa mã hóa chỉ nằm trong `.env`. Không commit `.env`.
+- **Khóa mã hóa** (`docs/lam-ro-yeu-cau.md` câu 31): `FIELD_ENCRYPTION_KEY` và `HASH_KEY` sinh một lần khi cài, **không** nằm trong file sao lưu; script sao lưu (Phase 8) nhắc người dùng cất bản sao khóa riêng (USB/giấy niêm phong). Thiếu hoặc sai khóa thì ứng dụng từ chối khởi động với thông báo tiếng Việt rõ ràng. MVP không hỗ trợ đổi khóa (giới hạn đã biết).
 - **Không gọi dịch vụ ngoài Internet** trong chức năng bắt buộc. API OCR trả phí chỉ là tùy chọn, tắt mặc định.
 - **Trạng thái:** chỉ dùng đúng ba bộ trạng thái và ba chỉ số tự tính ở mục II của `docs/yeu-cau.md`, cộng bộ thứ tư **trạng thái xác minh tài liệu** (Chưa xác minh / Đã đối chiếu bản gốc / Không hợp lệ), bộ này chỉ dùng trong tab Tài liệu (`docs/lam-ro-yeu-cau.md` câu 3). Khai báo bằng `TextChoices`, không viết chuỗi trạng thái rải rác. "Chờ hủy" không phải trạng thái, chỉ là danh sách tính tự động.
 
