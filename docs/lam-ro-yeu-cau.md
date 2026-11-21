@@ -1,29 +1,45 @@
 # Làm rõ yêu cầu – PA Worker
 
-Ngày chốt: 21/11/2026 · Kết quả Phase 0 · Áp dụng cho `docs/yeu-cau.md` v1.0
+Ngày chốt: 21/11/2026 · Kết quả Phase 0 và rà thiết kế Phase 1 · Áp dụng cho `docs/yeu-cau.md` v1.0
 
-Tài liệu này ghi các quyết định trả lời câu hỏi Phase 0. `docs/yeu-cau.md` là bản khách hàng đã ký, **không sửa**. Khi tài liệu này khác `docs/yeu-cau.md` thì **theo tài liệu này**.
+Tài liệu này ghi các quyết định trả lời câu hỏi Phase 0 và các quyết định phát sinh khi thiết kế. `docs/yeu-cau.md` là bản khách hàng đã ký, **không sửa**. Khi tài liệu này khác `docs/yeu-cau.md` thì **theo tài liệu này**.
 
 Ký hiệu:
 - **[Đồng ý]**: theo đề xuất của đơn vị phát triển.
-- **[Sửa]**: khách hàng sửa đề xuất.
+- **[Sửa]**: người phụ trách dự án sửa đề xuất.
+- **[Nội bộ]**: quyết định nội bộ, chưa xác nhận với khách hàng.
 - **[Giả định]**: chưa có căn cứ chắc chắn, cần kiểm chứng khi triển khai thật.
+
+Các câu có [Sửa] hoặc [Nội bộ] được liệt kê ở mục E để xác nhận với khách hàng.
 
 ## A. Thiết kế dữ liệu
 
 ### 1. Mẫu che số CCCD [Đồng ý]
 Mẫu ở mục III (`0791•••••2345`) dài 13 ký tự, không khớp 12 chữ số. Chốt: hiện 4 số đầu, 4 dấu `•`, 4 số cuối, ví dụ `0791••••2345`. Mẫu này dùng chung cho màn hình, file Excel và bản in.
 
-### 2. Hủy hồ sơ hết hạn lưu trữ [Đồng ý]
+### 2. Hủy hồ sơ hết hạn lưu trữ [Đồng ý + Nội bộ]
 - Phần này nằm trong MVP.
 - "Hủy" ở mục VIII nghĩa là **ẩn danh hóa**, không xóa cứng bản ghi. Cụ thể:
   - Xóa dữ liệu cá nhân và tệp đính kèm.
   - Giữ bản ghi khung, mã hồ sơ, mã nhân viên và nhật ký thao tác.
+  - **[Nội bộ]** Trong nhật ký, giá trị trước/sau của các trường cá nhân nằm ở bảng riêng `AuditPersonalValue` (câu 30) và **bị xóa** khi ẩn danh hóa. Dòng nhật ký (ai, khi nào, hành động, trường nào thay đổi) **vẫn giữ**. Mỗi lần ẩn danh hóa ghi thêm một dòng nhật ký "Ẩn danh hóa".
 - Admin duyệt hủy từ danh sách hồ sơ hết hạn. Mỗi lần hủy sinh **biên bản hủy** (ai, khi nào, những hồ sơ nào) và ghi nhật ký.
 - Thời hạn lưu trữ theo mục VIII:
   - Ứng viên không đạt: 12 tháng kể từ ngày có kết quả.
   - Công nhân đã nghỉ: 10 năm kể từ ngày nghỉ.
   - Cả hai cấu hình được.
+- **[Nội bộ] Mọi hồ sơ Lưu trữ đều có ngày hết hạn lưu trữ tính được.** Căn cứ xét theo thứ tự trong bảng, gặp dòng đầu tiên khớp thì dùng:
+
+  | Căn cứ | Điều kiện | Mốc tính | Thời hạn |
+  | --- | --- | --- | --- |
+  | Công nhân đã nghỉ | Có mã NV và có ngày nghỉ việc | Ngày nghỉ việc | 10 năm |
+  | Công nhân lưu trữ khác | Có mã NV, không có ngày nghỉ việc | Ngày chuyển Lưu trữ | 10 năm |
+  | Ứng viên không được tuyển | Chưa có mã NV, lần ứng tuyển gần nhất Không đạt hoặc Ứng viên từ chối, có ngày kết quả | Ngày có kết quả | 12 tháng |
+  | Hồ sơ bị từ chối | Chưa có mã NV, chuyển Lưu trữ từ Bị từ chối | Ngày chuyển Lưu trữ | 12 tháng |
+  | Hồ sơ bỏ dở | Chưa có mã NV, tự Lưu trữ với lý do "Hồ sơ bỏ dở" (câu 9) | Ngày chuyển Lưu trữ | 12 tháng |
+  | Ứng viên lưu trữ khác | Mọi trường hợp còn lại | Ngày chuyển Lưu trữ | 12 tháng |
+
+  "Ngày chuyển Lưu trữ" lấy từ lần chuyển sang Lưu trữ gần nhất trong lịch sử trạng thái (luôn có, vì mọi lần chuyển trạng thái đều được ghi). "12 tháng" và "10 năm" là hai giá trị cấu hình ở trên. Phải có test chứng minh mọi hồ sơ Lưu trữ đều tính được ngày hết hạn.
 - "Chờ hủy" **không phải trạng thái mới**. Đây là danh sách tính tự động (hồ sơ Lưu trữ đã quá thời hạn). Hồ sơ vẫn ở trạng thái Lưu trữ.
 
 ### 3. Trạng thái xác minh tài liệu [Đồng ý]
@@ -61,7 +77,7 @@ Nút "Tiếp nhận vào làm" chỉ hiện, và máy chủ chỉ chấp nhận,
 - Người không được duyệt hoặc trả lại một lần gửi duyệt gồm: **người tạo hồ sơ** và **người gửi duyệt lần đó**.
 - Admin duyệt thay được. **[Giả định]** Nếu Admin chính là người tạo hoặc người gửi lần đó thì Admin cũng bị chặn.
 
-### 9. Chuyển trạng thái xác minh [Đồng ý + Sửa]
+### 9. Chuyển trạng thái xác minh [Đồng ý + Sửa + Nội bộ]
 
 | Từ | Sang | Ai | Ghi chú |
 | --- | --- | --- | --- |
@@ -69,18 +85,21 @@ Nút "Tiếp nhận vào làm" chỉ hiện, và máy chủ chỉ chấp nhận,
 | Chờ duyệt | Đã xác minh / Cần bổ sung / Bị từ chối | QL, Admin | Cần bổ sung, Bị từ chối bắt buộc ghi lý do; áp dụng câu 8 |
 | Cần bổ sung | Chờ duyệt | HR, QL, Admin | Sau khi bổ sung |
 | Đã xác minh | Chờ duyệt | Tự động | Khi sửa họ tên, ngày sinh hoặc số CCCD |
-| Bị từ chối | Lưu trữ | HR, QL, Admin | Chỉ được chuyển sang Lưu trữ |
+| Bị từ chối | Lưu trữ | HR, QL, Admin; hoặc tự động | Chỉ được chuyển sang Lưu trữ |
 | Nháp, Cần bổ sung | Lưu trữ | HR, QL, Admin; hoặc tự động | Có hộp xác nhận |
 | Đã xác minh | Lưu trữ | QL, Admin; hoặc tự động | Có hộp xác nhận, **bắt buộc ghi lý do**. Máy chủ **chặn** khi trạng thái làm việc là Thử việc hoặc Đang làm việc |
 | Lưu trữ | Nháp | HR, QL, Admin | "Mở lại hồ sơ" (câu 6) |
 
-- **Chuyển Lưu trữ thủ công** [Sửa – quyết định nội bộ ngày 21/11/2026, chưa xác nhận với khách hàng]: HR chỉ chuyển Lưu trữ khi hồ sơ ở Nháp hoặc Cần bổ sung (hoặc Bị từ chối). HR **không** chuyển Lưu trữ hồ sơ Đã xác minh. Hai quy tắc tự động Lưu trữ bên dưới không bị ảnh hưởng, vì chỉ áp dụng cho hồ sơ Đã nghỉ việc hoặc chưa có mã NV.
+- **[Nội bộ] Chuyển Lưu trữ thủ công:** HR chỉ chuyển Lưu trữ khi hồ sơ ở Nháp, Cần bổ sung hoặc Bị từ chối. HR **không** chuyển Lưu trữ hồ sơ Đã xác minh; việc này chỉ QL hoặc Admin làm, theo dòng tương ứng trong bảng.
 - **Chờ duyệt:** HR không sửa được hồ sơ. QL và Admin chỉ thao tác duyệt, trả lại hoặc từ chối.
 - **Lưu trữ:** chỉ xem.
-- **Tự động Lưu trữ** [Sửa]: một tác vụ chạy hằng ngày, mỗi lần chuyển đều ghi nhật ký (người thực hiện là "Hệ thống").
-  - Hồ sơ có trạng thái làm việc **Đã nghỉ việc**: tự Lưu trữ sau **30 ngày kể từ ngày nghỉ**, để HR còn bổ sung giấy tờ nghỉ việc.
-  - Hồ sơ **chưa có mã NV** mà lần ứng tuyển gần nhất là **Không đạt** hoặc **Ứng viên từ chối**: tự Lưu trữ sau **30 ngày kể từ ngày có kết quả**.
-  - Cả hai số ngày cấu hình được trong Cài đặt.
+- **Tự động Lưu trữ** [Sửa + Nội bộ]: một tác vụ chạy hằng ngày, mỗi lần chuyển đều ghi nhật ký (người thực hiện là "Hệ thống"). Bốn quy tắc:
+  1. [Sửa] Hồ sơ có trạng thái làm việc **Đã nghỉ việc**: tự Lưu trữ sau **30 ngày kể từ ngày nghỉ**, để HR còn bổ sung giấy tờ nghỉ việc.
+  2. [Sửa] Hồ sơ **chưa có mã NV** mà lần ứng tuyển gần nhất là **Không đạt** hoặc **Ứng viên từ chối**: tự Lưu trữ sau **30 ngày kể từ ngày có kết quả**.
+  3. [Nội bộ] Hồ sơ **Bị từ chối**: tự Lưu trữ sau **30 ngày kể từ ngày bị từ chối** (dùng chung số ngày với quy tắc 2).
+  4. [Nội bộ] Hồ sơ **Nháp** hoặc **Cần bổ sung** không có thay đổi nào trong **6 tháng** (`stale_draft_months = 6`): tự Lưu trữ, lý do "Hồ sơ bỏ dở". "Thay đổi" gồm sửa hồ sơ và dữ liệu con (giấy tờ, liên hệ, đồng ý, tài liệu, ứng tuyển).
+  - Số ngày (30, 30) và số tháng (6) cấu hình được trong Cài đặt.
+  - **[Nội bộ]** Tự động Lưu trữ không áp dụng cho hồ sơ có trạng thái làm việc Thử việc hoặc Đang làm việc (giống chặn thủ công ở bảng trên), vì hồ sơ nhập từ Excel có thể ở Nháp mà người đó vẫn đang làm.
 
 ### 10. Thêm tài liệu khi đã xác minh [Đồng ý]
 HR được **thêm** tài liệu mới khi hồ sơ ở Đã xác minh, và trạng thái hồ sơ không đổi. Việc **thay thế** tài liệu vẫn theo ma trận mục III: HR chỉ thay thế khi hồ sơ ở Nháp hoặc Cần bổ sung.
@@ -93,22 +112,23 @@ HR được **thêm** tài liệu mới khi hồ sơ ở Đã xác minh, và tr�
 - Số CCCD luôn hiện ở dạng che (câu 1).
 - Vai trò có quyền bấm **"Hiện số đầy đủ"** thì mới thấy số đầy đủ, và mỗi lần bấm ghi một dòng nhật ký. Ảnh CCCD áp dụng tương tự: mở xem hoặc tải xuống đều ghi nhật ký.
 
-### 13. Trường nhạy cảm ẩn với Viewer [Đồng ý]
+### 13. Trường nhạy cảm ẩn với Viewer [Đồng ý + Nội bộ]
 - **Viewer không thấy:**
   - Số CCCD (chỉ thấy dạng che)
   - Số CMND cũ
   - Địa chỉ thường trú/cư trú
   - Quê quán / nơi đăng ký khai sinh
   - Ảnh CCCD
+  - **[Nội bộ]** Mức lương mong muốn (trang Tuyển dụng, tab Tuyển dụng trong chi tiết hồ sơ, file xuất)
 - **Viewer vẫn thấy:** SĐT và nơi ở hiện tại.
 - **Viewer không** xem trước và không tải được tài liệu.
 
 ### 14. Trình độ học vấn [Đồng ý]
 EducationLevels là danh mục do Admin quản lý trong Cài đặt, có thứ tự cấp bậc. Bộ lọc và báo cáo theo trình độ lấy **trình độ cao nhất** của mỗi người.
 
-### 15. Vị trí làm việc [Đồng ý]
+### 15. Vị trí làm việc [Đồng ý + Nội bộ]
 - Thông tin làm việc lưu **Bộ phận** và **Tổ (không bắt buộc)**. **[Giả định]** Bộ phận là bắt buộc. Nếu có chọn Tổ thì Tổ phải thuộc Bộ phận đã chọn.
-- Dữ liệu mẫu (`seed_demo`) phải có phòng ban "Khối văn phòng" với bộ phận **"Văn phòng"** cho nhân viên khối văn phòng (vì Bộ phận bắt buộc), và có **ít nhất 1 tài khoản Quản lý nhân sự**. [Bổ sung – quyết định nội bộ ngày 21/11/2026, chưa xác nhận với khách hàng]
+- **[Nội bộ]** Dữ liệu mẫu (`seed_demo`) phải có phòng ban "Khối văn phòng" với bộ phận **"Văn phòng"** cho nhân viên khối văn phòng (vì Bộ phận bắt buộc), và có **ít nhất 1 tài khoản Quản lý nhân sự**.
 - Phòng ban suy ra từ Bộ phận.
 - "Người quản lý trực tiếp" liên kết tới một **hồ sơ công nhân khác**, không bắt buộc.
 
@@ -162,22 +182,92 @@ Phase 2 dùng giao diện tạm. Ở phase này, bước b của vòng lặp t�
 
 ## C. Quyết định bổ sung (Phase 1)
 
-Nguồn: **quyết định nội bộ ngày 21/11/2026, chưa xác nhận với khách hàng.**
-
-### 25. Kỹ năng
+### 25. Kỹ năng [Nội bộ]
 Kỹ năng lưu ở **một trường văn bản nhiều dòng "Kỹ năng"** trong hồ sơ, hiển thị ở tab Tuyển dụng & CV. Không thêm bảng riêng. Thao tác "Đưa vào trường…" ở màn hình CV (mục V) gán đoạn văn bản vào trường này.
 
-### 26. Nhóm tuổi
+### 26. Nhóm tuổi [Nội bộ]
 Câu 16 cho lưu người từ 15 đến dưới 18 tuổi, nên Dashboard và báo cáo dùng **5 nhóm tuổi**: Dưới 18 · 18–25 · 26–35 · 36–45 · Trên 45. Hồ sơ chưa có ngày sinh (Nháp) vào nhóm "Chưa có ngày sinh", để tổng các nhóm luôn bằng tổng hồ sơ.
 
-### 27. File Excel mẫu nhập hàng loạt
+### 27. File Excel mẫu nhập hàng loạt [Nội bộ]
 - File có 2 phần: **thông tin cá nhân** (bắt buộc) và **thông tin làm việc** (không bắt buộc).
 - Dòng **không có** thông tin làm việc: nhập như hồ sơ ứng viên, trạng thái Nháp, không có mã NV.
 - Dòng **có** thông tin làm việc (công nhân hiện hữu): nhận mã NV cũ từ file, phòng ban, bộ phận, tổ, chức danh, ca, ngày vào làm, trạng thái làm việc. Hồ sơ vào trạng thái Nháp và vẫn phải qua duyệt như bình thường.
-- **Quy tắc mã NV:** mã nhập từ file chỉ được nhận qua chức năng nhập Excel (Admin/QL), kiểm tra không trùng. Bộ sinh mã tự động tiếp tục từ số lớn nhất đã có để không bao giờ cấp trùng. Mã sai định dạng hoặc trùng thì báo lỗi dòng đó.
+- **Quy tắc mã NV:**
+  - Mã nhập từ file chỉ được nhận qua chức năng nhập Excel, phần thông tin làm việc (Admin/QL).
+  - Nhận **mọi mã cũ không trùng**, dài **tối đa 20 ký tự**, chỉ gồm **chữ, số và dấu gạch ngang**. Mã trùng (với hồ sơ đã có hoặc dòng khác trong cùng file) hoặc sai các điều kiện này thì báo lỗi dòng đó.
+  - Bộ đếm mã (`CodeSequence`) **chỉ được đẩy lên** khi mã cũ **khớp định dạng mã đang cấu hình** (ví dụ `CN-00456` khi cấu hình là `CN` + 5 chữ số): bộ đếm lấy số lớn hơn giữa số hiện tại và số của mã cũ. Mã cũ khác định dạng (ví dụ `NV2019-A12`) vẫn được nhận nhưng không ảnh hưởng bộ đếm.
+  - Bộ sinh mã tự động, **trước khi cấp**, kiểm tra mã sinh ra chưa tồn tại; nếu đã tồn tại thì tăng tiếp cho tới khi gặp mã chưa dùng. Nhờ vậy không bao giờ cấp trùng.
 - **Danh mục** (phòng ban, bộ phận, tổ, chức danh, ca) trong file phải khớp tên đã có trong hệ thống; không khớp thì báo lỗi dòng, không tự tạo danh mục mới.
 - Cách hiểu chi tiết:
   - HR vẫn dùng được nhập Excel cho dòng chỉ có thông tin cá nhân. Dòng có thông tin làm việc mà người nhập là HR thì báo lỗi dòng: "Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc."
   - Phòng ban ghi trong file phải khớp phòng ban của bộ phận; tổ (nếu có) phải thuộc bộ phận.
   - Trạng thái làm việc "Đã nghỉ việc" thì bắt buộc ngày nghỉ và lý do nghỉ.
 - Danh sách cột chi tiết ở `docs/thiet-ke/excel-mau.md`.
+
+## D. Quyết định bổ sung (rà thiết kế) [Nội bộ]
+
+### 28. Hai cơ chế khóa tài khoản [Nội bộ]
+| | Admin khóa | Khóa tạm do sai mật khẩu |
+| --- | --- | --- |
+| Lưu ở | `is_active = False` | `locked_until`, `failed_login_count` |
+| Khi nào | Admin bấm "Khóa tài khoản" | Lần sai thứ 5 liên tiếp |
+| Hết khóa | Chỉ khi Admin bấm "Mở khóa" (vô thời hạn) | Tự hết sau 15 phút, hoặc Admin bấm "Mở khóa" |
+| Nhật ký | Khóa / Mở khóa tài khoản | Lịch sử đăng nhập |
+
+"Mở khóa" của Admin bật lại `is_active`, đồng thời xóa `locked_until` và đặt `failed_login_count` về 0.
+
+### 29. Bảo vệ quyền quản trị [Nội bộ]
+- Admin không tự khóa và không tự đổi vai trò của chính mình.
+- Không ai được khóa hoặc hạ vai trò **Admin cuối cùng đang hoạt động** (vai trò Admin và chưa bị khóa).
+- Kiểm tra ở máy chủ, có test cho từng trường hợp.
+
+### 30. Nhật ký và dữ liệu cá nhân [Nội bộ]
+- Thêm bảng `AuditPersonalValue` (dòng nhật ký, hồ sơ, tên trường, giá trị cũ, giá trị mới); giá trị cũ/mới **mã hóa** như trường nhạy cảm.
+- Với trường cá nhân (họ tên, ngày sinh, giới tính, SĐT, email, nơi ở, giấy tờ, liên hệ khẩn cấp, ghi chú, kỹ năng, mức lương mong muốn…), dòng nhật ký chỉ ghi tên trường và "(xem giá trị chi tiết)"; giá trị trước/sau nằm ở `AuditPersonalValue`, chỉ Admin và QL xem (câu 11).
+- Nhật ký vẫn chỉ thêm, không sửa, không xóa. Ngoại lệ duy nhất: ẩn danh hóa (câu 2) xóa mọi `AuditPersonalValue` của hồ sơ đó và ghi một dòng nhật ký "Ẩn danh hóa".
+- Phần mô tả đối tượng của nhật ký và lý do do hệ thống tự điền **không chứa họ tên**, chỉ dùng mã hồ sơ. Ô lý do hiện gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"; không chặn lưu.
+
+### 31. Cất giữ khóa mã hóa [Nội bộ]
+- `FIELD_ENCRYPTION_KEY` (mã hóa) và `HASH_KEY` (băm) được sinh **một lần khi cài đặt** và nằm trong `.env`.
+- Hai khóa **không nằm trong file sao lưu**. Script sao lưu (Phase 8) nhắc người dùng cất bản sao khóa ở nơi riêng (USB hoặc giấy niêm phong). Mất khóa thì không đọc lại được dữ liệu đã mã hóa từ bản sao lưu.
+- Thiếu khóa hoặc khóa sai định dạng thì ứng dụng **từ chối khởi động** với thông báo rõ ràng bằng tiếng Việt.
+- **Giới hạn đã biết:** MVP không hỗ trợ đổi khóa.
+
+### 32. Tệp đính kèm hợp đồng [Nội bộ]
+Hợp đồng trỏ tới một tài liệu; nếu tài liệu đó đã bị thay thế, màn hình hợp đồng luôn hiển thị và mở **bản hiện hành** của chuỗi thay thế (đi theo các lần thay thế tới bản đang dùng).
+
+### 33. Thời hạn lưu trữ của "Ứng viên từ chối" [Nội bộ]
+Hồ sơ ứng viên có lần ứng tuyển gần nhất là "Ứng viên từ chối" dùng chung thời hạn lưu trữ 12 tháng với "Không đạt" (căn cứ "Ứng viên không được tuyển" ở câu 2), vì câu 9 đã gộp hai trường hợp này cho tự Lưu trữ.
+
+### 34. Ai đổi trạng thái xác minh tài liệu [Nội bộ]
+Chỉ QL và Admin đổi trạng thái xác minh tài liệu (theo mục II: "Quản lý đã đối chiếu với bản gốc"), kể cả khi hồ sơ đang Chờ duyệt.
+
+### 35. Hồ sơ Bị từ chối chỉ xem [Nội bộ]
+Hồ sơ Bị từ chối không sửa được; thao tác duy nhất là chuyển Lưu trữ (câu 9).
+
+### 36. Chờ duyệt chỉ khóa phần được duyệt [Nội bộ]
+Khi hồ sơ Chờ duyệt, chỉ khóa phần được duyệt: thông tin cá nhân, giấy tờ, liên hệ, đồng ý xử lý dữ liệu, tài liệu. Tab Tuyển dụng và Quá trình làm việc vẫn thao tác được vì ba bộ trạng thái độc lập. Hồ sơ Lưu trữ thì khóa toàn bộ.
+
+### 37. Giới tính [Nội bộ]
+Giới tính chỉ có hai giá trị Nam, Nữ, khớp thông tin trên CCCD.
+
+## E. Cần xác nhận với khách hàng
+
+Ưu tiên cao (ảnh hưởng trực tiếp tới dữ liệu của khách):
+1. **Hủy = ẩn danh hóa** (câu 2, 30): không xóa cứng; giữ mã và nhật ký, xóa dữ liệu cá nhân, tệp và giá trị cá nhân trong nhật ký. Kèm bảng căn cứ hạn lưu trữ (câu 2).
+2. **Tự Lưu trữ** (câu 9): 30 ngày sau nghỉ việc; 30 ngày sau kết quả Không đạt/Ứng viên từ chối; 30 ngày sau Bị từ chối; hồ sơ Nháp/Cần bổ sung bỏ dở 6 tháng.
+3. **Chặn nhập người dưới 15 tuổi** (câu 16); 15 đến dưới 18 chỉ cảnh báo.
+
+Các điểm khác:
+- Câu 5: Nháp chỉ cần họ tên + SĐT; điều kiện gửi duyệt; cảnh báo trùng theo SĐT, họ tên + ngày sinh.
+- Câu 9: HR không chuyển Lưu trữ hồ sơ Đã xác minh; QL/Admin chuyển phải ghi lý do, bị chặn khi Thử việc/Đang làm việc.
+- Câu 13: ẩn mức lương mong muốn với Viewer.
+- Câu 15: dữ liệu mẫu có bộ phận "Văn phòng" và ít nhất 1 tài khoản QL.
+- Câu 25: kỹ năng là một trường văn bản.
+- Câu 26: 5 nhóm tuổi (thêm Dưới 18) và nhóm "Chưa có ngày sinh".
+- Câu 27: file Excel 2 phần; nhận mã NV cũ (tối đa 20 ký tự, chữ/số/gạch ngang).
+- Câu 28: hai cơ chế khóa tài khoản.
+- Câu 29: bảo vệ Admin cuối cùng.
+- Câu 31: khóa mã hóa không nằm trong file sao lưu, phải cất riêng; chưa hỗ trợ đổi khóa.
+- Câu 32: hợp đồng hiển thị bản tài liệu hiện hành.
+- Câu 33–37: "Ứng viên từ chối" lưu 12 tháng; chỉ QL/Admin xác minh tài liệu; Bị từ chối chỉ xem; Chờ duyệt chỉ khóa phần được duyệt; giới tính Nam/Nữ.
