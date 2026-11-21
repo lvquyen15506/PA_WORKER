@@ -81,6 +81,16 @@ Nhãn trạng thái: nền màu nhạt (màu chính ở độ đậm 12%), chữ
 | Đỏ (danger) | Bị từ chối · Không đạt |
 | Xám (muted) | Nháp · Lưu trữ · Đã nghỉ việc · Ứng viên từ chối |
 
+**Trạng thái xác minh tài liệu** (bộ riêng, chỉ dùng trong tab Tài liệu, xem `docs/lam-ro-yeu-cau.md` câu 3), cùng kiểu nhãn:
+
+| Màu | Trạng thái tài liệu |
+| --- | --- |
+| Xám (muted) | Chưa xác minh |
+| Xanh lá (success) | Đã đối chiếu bản gốc |
+| Đỏ (danger) | Không hợp lệ |
+
+"Chờ hủy" **không** phải trạng thái, nên không có nhãn riêng. Tab "Chờ hủy" trong Cài đặt hiển thị nhãn Lưu trữ (xám) cùng cột "Hết hạn lưu trữ" (ngày dd/mm/yyyy).
+
 Ánh xạ này viết **một lần** trong một template tag/filter (ví dụ `{{ status|status_badge }}`), không lặp lại ở từng trang.
 
 ## 6. Icon

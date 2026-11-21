@@ -5,6 +5,7 @@ Web app quản lý hồ sơ công nhân cho doanh nghiệp sản xuất. Đơn v
 ## Nguồn sự thật
 
 - `docs/yeu-cau.md`: tài liệu yêu cầu **đã được khách hàng duyệt**. Mọi chức năng, trường dữ liệu, trạng thái, phân quyền và tiêu chí nghiệm thu lấy từ đây. Không tự thêm chức năng ngoài tài liệu; thấy chỗ mâu thuẫn hoặc chưa rõ thì **hỏi lại**, không đoán.
+- `docs/lam-ro-yeu-cau.md`: các quyết định làm rõ yêu cầu đã chốt với khách hàng (Phase 0). **Khi `docs/lam-ro-yeu-cau.md` khác `docs/yeu-cau.md` thì theo `docs/lam-ro-yeu-cau.md`.** Không sửa `docs/yeu-cau.md` (bản đã ký).
 - `docs/phases.md`: kế hoạch từng phase và điều kiện "xong".
 - `docs/tien-do.md`: nhật ký tiến độ. Cập nhật cuối mỗi phase (làm gì, còn gì, quyết định nào đã chốt).
 - Giao diện: **luôn dùng skill `pa-ui`** (`.claude/skills/pa-ui/SKILL.md`) khi tạo hoặc sửa bất kỳ template, CSS, trang, form, bảng, nút nào.
@@ -51,7 +52,8 @@ docker compose up -d --build                          # chạy hệ thống
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py seed_demo    # dữ liệu giả lập (tạo ở phase 2)
 docker compose exec web pytest
-docker compose exec web ruff check . && ruff format .
+docker compose exec web ruff check .
+docker compose exec web ruff format .
 docker compose logs -f web
 ```
 
@@ -67,7 +69,7 @@ docker compose logs -f web
 - **Tệp tải lên:** lưu ngoài thư mục public, tên ngẫu nhiên, kiểm tra định dạng thật của tệp, tối đa 10 MB, chỉ tải qua view có kiểm tra quyền.
 - **Bí mật:** SECRET_KEY, mật khẩu CSDL, khóa mã hóa chỉ nằm trong `.env`. Không commit `.env`.
 - **Không gọi dịch vụ ngoài Internet** trong chức năng bắt buộc. API OCR trả phí chỉ là tùy chọn, tắt mặc định.
-- **Trạng thái:** chỉ dùng đúng ba bộ trạng thái và ba chỉ số tự tính ở mục II của `docs/yeu-cau.md`. Khai báo bằng `TextChoices`, không viết chuỗi trạng thái rải rác.
+- **Trạng thái:** chỉ dùng đúng ba bộ trạng thái và ba chỉ số tự tính ở mục II của `docs/yeu-cau.md`, cộng bộ thứ tư **trạng thái xác minh tài liệu** (Chưa xác minh / Đã đối chiếu bản gốc / Không hợp lệ), bộ này chỉ dùng trong tab Tài liệu (`docs/lam-ro-yeu-cau.md` câu 3). Khai báo bằng `TextChoices`, không viết chuỗi trạng thái rải rác. "Chờ hủy" không phải trạng thái, chỉ là danh sách tính tự động.
 
 ## Kiểm thử
 
@@ -79,8 +81,8 @@ docker compose logs -f web
 
 Áp dụng cho mọi phase. Sau mỗi phần code (một tính năng, một trang, hoặc một nhóm model), tự chạy vòng lặp:
 
-a. **Logic:** chạy `docker compose exec web pytest` và `ruff check .`. Mỗi quy tắc nghiệp vụ mới phải có test (phân quyền đúng/sai vai trò, chuyển trạng thái, sinh mã, kiểm tra trùng, ghi audit log).
-b. **Giao diện:** dùng skill `webapp-testing` đăng nhập bằng từng tài khoản mẫu liên quan, mở các trang vừa làm, bấm thử các nút và form chính (cả trường hợp nhập sai), đọc lỗi console trình duyệt, chụp màn hình ở 1366x768 và 390x844 lưu vào `docs/screenshots/<phase>/`. Đối chiếu với checklist mục 10 của skill `pa-ui` và với trang `/ui-kit` (khi đã có).
+a. **Logic:** chạy `docker compose exec web pytest` và `docker compose exec web ruff check .`. Mỗi quy tắc nghiệp vụ mới phải có test (phân quyền đúng/sai vai trò, chuyển trạng thái, sinh mã, kiểm tra trùng, ghi audit log).
+b. **Giao diện:** dùng skill `webapp-testing` đăng nhập bằng từng tài khoản mẫu liên quan, mở các trang vừa làm, bấm thử các nút và form chính (cả trường hợp nhập sai), đọc lỗi console trình duyệt, chụp màn hình ở 1366x768 và 390x844 lưu vào `docs/screenshots/<phase>/`. Đối chiếu với checklist mục 10 của skill `pa-ui` và với trang `/ui-kit` (khi đã có). Riêng Phase 2 (giao diện tạm) chỉ cần đăng nhập, mở trang, thử form, đọc lỗi console và chụp màn hình; checklist pa-ui áp dụng từ Phase 3.
 c. **Nếu có lỗi:** tìm nguyên nhân gốc, sửa, rồi chạy lại cả a và b. Lặp tối đa 3 lần cho cùng một lỗi; quá 3 lần thì dừng và báo: lỗi gì, đã thử gì, đề xuất hướng xử lý.
 d. **Cấm** để test "xanh" bằng cách: xóa hoặc nới test, thêm skip, bắt ngoại lệ rồi bỏ qua, sửa dữ liệu mong đợi cho khớp kết quả sai, đổi giao diện chuẩn `/ui-kit` hoặc quy tắc `pa-ui`.
 e. Chỉ khi a và b đều đạt mới commit (thông điệp tiếng Việt, mô tả việc đã làm) và push lên `origin`.

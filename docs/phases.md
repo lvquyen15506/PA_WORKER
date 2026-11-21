@@ -32,9 +32,14 @@ Phase 1. Thiết kế, chưa viết code ứng dụng:
 - docs/thiet-ke/erd.md: sơ đồ ERD bằng Mermaid, đủ các bảng ở mục VI của yêu cầu, ghi khóa chính, khóa ngoại, ràng buộc duy nhất, trường mã hóa.
 - docs/thiet-ke/models.md: danh sách model Django theo từng app (theo cấu trúc trong CLAUDE.md), trường, kiểu, bắt buộc, TextChoices cho trạng thái.
 - docs/thiet-ke/trang.md: danh sách URL và trang, vai trò nào vào được, component pa-ui nào dùng.
+- docs/thiet-ke/kien-truc.md: sơ đồ kiến trúc (Mermaid): container web/db, volume, các app Django, luồng nhận diện CCCD/CV offline.
+- docs/thiet-ke/phac-thao-trang.md: phác thảo bố cục 12 trang ở mục VII (khung chữ/ASCII, chỉ dùng component pa-ui) và 4 trang phụ ở câu 19 của docs/lam-ro-yeu-cau.md.
+- docs/thiet-ke/mau-dong-y.md: nháp mẫu văn bản đồng ý xử lý dữ liệu cá nhân (để in).
+- docs/thiet-ke/excel-mau.md: danh sách cột file Excel mẫu nhập hàng loạt (tên cột, bắt buộc, định dạng, ví dụ giả).
+Áp dụng mọi quyết định trong docs/lam-ro-yeu-cau.md.
 Dừng lại cho tôi duyệt.
 ```
-**Xong khi:** bạn duyệt ERD và danh sách trang.
+**Xong khi:** bạn duyệt ERD, sơ đồ kiến trúc, danh sách và phác thảo trang, mẫu văn bản đồng ý, cột Excel mẫu.
 
 ## Phase 2 – Nền tảng và Docker
 
@@ -51,6 +56,7 @@ Phase 2 theo docs/phases.md và thiết kế đã duyệt ở docs/thiet-ke/:
 - Test cho phân quyền, khóa tài khoản, sinh mã, mã hóa.
 Giao diện tạm thời tối giản, phase 3 mới làm giao diện chuẩn.
 ```
+Kiểm tra giao diện ở phase này (bước b của vòng lặp tự kiểm thử) được nới: chỉ đăng nhập, mở trang, thử form, đọc lỗi console, chụp màn hình; chưa áp checklist pa-ui (câu 24 của docs/lam-ro-yeu-cau.md).
 **Xong khi:** `docker compose up` chạy trên máy sạch; 4 tài khoản mẫu đăng nhập được; test đạt. (Kịch bản nghiệm thu 1, 15)
 
 ## Phase 3 – Bộ giao diện mẫu (quan trọng nhất cho UI đồng bộ)
