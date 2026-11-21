@@ -8,6 +8,7 @@
 | 21/11/2026 | Web app chạy cục bộ; Python 3.12 + Django 5.2 LTS + PostgreSQL 16; triển khai bằng Docker Compose |
 | 21/11/2026 | Giao diện theo skill `pa-ui`: navy/xanh dương/trắng, Bootstrap 5, một bộ icon, không màu mè |
 | 21/11/2026 | Chốt 24 câu làm rõ yêu cầu ở Phase 0 (che CCCD, ẩn danh hóa khi hủy, bộ trạng thái tài liệu, Nháp chỉ cần họ tên + SĐT, tự Lưu trữ sau 30 ngày, tuổi < 15 chặn, cấu hình QR trong Cài đặt…), chi tiết ở `docs/lam-ro-yeu-cau.md`; tài liệu này ưu tiên hơn `docs/yeu-cau.md` khi khác nhau |
+| 21/11/2026 | Quyết định nội bộ, chưa xác nhận với khách hàng: câu 9 – HR chỉ chuyển Lưu trữ từ Nháp/Cần bổ sung, hồ sơ Đã xác minh chỉ QL/Admin chuyển Lưu trữ (bắt buộc lý do, chặn khi Thử việc/Đang làm việc); câu 15 – dữ liệu mẫu có bộ phận "Văn phòng" và ít nhất 1 tài khoản QL; câu 25 – kỹ năng là trường văn bản; câu 26 – 5 nhóm tuổi (thêm Dưới 18); câu 27 – file Excel mẫu 2 phần (cá nhân + làm việc, nhận mã NV cũ qua Admin/QL) |
 
 ## Nhật ký phase
 

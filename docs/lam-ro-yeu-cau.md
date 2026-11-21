@@ -70,9 +70,11 @@ Nút "Tiếp nhận vào làm" chỉ hiện, và máy chủ chỉ chấp nhận,
 | Cần bổ sung | Chờ duyệt | HR, QL, Admin | Sau khi bổ sung |
 | Đã xác minh | Chờ duyệt | Tự động | Khi sửa họ tên, ngày sinh hoặc số CCCD |
 | Bị từ chối | Lưu trữ | HR, QL, Admin | Chỉ được chuyển sang Lưu trữ |
-| Nháp, Cần bổ sung, Đã xác minh | Lưu trữ | HR, QL, Admin; hoặc tự động | Có hộp xác nhận. **[Giả định]** Được chuyển thủ công từ ba trạng thái này |
+| Nháp, Cần bổ sung | Lưu trữ | HR, QL, Admin; hoặc tự động | Có hộp xác nhận |
+| Đã xác minh | Lưu trữ | QL, Admin; hoặc tự động | Có hộp xác nhận, **bắt buộc ghi lý do**. Máy chủ **chặn** khi trạng thái làm việc là Thử việc hoặc Đang làm việc |
 | Lưu trữ | Nháp | HR, QL, Admin | "Mở lại hồ sơ" (câu 6) |
 
+- **Chuyển Lưu trữ thủ công** [Sửa – quyết định nội bộ ngày 21/11/2026, chưa xác nhận với khách hàng]: HR chỉ chuyển Lưu trữ khi hồ sơ ở Nháp hoặc Cần bổ sung (hoặc Bị từ chối). HR **không** chuyển Lưu trữ hồ sơ Đã xác minh. Hai quy tắc tự động Lưu trữ bên dưới không bị ảnh hưởng, vì chỉ áp dụng cho hồ sơ Đã nghỉ việc hoặc chưa có mã NV.
 - **Chờ duyệt:** HR không sửa được hồ sơ. QL và Admin chỉ thao tác duyệt, trả lại hoặc từ chối.
 - **Lưu trữ:** chỉ xem.
 - **Tự động Lưu trữ** [Sửa]: một tác vụ chạy hằng ngày, mỗi lần chuyển đều ghi nhật ký (người thực hiện là "Hệ thống").
@@ -106,6 +108,7 @@ EducationLevels là danh mục do Admin quản lý trong Cài đặt, có thứ 
 
 ### 15. Vị trí làm việc [Đồng ý]
 - Thông tin làm việc lưu **Bộ phận** và **Tổ (không bắt buộc)**. **[Giả định]** Bộ phận là bắt buộc. Nếu có chọn Tổ thì Tổ phải thuộc Bộ phận đã chọn.
+- Dữ liệu mẫu (`seed_demo`) phải có phòng ban "Khối văn phòng" với bộ phận **"Văn phòng"** cho nhân viên khối văn phòng (vì Bộ phận bắt buộc), và có **ít nhất 1 tài khoản Quản lý nhân sự**. [Bổ sung – quyết định nội bộ ngày 21/11/2026, chưa xác nhận với khách hàng]
 - Phòng ban suy ra từ Bộ phận.
 - "Người quản lý trực tiếp" liên kết tới một **hồ sơ công nhân khác**, không bắt buộc.
 
@@ -156,3 +159,25 @@ Cả `ruff check` và `ruff format` đều chạy trong container `web` (đã s�
 
 ### 24. Kiểm tra giao diện ở Phase 2 [Đồng ý]
 Phase 2 dùng giao diện tạm. Ở phase này, bước b của vòng lặp tự kiểm thử chỉ gồm: đăng nhập, mở trang, thử form, đọc lỗi console và chụp màn hình. Checklist mục 10 của skill `pa-ui` áp dụng đầy đủ từ Phase 3.
+
+## C. Quyết định bổ sung (Phase 1)
+
+Nguồn: **quyết định nội bộ ngày 21/11/2026, chưa xác nhận với khách hàng.**
+
+### 25. Kỹ năng
+Kỹ năng lưu ở **một trường văn bản nhiều dòng "Kỹ năng"** trong hồ sơ, hiển thị ở tab Tuyển dụng & CV. Không thêm bảng riêng. Thao tác "Đưa vào trường…" ở màn hình CV (mục V) gán đoạn văn bản vào trường này.
+
+### 26. Nhóm tuổi
+Câu 16 cho lưu người từ 15 đến dưới 18 tuổi, nên Dashboard và báo cáo dùng **5 nhóm tuổi**: Dưới 18 · 18–25 · 26–35 · 36–45 · Trên 45. Hồ sơ chưa có ngày sinh (Nháp) vào nhóm "Chưa có ngày sinh", để tổng các nhóm luôn bằng tổng hồ sơ.
+
+### 27. File Excel mẫu nhập hàng loạt
+- File có 2 phần: **thông tin cá nhân** (bắt buộc) và **thông tin làm việc** (không bắt buộc).
+- Dòng **không có** thông tin làm việc: nhập như hồ sơ ứng viên, trạng thái Nháp, không có mã NV.
+- Dòng **có** thông tin làm việc (công nhân hiện hữu): nhận mã NV cũ từ file, phòng ban, bộ phận, tổ, chức danh, ca, ngày vào làm, trạng thái làm việc. Hồ sơ vào trạng thái Nháp và vẫn phải qua duyệt như bình thường.
+- **Quy tắc mã NV:** mã nhập từ file chỉ được nhận qua chức năng nhập Excel (Admin/QL), kiểm tra không trùng. Bộ sinh mã tự động tiếp tục từ số lớn nhất đã có để không bao giờ cấp trùng. Mã sai định dạng hoặc trùng thì báo lỗi dòng đó.
+- **Danh mục** (phòng ban, bộ phận, tổ, chức danh, ca) trong file phải khớp tên đã có trong hệ thống; không khớp thì báo lỗi dòng, không tự tạo danh mục mới.
+- Cách hiểu chi tiết:
+  - HR vẫn dùng được nhập Excel cho dòng chỉ có thông tin cá nhân. Dòng có thông tin làm việc mà người nhập là HR thì báo lỗi dòng: "Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc."
+  - Phòng ban ghi trong file phải khớp phòng ban của bộ phận; tổ (nếu có) phải thuộc bộ phận.
+  - Trạng thái làm việc "Đã nghỉ việc" thì bắt buộc ngày nghỉ và lý do nghỉ.
+- Danh sách cột chi tiết ở `docs/thiet-ke/excel-mau.md`.
