@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+db.sqlite3
+media/
+staticfiles/
+backups/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+Thumbs.db
+.claude/settings.local.json
