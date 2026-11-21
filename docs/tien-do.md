@@ -15,7 +15,7 @@
 | Phase | Trạng thái | Ngày xong | Ghi chú |
 | --- | --- | --- | --- |
 | 0. Khởi động | Xong | 21/11/2026 | Cài skill webapp-testing + Playwright (Python 3.12 64-bit); thêm vòng lặp tự kiểm thử vào CLAUDE.md; tóm tắt yêu cầu, chốt 24 câu hỏi vào `docs/lam-ro-yeu-cau.md` |
-| 1. Thiết kế | Chưa làm | | |
+| 1. Thiết kế | Đang làm | | Xong 3/7 file, đã rà và đồng bộ với `lam-ro-yeu-cau.md` câu 1–37: `docs/thiet-ke/erd.md` (34 bảng, 5 sơ đồ Mermaid đã kiểm tra cú pháp bằng parser của mermaid 11.4.1), `models.md` (34 model, TextChoices, quy tắc nghiệp vụ), `trang.md` (URL, quyền, component, ánh xạ 17 kịch bản nghiệm thu). CLAUDE.md cập nhật theo thiết kế. Không có code nên chưa chạy pytest/ruff/chụp màn hình |
 | 2. Nền tảng + Docker | Chưa làm | | |
 | 3. Bộ giao diện mẫu | Chưa làm | | |
 | 4. Hồ sơ + tài liệu | Chưa làm | | |
@@ -26,4 +26,5 @@
 
 ## Việc còn tồn
 
-- (trống)
+- Phase 1 còn 4 file chưa viết: `docs/thiet-ke/kien-truc.md` (gồm mục cất giữ khóa mã hóa, câu 31), `phac-thao-trang.md`, `mau-dong-y.md`, `excel-mau.md`. CLAUDE.md đã tham chiếu `kien-truc.md` như thiết kế đã duyệt, nên phải viết và duyệt file này trước Phase 2.
+- Xác nhận với khách hàng các câu [Sửa]/[Nội bộ] ở mục E của `docs/lam-ro-yeu-cau.md` (ưu tiên: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi).
