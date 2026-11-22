@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Nhập từ CCCD và CV{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Nhập từ CCCD và CV" breadcrumbs=crumbs %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% include "components/_alert.html" with kind="info" text="Ảnh và kết quả nhận diện bị xóa sau 24 giờ nếu chưa lưu hồ sơ." %}
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-xl-8">
+    {% include "components/_form_section.html" with title="Tải tệp (ít nhất một)" fields=form.visible_fields %}
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="/ho-so/them/">Hủy</a>
+      <button class="btn btn-primary" type="submit">Nhận diện</button>
+    </div>
+  </div></div>
+</form>
+{% endblock %}

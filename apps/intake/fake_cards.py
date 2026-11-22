@@ -216,14 +216,15 @@ def _degrade(image, quality):
     return image
 
 
-def generate_cards(out_dir, qr_formats, seed=2026):
+def generate_cards(out_dir, qr_formats, seed=2026, offset=0):
     """Sinh 15 thẻ × 2 mặt vào `out_dir`, kèm truth.json. `qr_formats`: {mã mẫu thẻ: QrFormat}.
     Trả danh sách mô tả thẻ."""
     rng = random.Random(seed)
     os.makedirs(out_dir, exist_ok=True)
     cards = []
     for index, (doc_type, quality) in enumerate(PLAN, start=1):
-        values = _make_values(rng, index, doc_type)
+        # offset: dịch số CCCD giả (999 + 9 chữ số) để mỗi lần chạy nghiệm thu có số không trùng.
+        values = _make_values(rng, index + offset, doc_type)
         layout = _SIDES[doc_type]
         qr_payload, qr_fields = None, []
         if layout["qr_side"]:

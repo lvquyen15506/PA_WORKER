@@ -56,6 +56,53 @@
       });
       update();
     }
+
+    // Nhãn nguồn: ô có giá trị máy đọc (data-pa-orig) bị sửa thì nhãn đổi thành "Nhập tay"
+    document.querySelectorAll("[data-pa-orig]").forEach(function (el) {
+      var tag = document.querySelector("label[for='" + el.id + "'] .pa-source");
+      if (!tag) return;
+      var original = tag.textContent;
+      var refresh = function () {
+        tag.textContent = el.value.trim() === el.dataset.paOrig.trim() ? original : "Nhập tay";
+      };
+      el.addEventListener("input", refresh);
+      el.addEventListener("change", refresh);
+    });
+
+    // "Đưa vào trường…": đưa đoạn chữ HR đang bôi đen trong văn bản CV (hoặc giá trị gợi ý) vào ô đích
+    function putInto(targetId, text, clean) {
+      var target = document.getElementById(targetId);
+      if (!target || !text) return false;
+      if (clean === "phone") text = text.replace(/[\s.\-]/g, "");
+      if (target.tagName === "TEXTAREA" && target.value.trim()) {
+        target.value = target.value.replace(/\s+$/, "") + "\n" + text;
+      } else {
+        target.value = text;
+      }
+      target.dispatchEvent(new Event("input", { bubbles: true }));
+      target.dispatchEvent(new Event("change", { bubbles: true }));
+      return true;
+    }
+    var cvText = document.getElementById("id_cv_text");
+    var cvMessage = document.querySelector("[data-pa-cv-message]");
+    document.querySelectorAll("[data-pa-insert-selection]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var selected = cvText
+          ? cvText.value.substring(cvText.selectionStart, cvText.selectionEnd).trim()
+          : "";
+        var done = putInto(btn.dataset.paInsertSelection, selected, btn.dataset.paClean);
+        if (cvMessage) {
+          cvMessage.textContent = done
+            ? "Đã đưa đoạn chữ vào ô " + btn.textContent.trim() + ". Kiểm tra và sửa lại nếu cần."
+            : "Hãy bôi đen một đoạn trong văn bản CV trước khi chọn Đưa vào trường…";
+        }
+      });
+    });
+    document.querySelectorAll("[data-pa-insert-value]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        putInto(btn.dataset.paTarget, btn.dataset.paInsertValue, "");
+      });
+    });
   });
 
   // HTMX gửi kèm CSRF token

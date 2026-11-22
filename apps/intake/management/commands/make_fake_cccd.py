@@ -29,12 +29,17 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--out", default="tests/fixtures/cccd", help="Thư mục ảnh thẻ.")
         parser.add_argument("--cv", default="", help="Thư mục CV giả (bỏ trống thì không sinh CV).")
+        parser.add_argument(
+            "--offset", type=int, default=0, help="Dịch số CCCD giả để không trùng lần chạy trước."
+        )
 
     def handle(self, *args, **options):
         formats = {q.id_doc_type: q for q in QrFormat.objects.all()}
         if not formats:
             raise CommandError("Chưa có cấu hình QR trong cơ sở dữ liệu.")
-        cards = fake_cards.generate_cards(options["out"], formats)
+        if not 0 <= options["offset"] < 900_000_000:
+            raise CommandError("--offset phải từ 0 đến dưới 900000000.")
+        cards = fake_cards.generate_cards(options["out"], formats, offset=options["offset"])
         with open(os.path.join(options["out"], "README.md"), "w", encoding="utf-8") as handle:
             handle.write(README)
         self.stdout.write(

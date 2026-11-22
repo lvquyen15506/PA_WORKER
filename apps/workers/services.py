@@ -13,14 +13,20 @@ from django.utils import timezone
 
 from apps.audit.personal_fields import attr_name
 from apps.audit.services import log
-from apps.core.choices import AuditAction, CodeType, ConsentMethod, VerificationStatus
+from apps.core.choices import (
+    AuditAction,
+    CodeType,
+    ConsentMethod,
+    FieldSource,
+    VerificationStatus,
+)
 from apps.core.codes import next_code
 from apps.core.models import ApplicationSource, DocumentType, Position
 from apps.core.storage import private_storage
 from apps.recruitment.models import Application
 
 from . import rules, workflow
-from .models import DataConsent, EmergencyContact, IdentityDocument, Worker
+from .models import DataConsent, EmergencyContact, IdentityDocument, IdentityFieldSource, Worker
 from .validation import (
     DRAFT,
     IDENTITY_FIELDS,
@@ -201,6 +207,7 @@ def update_worker(user, worker, data, contacts=None, *, request=None):
             changes = _apply_worker(locked, data)
             identity_changes = _apply_identity(user, locked, data, request)
             contact_changed = _sync_contacts(user, locked, rows, request) if rows else False
+            _mark_manual(locked, changes, identity_changes)
 
             touched_identity = [
                 IDENTITY_LABEL[name]
@@ -230,6 +237,20 @@ def update_worker(user, worker, data, contacts=None, *, request=None):
         if "id_number_hash" not in str(exc):
             raise
         raise WorkerDataError({"id_number": MSG_DUPLICATE}) from exc
+
+
+SOURCE_WORKER_FIELDS = ("full_name", "date_of_birth", "gender", "nationality")
+
+
+def _mark_manual(worker, changes, identity_changes):
+    """Trường do máy đọc (QR/OCR) mà bị sửa tay thì ghi nhận là Nhập tay và đã được người sửa
+    (models.md, IdentityFieldSource)."""
+    names = [n for n in changes if n in SOURCE_WORKER_FIELDS]
+    names += [f"identity.{n}" for n in identity_changes]
+    if names:
+        IdentityFieldSource.objects.filter(worker=worker, field_name__in=names).exclude(
+            source=FieldSource.MANUAL
+        ).update(source=FieldSource.MANUAL, edited_by_user=True)
 
 
 def _apply_worker(worker, data):

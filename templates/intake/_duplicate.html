@@ -1,0 +1,11 @@
+{% comment %}Kết quả kiểm tra trùng trên màn hình đối chiếu. Tham số: session, duplicate (hồ sơ đang giữ số CCCD trùng),
+   warnings, errors. "Mở hồ sơ cũ" là POST: đóng phiên, không tạo hồ sơ mới.{% endcomment %}
+{% for e in errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% if duplicate %}
+  {% include "components/_alert.html" with kind="danger" text="Số CCCD này đã có hồ sơ. Mở hồ sơ cũ để cập nhật, không tạo hồ sơ mới." %}
+  <form method="post" action="/nhap-cccd/{{ session.pk }}/mo-ho-so-cu/{{ duplicate.pk }}/" class="mb-3">
+    {% csrf_token %}
+    <button class="btn btn-outline-secondary" type="submit">Mở hồ sơ cũ</button>
+  </form>
+{% endif %}
+{% for w in warnings %}{% include "components/_alert.html" with kind="warning" text=w %}{% endfor %}

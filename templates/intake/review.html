@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load pa_tags %}
+{% block title %}Đối chiếu thông tin{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Đối chiếu thông tin" breadcrumbs=crumbs %}
+{% include "components/_alert.html" with kind="info" text="Kết quả nhận diện chưa được lưu. Kiểm tra từng trường trước khi lưu hồ sơ." %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% if form.errors or contacts.total_error_count or education.total_error_count or experience.total_error_count or certificates.total_error_count %}
+  {% include "components/_alert.html" with kind="danger" text="Có ô chưa đúng. Kiểm tra các ô báo lỗi bên dưới." %}
+{% endif %}
+{% for note in notes %}{% include "components/_alert.html" with kind="warning" text=note %}{% endfor %}
+{% if external_enabled %}
+  {% include "components/_alert.html" with kind="warning" text="API OCR bên ngoài đang bật nhưng chưa cấu hình nhà cung cấp nên chưa gửi ảnh đi đâu." %}
+{% endif %}
+<div id="duplicate-check">{% include "intake/_duplicate.html" with session=session duplicate=duplicate warnings=warnings %}</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    {% if has_front %}
+    <section class="pa-form-section">
+      <h2 class="pa-card-title">Ảnh mặt trước</h2>
+      <img class="img-fluid mb-3" src="/nhap-cccd/{{ session.pk }}/tep/mat-truoc/" alt="Ảnh mặt trước giấy tờ">
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="/nhap-cccd/{{ session.pk }}/tep/mat-truoc/" target="_blank" rel="noopener">Phóng to</a>
+        <form method="post" action="/nhap-cccd/{{ session.pk }}/xoay/mat-truoc/">{% csrf_token %}<button class="btn btn-outline-secondary btn-sm" type="submit">Xoay ảnh</button></form>
+      </div>
+    </section>
+    {% endif %}
+    {% if has_back %}
+    <section class="pa-form-section">
+      <h2 class="pa-card-title">Ảnh mặt sau</h2>
+      <img class="img-fluid mb-3" src="/nhap-cccd/{{ session.pk }}/tep/mat-sau/" alt="Ảnh mặt sau giấy tờ">
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="/nhap-cccd/{{ session.pk }}/tep/mat-sau/" target="_blank" rel="noopener">Phóng to</a>
+        <form method="post" action="/nhap-cccd/{{ session.pk }}/xoay/mat-sau/">{% csrf_token %}<button class="btn btn-outline-secondary btn-sm" type="submit">Xoay ảnh</button></form>
+      </div>
+    </section>
+    {% endif %}
+    {% if has_cv %}
+    <section class="pa-form-section">
+      <h2 class="pa-card-title">CV</h2>
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <a class="btn btn-outline-secondary btn-sm" href="/nhap-cccd/{{ session.pk }}/tep/cv/" target="_blank" rel="noopener">Xem CV</a>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Đưa vào trường…</button>
+          <ul class="dropdown-menu">
+            {% for label, target, clean in cv_targets %}
+            <li><button class="dropdown-item" type="button" data-pa-insert-selection="{{ target }}"{% if clean %} data-pa-clean="{{ clean }}"{% endif %}>{{ label }}</button></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <p class="pa-small pa-muted" data-pa-cv-message>Bôi đen một đoạn trong văn bản CV rồi chọn Đưa vào trường…</p>
+      {% include "components/_form_field.html" with field=cv_form.cv_text %}
+      {% if cv_hints.phones or cv_hints.emails or cv_hints.sections.skills %}
+      <div class="mt-3">
+        <div class="pa-view-label">Gợi ý tìm thấy trong CV (chưa điền vào hồ sơ)</div>
+        <div class="d-flex flex-wrap gap-2 mt-1">
+          {% for phone in cv_hints.phones %}<button class="btn btn-outline-secondary btn-sm" type="button" data-pa-insert-value="{{ phone }}" data-pa-target="id_phone">Số điện thoại {{ phone }}</button>{% endfor %}
+          {% for mail in cv_hints.emails %}<button class="btn btn-outline-secondary btn-sm" type="button" data-pa-insert-value="{{ mail }}" data-pa-target="id_email">Email {{ mail }}</button>{% endfor %}
+          {% if cv_hints.sections.skills %}<button class="btn btn-outline-secondary btn-sm" type="button" data-pa-insert-value="{{ cv_hints.sections.skills }}" data-pa-target="id_skills">Kỹ năng ghi trong CV</button>{% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-6">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for title, fields in form.sections %}
+        {% include "components/_form_section.html" with title=title fields=fields meta=meta %}
+      {% endfor %}
+      {{ contacts.management_form }}
+      {% for title, fields, cform in contact_sections %}
+        {{ cform.id }}
+        {% include "components/_form_section.html" with title=title fields=fields meta=None %}
+      {% endfor %}
+      {{ education.management_form }}
+      {% for title, fields in education_sections %}{% include "components/_form_section.html" with title=title fields=fields meta=None %}{% endfor %}
+      {{ experience.management_form }}
+      {% for title, fields in experience_sections %}{% include "components/_form_section.html" with title=title fields=fields meta=None %}{% endfor %}
+      {{ certificates.management_form }}
+      {% for title, fields in certificate_sections %}{% include "components/_form_section.html" with title=title fields=fields meta=None %}{% endfor %}
+      <div class="pa-form-actions">
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#cancel-session">Hủy phiên</button>
+        <button class="btn btn-primary" type="submit" data-pa-gate{% if has_low %} disabled title="Cần tích Đã kiểm tra cho các trường tô vàng"{% endif %}>Lưu hồ sơ</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% include "components/_confirm_modal.html" with id="cancel-session" title="Hủy phiên nhận diện" message="Ảnh và kết quả nhận diện sẽ bị xóa ngay và không khôi phục được." action=cancel_action confirm_label="Hủy phiên" danger=True %}
+{% endblock %}
