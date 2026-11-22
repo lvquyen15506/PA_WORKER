@@ -156,6 +156,10 @@ MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 # Đăng nhập, phiên (ngưỡng cố định theo yêu cầu).
 LOGIN_URL = "/dang-nhap/"
 LOGIN_REDIRECT_URL = "/"
+# apps.accounts.services.end_sessions() đọc bảng Session nên phụ thuộc backend CSDL này.
+# Đổi SESSION_ENGINE thì phải sửa end_sessions() (nếu không, khóa tài khoản và đặt lại
+# mật khẩu sẽ không còn hủy được phiên đang đăng nhập).
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 30 * 60  # tự đăng xuất sau 30 phút không thao tác
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True

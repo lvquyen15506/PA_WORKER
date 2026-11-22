@@ -199,6 +199,7 @@ def reset_password(actor, target, *, request=None):
     target.set_password(temp)
     target.must_change_password = True
     target.save(update_fields=["password", "must_change_password"])
+    end_sessions(target)  # phiên đang đăng nhập bằng mật khẩu cũ phải bị hủy
     log(
         AuditAction.PASSWORD_RESET,
         user=actor,

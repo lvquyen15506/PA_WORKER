@@ -95,6 +95,22 @@ def test_khoa_tai_khoan_huy_phien_dang_nhap_mo_khoa_khong_song_lai():
     assert login(target).get("/").status_code == 200  # đăng nhập mới vẫn được
 
 
+def test_dat_lai_mat_khau_huy_phien_dang_nhap_cu():
+    admin = make_user("ADMIN", username="ad")
+    target = make_user(username="nv1")
+    c_target = login(target)
+    assert c_target.get("/").status_code == 200
+    login(admin).post(f"/tai-khoan/{target.pk}/dat-lai-mat-khau/")
+    r = c_target.get("/")
+    assert r.status_code == 302 and r.url.startswith("/dang-nhap/")
+
+
+def test_session_engine_la_csdl_vi_end_sessions_phu_thuoc():
+    from django.conf import settings
+
+    assert settings.SESSION_ENGINE == "django.contrib.sessions.backends.db"
+
+
 def test_admin_khoa_va_mo_khoa_ghi_nhat_ky():
     admin = make_user("ADMIN", username="ad")
     target = make_user(username="nv1")
