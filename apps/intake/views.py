@@ -12,7 +12,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.accounts.permissions import role_required
-from apps.core.choices import RoleCode
+from apps.audit.services import log
+from apps.core.choices import AuditAction, RoleCode
 from apps.documents.http import safe_content_disposition
 from apps.documents.validators import FORMATS, INLINE_KINDS
 from apps.recruitment.services import RecruitmentDataError
@@ -214,6 +215,14 @@ def session_file(request, pk, slot):
     if kind is None:
         raise Http404
     mime = FORMATS[kind][0]
+    if session.created_by_id != request.user.pk:  # Admin mở phiên của người khác thì ghi nhật ký
+        log(
+            AuditAction.VIEW_FILE,
+            user=request.user,
+            obj=session,
+            note=f"Xem {services.SLOTS[slot][1].lower()} của phiên nhận diện do người khác tạo",
+            request=request,
+        )
     try:
         handle = stored.open("rb")
     except FileNotFoundError as exc:

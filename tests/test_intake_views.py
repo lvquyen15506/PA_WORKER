@@ -283,6 +283,30 @@ def test_tep_phien_xem_truc_tiep_voi_header_an_toan():
     assert pdf["Content-Type"] == "application/pdf"
 
 
+def test_nguoi_tao_tu_xem_tep_phien_khong_ghi_view_file():
+    user = make_user("HR_STAFF")
+    session = make_session(user, "01", cv=cv_upload("cv-mau.pdf"))
+    client = login_client(user)
+    for slot in ("mat-truoc", "mat-sau", "cv"):
+        assert client.get(f"/nhap-cccd/{session.pk}/tep/{slot}/").status_code == 200
+    assert not AuditLog.objects.filter(action="VIEW_FILE").exists()
+
+
+def test_admin_xem_tep_phien_nguoi_khac_ghi_view_file():
+    owner = make_user("HR_STAFF")
+    session = make_session(owner, "01")
+    admin = make_user("ADMIN")
+    assert login_client(admin).get(f"/nhap-cccd/{session.pk}/tep/mat-truoc/").status_code == 200
+    entry = AuditLog.objects.get(action="VIEW_FILE")
+    assert entry.user == admin and entry.object_type == "intake.IntakeSession"
+    assert entry.object_id == str(session.pk) and "mặt trước" in entry.note
+    assert "999" not in entry.note and entry.object_repr.startswith("Phiên nhận diện")
+    # người khác không phải Admin vẫn bị 404 và không ghi gì thêm
+    other = login_client(make_user("HR_MANAGER"))
+    assert other.get(f"/nhap-cccd/{session.pk}/tep/mat-truoc/").status_code == 404
+    assert AuditLog.objects.filter(action="VIEW_FILE").count() == 1
+
+
 def test_cv_docx_chi_cho_tai_xuong_va_khe_la_404():
     user = make_user("HR_STAFF")
     session = make_session(user, "01", cv=cv_upload())
