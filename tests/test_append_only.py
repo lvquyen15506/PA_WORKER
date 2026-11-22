@@ -6,6 +6,7 @@ from django.db import DatabaseError, connection, transaction
 from apps.accounts.models import LoginHistory, Role, User
 from apps.audit.models import AuditLog, AuditPersonalValue
 from apps.core.models_base import AppendOnlyError
+from tests.factories import make_worker
 
 
 @pytest.fixture
@@ -59,7 +60,11 @@ def test_trigger_postgres_chan_sql_tho(log):
 
 def test_personal_value_tao_duoc_ma_hoa_va_khong_sua(log):
     pv = AuditPersonalValue.objects.create(
-        audit_log=log, field_name="full_name", old_value_enc="Nguyễn Văn A", new_value_enc="Trần B"
+        audit_log=log,
+        worker=make_worker(),
+        field_name="full_name",
+        old_value_enc="Nguyễn Văn A",
+        new_value_enc="Trần B",
     )
     pv.refresh_from_db()
     assert (pv.old_value_enc, pv.new_value_enc) == ("Nguyễn Văn A", "Trần B")
@@ -75,14 +80,18 @@ def test_personal_value_tao_duoc_ma_hoa_va_khong_sua(log):
 
 
 def test_personal_value_update_sql_tho_bi_trigger_chan(log):
-    AuditPersonalValue.objects.create(audit_log=log, field_name="phone", new_value_enc="0900000000")
+    AuditPersonalValue.objects.create(
+        audit_log=log, worker=make_worker(), field_name="phone", new_value_enc="0900000000"
+    )
     with pytest.raises(DatabaseError), transaction.atomic():
         with connection.cursor() as cur:
             cur.execute("UPDATE audit_auditpersonalvalue SET field_name = 'x'")
 
 
 def test_personal_value_xoa_duoc_cho_an_danh_hoa(log):
-    AuditPersonalValue.objects.create(audit_log=log, field_name="phone", new_value_enc="0900000000")
+    AuditPersonalValue.objects.create(
+        audit_log=log, worker=make_worker(), field_name="phone", new_value_enc="0900000000"
+    )
     AuditPersonalValue.objects.all().delete()
     assert AuditPersonalValue.objects.count() == 0
     assert AuditLog.objects.count() == 1  # dòng nhật ký vẫn còn

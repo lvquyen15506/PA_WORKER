@@ -1,7 +1,6 @@
 """Nhật ký thao tác (docs/thiet-ke/models.md mục 3.2).
 
-Hai trường `worker` (FK tới workers.Worker) của AuditLog và AuditPersonalValue được thêm
-ở bước 3b, khi model Worker đã có.
+Trường `worker` (FK tới workers.Worker) được thêm ở migration 0003, sau khi model Worker có.
 """
 
 from django.db import models
@@ -30,6 +29,16 @@ class AuditLog(AppendOnlyModel):
     object_id = models.CharField("Mã đối tượng", max_length=50)
     # Mã hồ sơ, mã hợp đồng, loại tài liệu, tên báo cáo. KHÔNG chứa họ tên, số CCCD, tên tệp gốc.
     object_repr = models.CharField("Đối tượng", max_length=200)
+    # Hồ sơ liên quan, để lọc nhật ký theo hồ sơ.
+    worker = models.ForeignKey(
+        "workers.Worker",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+        db_index=True,
+        verbose_name="Hồ sơ",
+    )
     changes = models.JSONField("Thay đổi", default=dict, blank=True)
     ip_address = models.GenericIPAddressField("Địa chỉ IP", null=True, blank=True)
     note = models.TextField("Ghi chú", blank=True)
@@ -53,6 +62,10 @@ class AuditPersonalValue(AppendOnlyModel):
         on_delete=models.PROTECT,
         related_name="personal_values",
         verbose_name="Dòng nhật ký",
+    )
+    # Để xóa theo hồ sơ khi ẩn danh hóa.
+    worker = models.ForeignKey(
+        "workers.Worker", on_delete=models.PROTECT, related_name="+", db_index=True
     )
     field_name = models.CharField("Tên trường", max_length=80)
     old_value_enc = EncryptedTextField("Giá trị cũ", null=True, blank=True)

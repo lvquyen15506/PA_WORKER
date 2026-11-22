@@ -30,7 +30,8 @@ class User(AbstractUser):
     locked_until = models.DateTimeField("Khóa tạm đến", null=True, blank=True)
 
     def __str__(self):
-        return self.full_name or self.username
+        # Chỉ tên đăng nhập: __str__ có thể lọt vào nhật ký/log. Giao diện hiện full_name riêng.
+        return self.username
 
     @property
     def role_code(self):
