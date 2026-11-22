@@ -95,8 +95,11 @@ Trước tiên tạo bộ 15 ảnh CCCD giả (tests/fixtures/cccd/) có chữ "
 có QR giả cùng cấu trúc. Sau đó: kiểm tra chất lượng ảnh, đọc QR, OCR Tesseract cho trường còn thiếu,
 màn hình đối chiếu 2 cột với nhãn nguồn và ngưỡng tin cậy, không lưu khi chưa xác nhận, trích văn bản CV và
 gán vào trường bằng thao tác bôi đen. Viết script đo độ chính xác trên bộ ảnh giả và ghi kết quả vào docs/.
+Cài đặt (chỉ Admin): khung /cai-dat/ có tab và tab OCR/QR (/cai-dat/ocr-qr/): ngưỡng tin cậy OCR,
+QrFormat theo mẫu thẻ (thứ tự trường, ký tự phân cách, định dạng ngày), API OCR ngoài tắt mặc định
+(bật thì cảnh báo gửi ảnh ra ngoài). Mọi thay đổi ghi nhật ký.
 ```
-**Xong khi:** kịch bản 3, 4 đạt; có bảng độ chính xác.
+**Xong khi:** kịch bản 3, 4 đạt; có bảng độ chính xác; đổi cấu hình QR trên `/cai-dat/ocr-qr/` thì bộ tách trường dùng cấu hình mới mà không sửa code (câu 20).
 
 ## Phase 6 – Tuyển dụng và quá trình làm việc
 
@@ -105,8 +108,12 @@ Câu lệnh mẫu:
 Phase 6: mục IV.4 và IV.5 của yêu cầu. Ứng tuyển nhiều lần trên một hồ sơ, học vấn/kinh nghiệm/chứng chỉ,
 nút "Tiếp nhận vào làm" sinh mã nhân viên, thông tin làm việc hiện tại, lịch sử điều chuyển không ghi đè,
 hợp đồng và cảnh báo sắp hết hạn.
+Cài đặt (chỉ Admin, thêm tab vào khung /cai-dat/ của Phase 5): danh mục 9 loại (/cai-dat/danh-muc/<loai>/:
+thêm, sửa, ngừng/dùng lại, không xóa), quy tắc sinh mã (/cai-dat/sinh-ma/, xem trước mã kế tiếp),
+ngưỡng (/cai-dat/nguong/: sắp hết hạn, hạn lưu trữ, số ngày tự Lưu trữ, số tháng hồ sơ bỏ dở,
+thời hạn phiên nhận diện). Mọi thay đổi ghi nhật ký.
 ```
-**Xong khi:** kịch bản 8, 9, 10 đạt.
+**Xong khi:** kịch bản 8, 9, 10 đạt; đổi quy tắc sinh mã và ngưỡng sắp hết hạn trên giao diện thì có tác dụng ngay (mã đã cấp giữ nguyên).
 
 ## Phase 7 – Tra cứu, Dashboard, báo cáo
 
@@ -116,8 +123,11 @@ Phase 7: mục IV.2, IV.7, IV.8 của yêu cầu. Dashboard (thẻ số liệu b
 báo cáo theo thời gian và phòng ban, xuất Excel (che CCCD theo quyền, ghi nhật ký), in báo cáo,
 nhập hồ sơ từ file Excel mẫu có báo lỗi từng dòng, trang nhật ký thao tác có bộ lọc.
 Kiểm tra tốc độ với 500 hồ sơ (danh sách, lọc, tìm < 2 giây).
+Cài đặt (chỉ Admin): tab Chờ hủy (/cai-dat/cho-huy/: hồ sơ Lưu trữ quá hạn, cột căn cứ và ngày hết hạn,
+chọn nhiều rồi ẩn danh hóa qua hộp xác nhận) và Biên bản hủy (/cai-dat/bien-ban-huy/: danh sách, xem, in,
+ghi nhật ký PRINT). Dùng lại expired_queryset và anonymize đã làm ở Phase 4.
 ```
-**Xong khi:** kịch bản 11, 12, 13, 16 đạt.
+**Xong khi:** kịch bản 11, 12, 13, 16 đạt; ẩn danh hóa từ danh sách chờ hủy sinh biên bản đúng (câu 2).
 
 ## Phase 8 – Nghiệm thu và bàn giao
 

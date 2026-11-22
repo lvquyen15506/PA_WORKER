@@ -34,6 +34,7 @@
 - Khách hàng xác nhận mục E của `docs/lam-ro-yeu-cau.md` (5 điểm ưu tiên cao: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi, duyệt hồ sơ nhập Excel, ẩn danh hóa theo yêu cầu).
 - Pháp chế doanh nghiệp duyệt `docs/thiet-ke/mau-dong-y.md` (5 câu hỏi ở cuối file).
 - Cấu trúc QR CCCD là giả định (câu 20), cần kiểm chứng bằng thẻ thật tại chỗ khách khi triển khai.
+- Trang Cài đặt (trước đây chưa phase nào nhận) đã được giao trong `docs/phases.md` (22/11/2026): Phase 5 làm khung `/cai-dat/` và tab OCR/QR; Phase 6 làm danh mục, sinh mã, ngưỡng; Phase 7 làm Chờ hủy và Biên bản hủy (dùng `expired_queryset`, `anonymize` của Phase 4).
 - Phase 3: các mục sidebar chưa có trang (`/ho-so/`, `/tuyen-dung/`, `/cai-dat/`…) hiện trả 404 cho đến phase làm trang đó. `/ui-kit/` truy cập bằng URL, chưa có liên kết trong menu.
 - Cột bảng của Tuyển dụng (Phase 6), Duyệt hồ sơ (Phase 4), Nhật ký (Phase 7) là phỏng đoán, xem `phac-thao-trang.md`.
 - Phase 4: `auto_archive` trong `run_daily_jobs` mới là khung (trả 0), cần `workflow.transition`; `/ho-so/` chưa có nên "thấy ~500 hồ sơ" (kịch bản 1) hiện chỉ kiểm chứng bằng `seed_demo` và test đếm bản ghi.
