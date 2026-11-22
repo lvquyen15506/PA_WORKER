@@ -23,7 +23,7 @@ Phase 3 · Ngày 22/11/2026 · Dựa trên `docs/thiet-ke/trang.md` mục 2–5 
 - Hộp xác nhận mọi thao tác không hoàn tác được dùng `[_confirm_modal]`. Modal chỉ là giao diện: nút xác nhận gửi form POST có CSRF, máy chủ kiểm tra lại mọi trường.
 - Nút ẩn với vai trò không có quyền chỉ là phần phụ; máy chủ vẫn trả 403 (`trang.md` mục 1).
 - Ô trống trong bảng hiện "—"; ngày dd/mm/yyyy; cột Mã và Trạng thái không xuống dòng; cột Thao tác căn phải, tối đa 3 nút icon mỗi dòng.
-- Viewer không thấy: số CCCD đầy đủ (chỉ dạng che), CMND cũ, địa chỉ thường trú/cư trú, quê quán, ảnh CCCD, mức lương mong muốn.
+- Viewer không thấy: số CCCD đầy đủ (chỉ dạng che), CMND cũ, địa chỉ thường trú/cư trú, quê quán, ảnh CCCD. (Mức lương mong muốn: từ v1.1 Viewer cũng xem được, câu 48.)
 
 ## 1. Khung chung (`base.html`)
 
@@ -117,7 +117,7 @@ Mỗi biểu đồ có tiêu đề nói kết quả và đơn vị. Khối "Ch�
               (TT hồ sơ)(TT làm việc)(Thiếu giấy tờ)(Hoàn thiện)
               (Tiếp nhận từ)(đến)         [ Lọc ] [ Xóa lọc ]
 [_table]
- STT | Mã NV | Họ và tên | Ngày sinh | Giới tính | SĐT | Bộ phận | Chức danh |
+ STT | Mã NV | Họ và tên | Ngày sinh | Giới tính | SĐT | Công ty khách | Chức danh |   <- v1.1: cột "Bộ phận" đổi thành "Công ty khách" (đợt đang diễn ra, "—" nếu chưa có)
  Ngày vào làm | TT hồ sơ [_status_badge] | TT làm việc [_status_badge] | Thao tác
  ...                                   <bi-eye> <bi-pencil>{A,Q,H}
 [_pagination] Hiển thị 1–20 / 512
@@ -131,7 +131,7 @@ Mỗi biểu đồ có tiêu đề nói kết quả và đơn vị. Khối "Ch�
 - Bộ lọc thêm "Trạng thái tuyển dụng" (xét lần ứng tuyển gần nhất), "Hoàn thiện", khoảng ngày tiếp nhận; tham số URL tiếng Việt không dấu trùng với liên kết thẻ Dashboard.
 - Bộ lọc được giữ trong phiên, **trừ chữ tìm kiếm** (có thể là số CCCD, không lưu vào phiên); "Xóa lọc" là `?reset=1`.
 
-**v1.1:** thêm ô lọc "Công ty khách" (danh sách công ty và địa điểm, `_form_field` dạng chọn trong `_filter_bar`) và tham số `?dot_sap_du_han=1` từ Dashboard. **Không thêm cột** vào bảng (12 cột đã vừa khung 1366 px); công ty khách hiện ở tab Quá trình làm việc. Nếu khách muốn thấy cột "Công ty khách" ở danh sách thì phải bỏ hoặc gộp một cột (chờ quyết định).
+**v1.1 (quyết định 23/11/2026, câu 48):** thêm ô lọc "Công ty khách" (hiện "tên – địa điểm", `_form_field` dạng chọn trong `_filter_bar`) và tham số `?dot_sap_du_han=1` từ Dashboard; bộ lọc Bộ phận có thêm lựa chọn "Chưa có bộ phận". **Cột "Bộ phận" được thay bằng cột "Công ty khách"**, vẫn 12 cột nên vừa khung 1366 px; bộ phận nội bộ xem ở tab Quá trình làm việc.
 
 Ô tìm nhanh ở thanh trên gửi tới `?q=`. Viewer: không tìm theo CCCD, không có nút Xuất Excel, Thêm hồ sơ, Sửa.
 
@@ -179,12 +179,12 @@ Vẽ kỹ ở mục 3.
 [_filter_bar] (TT tuyển dụng)(Vị trí)(Nguồn)(Từ ngày)(đến)   [ Lọc ] [ Xóa lọc ]
 [Phỏng đoán – chốt ở Phase 6: cột và bộ lọc]
 [_table]
- Mã hồ sơ | Họ và tên | Vị trí | Nguồn | Ngày ứng tuyển | Mức lương mong muốn{A,Q,H} |
+ Mã hồ sơ | Họ và tên | Vị trí | Nguồn | Ngày ứng tuyển | Mức lương mong muốn |
  Trạng thái [_status_badge] | Thao tác <bi-eye> <bi-pencil>{A,Q,H}
 [_pagination]    ([_empty_state] khi trống)
 ```
 
-Viewer: không có cột Mức lương mong muốn.
+Viewer: thấy cột Mức lương mong muốn từ v1.1 (câu 48, bỏ ẩn ở câu 13).
 
 ### 2.8 Duyệt hồ sơ `/duyet-ho-so/` {A,Q}
 
@@ -334,7 +334,7 @@ Nút "Ẩn danh hóa" chỉ bật khi ô mã khớp (giao diện); máy chủ ki
 **Tab 2 – Tuyển dụng & CV (`tuyen-dung`)**
 
 ```
-[_table] Lần ứng tuyển:  Vị trí | Nguồn | Ngày | Mức lương mong muốn{A,Q,H} | TT tuyển dụng [_status_badge] | Thao tác
+[_table] Lần ứng tuyển:  Vị trí | Nguồn | Ngày | Mức lương mong muốn | TT tuyển dụng [_status_badge] | Thao tác
          [ Thêm lần ứng tuyển ]{A,Q,H}     [ Tiếp nhận ]{A,Q,H, chỉ khi Đạt + Đã xác minh}
 [_table] Học vấn      [ Thêm ]{A,Q,H}    cột: Trình độ | Trường | Ngành | Năm | Thao tác <pencil> [ Xóa ]
 [_table] Chứng chỉ    [ Thêm ]{A,Q,H}
@@ -348,22 +348,22 @@ Xóa dòng con qua `[_confirm_modal]` (dòng con là ngoại lệ được xóa,
 **Tab 3 – Quá trình làm việc (`lam-viec`)**
 
 ```
-[_form_section] Hiện tại (xem): Phòng ban, Bộ phận, Chức danh, Ca, Ngày vào làm, TT làm việc [_status_badge]
+[_form_section] Hiện tại (xem): Phòng ban, Bộ phận ("—" nếu chưa có, v1.1), Chức danh, Ca, Ngày vào làm, TT làm việc [_status_badge]
                                   [ Ghi nhận thay đổi ]{A,Q,H}
 [_form_section] Đợt làm việc hiện tại (v1.1, xem): Công ty khách | Địa điểm | Vị trí | Từ ngày | Đến ngày (trống = đang mở)
                 [_status_badge: Sắp hết hạn] khi sắp đủ 12 tháng              [ Thêm đợt làm việc ]{A,Q,H}
 [_table] Lịch sử đợt làm việc (v1.1): Công ty khách | Địa điểm | Vị trí | Từ ngày | Đến ngày | Ghi chú | <bi-pencil>{A,Q,H}
          (đợt mới nhất trước; không có nút xóa; [_empty_state] nếu chưa có đợt nào)
-[_form_section] Lương hiện tại (v1.1, xem, mọi vai trò): Lương tháng | Đơn giá tháng (tính cho công ty khách) | Áp dụng từ
-                                                       [ Ghi nhận thay đổi lương ]{A,Q}
-[_table] Lịch sử lương (v1.1): Ngày áp dụng | Lương tháng | Đơn giá tháng | Lý do | Người sửa | Ngày ghi
-         (mọi vai trò xem; chỉ thêm dòng, không có nút sửa/xóa; cột số căn phải, ô trống "—")
+[_form_section] Lương hiện tại của đợt hiện tại (v1.1, xem, mọi vai trò): Lương tháng | Đơn giá tháng (tính cho công ty khách) | Áp dụng từ
+                                                       [ Ghi nhận thay đổi lương ]{A,Q}  (thêm dòng cho một đợt)
+[_table] Lịch sử lương (v1.1, câu 48: mỗi đợt một chuỗi): Công ty khách (đợt) | Ngày áp dụng | Lương tháng | Đơn giá tháng | Lý do | Người sửa | Ngày ghi
+         (nhóm/sắp theo đợt, mới nhất trước; mọi vai trò xem; chỉ thêm dòng, không có nút sửa/xóa; cột số căn phải, ô trống "—")
 [_table] Lịch sử điều chuyển: Ngày hiệu lực | Thay đổi (từ → đến) | Số quyết định | Lý do
 [_table] Hợp đồng: Loại | Số HĐ | Từ ngày | Đến ngày [_status_badge: Sắp hết hạn nếu có] | Tệp (bản hiện hành) <bi-download>{A,Q,H} | <pencil>
          [ Thêm hợp đồng ]{A,Q,H}
 ```
 
-**Form v1.1 ở tab này** (cùng khuôn `[_form_section]` + `[_form_field]`, `[ Hủy ] [*Lưu*]`): *Thêm/sửa đợt làm việc* gồm Công ty khách * (chọn, hiện "tên – địa điểm"), Vị trí * (chọn từ Chức danh), Ngày bắt đầu *, Ngày kết thúc, Ghi chú; *Ghi nhận thay đổi lương* gồm Lương tháng *, Đơn giá tháng, Ngày áp dụng *, Lý do * (gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"). Lỗi chồng lấn ngày hoặc đang có đợt mở hiện bằng `_alert`/lỗi dưới ô. Chỉ dùng component đã duyệt ở `/ui-kit/`: `_form_section`, `_form_field`, `_table`, `_status_badge` (nhãn "Sắp hết hạn" sẵn có), `_alert`, `_empty_state`; không thêm component hay nhãn mới.
+**Form v1.1 ở tab này** (cùng khuôn `[_form_section]` + `[_form_field]`, `[ Hủy ] [*Lưu*]`): *Thêm/sửa đợt làm việc* gồm Công ty khách * (chọn, hiện "tên – địa điểm"), Vị trí * (chọn từ Chức danh), Ngày bắt đầu *, Ngày kết thúc, Ghi chú; *Ghi nhận thay đổi lương* gồm Đợt làm việc * (chọn trong các đợt của công nhân, mặc định đợt hiện tại), Lương tháng *, Đơn giá tháng (được trống), Ngày áp dụng * (trong khoảng ngày của đợt), Lý do * (gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"). Lỗi chồng lấn ngày hoặc đang có đợt mở hiện bằng `_alert`/lỗi dưới ô. Chỉ dùng component đã duyệt ở `/ui-kit/`: `_form_section`, `_form_field`, `_table`, `_status_badge` (nhãn "Sắp hết hạn" sẵn có), `_alert`, `_empty_state`; không thêm component hay nhãn mới.
 
 **Tab 4 – Tài liệu (`tai-lieu`)**
 

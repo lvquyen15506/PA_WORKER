@@ -118,7 +118,8 @@ Phần v1.1 (phiếu thay đổi đã ký 23/11/2026, `docs/lam-ro-yeu-cau.md` c
 - Model `ClientCompany`, `WorkAssignment`, `SalaryHistory` (+ migration, trigger chặn UPDATE lịch sử lương, ràng buộc một đợt mở mỗi công nhân), `assignment_limit_months` ở Cài đặt (`/cai-dat/nguong/`).
 - Tab Quá trình làm việc: đợt làm việc (thêm, sửa, không xóa, không chồng lấn, tự đóng khi nghỉ việc) và lịch sử lương (mọi vai trò xem, chỉ A, Q thêm dòng; mã hóa; nhật ký không chứa giá trị lương).
 - Bộ lọc `/ho-so/` theo công ty khách và `?dot_sap_du_han=1`; chỉ báo đợt sắp đủ 12 tháng ở `apps.workers.indicators`.
-- Cập nhật `PERSONAL_FIELDS`, `LOGICAL_TO_ATTR`, hàm `anonymize` (xóa lịch sử lương, xóa `note` của đợt), `seed_demo` (công ty khách, đợt, lương giả), và bổ sung ngoại lệ vào `CLAUDE.md` khi được duyệt.
+- Câu 48: migration `Employment.section` không bắt buộc (form tiếp nhận/ghi nhận thay đổi, kiểm tra Tổ cần Bộ phận); danh sách `/ho-so/` thay cột "Bộ phận" bằng "Công ty khách" và thêm lựa chọn "Chưa có bộ phận" ở bộ lọc; bỏ ẩn mức lương mong muốn với Viewer (đổi test, trang Tuyển dụng, tab Tuyển dụng); `SalaryHistory` gắn FK `assignment` (mỗi đợt một chuỗi lương); cảnh báo 12 tháng cộng dồn đợt liền nhau cùng công ty.
+- Cập nhật `PERSONAL_FIELDS`, `LOGICAL_TO_ATTR`, hàm `anonymize` (xóa lịch sử lương, xóa `note` của đợt), `seed_demo` (công ty khách, đợt, lương giả), (ngoại lệ xóa `SalaryHistory` đã ghi vào `CLAUDE.md`).
 - Test: quyền xem/thêm lương theo 4 vai trò (kể cả gọi thẳng URL), một công ty tại một lúc, không chồng lấn, cột lương không lộ giá trị rõ trong `AuditLog.changes` và trong CSDL, hạn lưu trữ 10 năm không đổi khi đợt kết thúc (câu 44), ẩn danh hóa xóa lịch sử lương.
 - Khối "Đợt làm việc sắp đủ 12 tháng" ở Dashboard và loại báo cáo "Công nhân đang làm theo công ty khách hàng" thuộc trang của Phase 7; Phase 6 chỉ làm hàm tính để Phase 7 dùng lại.
 ```
@@ -136,7 +137,8 @@ Cài đặt (chỉ Admin): tab Chờ hủy (/cai-dat/cho-huy/: hồ sơ Lưu tr�
 chọn nhiều rồi ẩn danh hóa qua hộp xác nhận) và Biên bản hủy (/cai-dat/bien-ban-huy/: danh sách, xem, in,
 ghi nhật ký PRINT). Dùng lại expired_queryset và anonymize đã làm ở Phase 4.
 v1.1: thêm vào Dashboard khối việc cần làm "Đợt làm việc sắp đủ 12 tháng" (không thêm thẻ) và loại báo cáo
-"Công nhân đang làm theo công ty khách hàng" (câu 43, 45), dùng hàm đã làm ở Phase 6.
+"Công nhân đang làm theo công ty khách hàng" (câu 43, 45), dùng hàm đã làm ở Phase 6. Báo cáo và biểu đồ theo phòng ban/bộ phận có nhóm "Chưa có bộ phận".
+Nhập Excel (phần B) có thêm "Công ty khách" và "Ngày bắt đầu đợt", tạo `WorkAssignment`, không nhập lương (`excel-mau.md`).
 ```
 **Xong khi:** kịch bản 11, 12, 13, 16 đạt; ẩn danh hóa từ danh sách chờ hủy sinh biên bản đúng (câu 2); khối 12 tháng và báo cáo theo công ty khách có số liệu khớp danh sách đích.
 

@@ -61,6 +61,7 @@ erDiagram
     ClientCompanies ||--o{ WorkAssignments : "làm tại"
     Positions ||--o{ WorkAssignments : "vị trí"
     Workers ||--o{ SalaryHistory : "lịch sử lương"
+    WorkAssignments ||--o{ SalaryHistory : "lương của đợt"
     Users ||--o{ SalaryHistory : "ghi"
 
     Departments ||--o{ Sections : "gồm"
@@ -305,6 +306,7 @@ erDiagram
     Positions ||--o{ WorkAssignments : "vị trí"
     Users ||--o{ WorkAssignments : "ghi"
     Workers ||--o{ SalaryHistory : "lịch sử lương"
+    WorkAssignments ||--o{ SalaryHistory : "lương của đợt"
     Users ||--o{ SalaryHistory : "ghi"
 
     Applications {
@@ -313,7 +315,7 @@ erDiagram
         bigint position_id FK
         bigint source_id FK "ApplicationSources"
         date applied_date
-        decimal expected_salary "ẩn với Viewer"
+        decimal expected_salary "mọi vai trò xem được từ v1.1 (câu 48)"
         date available_date "ngày có thể nhận việc"
         varchar status "RecruitmentStatus"
         datetime interview_at
@@ -358,8 +360,8 @@ erDiagram
         bigint application_id FK,UK "lần ứng tuyển được tiếp nhận; rỗng khi nhập Excel"
         date received_date "ngày tiếp nhận"
         date start_date "ngày bắt đầu, ngày vào làm"
-        bigint section_id FK "bộ phận, bắt buộc"
-        bigint team_id FK "tổ, không bắt buộc, phải thuộc bộ phận"
+        bigint section_id FK "bộ phận, KHÔNG bắt buộc từ v1.1 (câu 48); rỗng thì chưa có phòng ban"
+        bigint team_id FK "tổ, không bắt buộc; có tổ thì phải có bộ phận và tổ thuộc bộ phận đó"
         bigint position_id FK
         bigint shift_id FK
         bigint manager_id FK "Workers, không bắt buộc"
@@ -417,7 +419,8 @@ erDiagram
     }
     SalaryHistory {
         bigint id PK
-        bigint worker_id FK
+        bigint assignment_id FK "bắt buộc: lương và đơn giá thuộc một đợt làm việc (câu 48)"
+        bigint worker_id FK "= WorkAssignments.worker_id; giữ để xóa theo hồ sơ khi ẩn danh hóa và truy vấn"
         text monthly_salary_enc "lương tháng, VNĐ, mã hóa"
         text client_unit_price_enc "đơn giá tháng tính cho công ty khách, VNĐ, mã hóa; có thể rỗng"
         date effective_date "ngày áp dụng"
@@ -562,15 +565,15 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 | --- | --- |
 | `ClientCompanies` | Câu 39: danh mục công ty khách hàng, chỉ tên + địa điểm, mỗi địa điểm một dòng, ngừng sử dụng thay cho xóa |
 | `WorkAssignments` | Câu 40: đợt làm việc của công nhân tại một công ty khách; mỗi lúc một công ty; giữ lịch sử. Tách khỏi `Employments` vì `Employments` là quan hệ lao động với bên cung ứng (1 dòng/người), còn đợt là quan hệ 1-nhiều theo thời gian |
-| `SalaryHistory` | Câu 41, 42: lịch sử lương tháng và đơn giá tháng, chỉ thêm, cột mã hóa, xóa khi ẩn danh hóa |
+| `SalaryHistory` | Câu 41, 42, 48: lịch sử lương tháng và đơn giá tháng của từng đợt làm việc, chỉ thêm, cột mã hóa, xóa khi ẩn danh hóa |
 
-`Employments` giữ nguyên là quan hệ lao động với bên cung ứng (ngày bắt đầu, trạng thái làm việc, ngày nghỉ việc = ngày chấm dứt hợp đồng lao động, câu 44). **Bộ phận (`Sections`), Tổ (`Teams`), Ca (`Shifts`), Phòng ban (`Departments`) nội bộ giữ nguyên trong v1.1**, vì phiếu không bỏ chúng và yêu cầu v1.0 còn dùng chúng cho bộ lọc, Dashboard và báo cáo; chúng mô tả bộ phận nội bộ của bên cung ứng, còn nơi làm việc thực tế là `WorkAssignments`. Có thể cho `Employments.section_id` thành không bắt buộc nếu khách xác nhận công nhân cung ứng không thuộc bộ phận nội bộ nào (xem `lam-ro-yeu-cau.md` mục F và báo cáo thay đổi).
+`Employments` giữ nguyên là quan hệ lao động với bên cung ứng (ngày bắt đầu, trạng thái làm việc, ngày nghỉ việc = ngày chấm dứt hợp đồng lao động, câu 44). **Bộ phận (`Sections`), Tổ (`Teams`), Ca (`Shifts`), Phòng ban (`Departments`) nội bộ giữ nguyên trong v1.1** (quyết định 23/11/2026, câu 48), vì yêu cầu v1.0 còn dùng chúng cho bộ lọc, Dashboard và báo cáo; chúng mô tả bộ phận nội bộ của bên cung ứng, còn nơi làm việc thực tế là `WorkAssignments`. **`Employments.section_id` đổi thành không bắt buộc** (cột nullable; migration ở Phase 6).
 
 **Điều chỉnh:**
 
 | Mục VI | Thiết kế | Lý do |
 | --- | --- | --- |
-| `Employments → Teams` | `Employments → Sections` (bắt buộc) và `→ Teams` (không bắt buộc) | Câu 15: tổ không bắt buộc, bộ phận bắt buộc; phòng ban suy ra từ bộ phận |
+| `Employments → Teams` | `Employments → Sections` (**không bắt buộc từ v1.1**) và `→ Teams` (không bắt buộc) | Câu 15 (sửa bởi câu 48): bộ phận và tổ đều không bắt buộc; có tổ thì phải có bộ phận; phòng ban suy ra từ bộ phận, chưa có bộ phận thì nhóm "Chưa có bộ phận" ở báo cáo |
 | — | `Employments.manager_id → Workers` | Câu 15: người quản lý trực tiếp là một hồ sơ khác |
 | — | `Employments.application_id → Applications` | Câu 7: biết lần ứng tuyển nào được tiếp nhận |
 | `Settings` (chung chung) | Một dòng duy nhất, các cột cụ thể | Quy tắc mã, ngưỡng, thời hạn lưu trữ, cấu hình OCR có kiểu rõ ràng, dễ kiểm tra |
@@ -578,7 +581,7 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 
 **Một cột tính sẵn:** `Workers.name_search` (họ tên bỏ dấu, chữ thường) lặp lại thông tin của `full_name`. Lý do: tìm không dấu phải chạy được trên cả PostgreSQL lẫn SQLite (bản dự phòng không Docker) và dưới 2 giây với 500 hồ sơ. Giá trị luôn được tính lại khi lưu, không cho sửa tay.
 
-**Không lưu riêng, chỉ tính:** đợt làm việc hiện tại (đợt có `start_date` ≤ hôm nay và `end_date` rỗng hoặc ≥ hôm nay), mức lương và đơn giá hiện tại (dòng `SalaryHistory` có `effective_date` lớn nhất không quá hôm nay), đợt sắp đủ 12 tháng (`start_date` + `assignment_limit_months` nằm trong `expiry_warning_days` ngày tới; **không có trạng thái đợt làm việc**, không tạo bộ trạng thái thứ năm), ảnh chân dung (là `WorkerDocuments` có loại `PORTRAIT`, câu 4), phòng ban (từ bộ phận), thiếu giấy tờ / hoàn thiện / sắp hết hạn, ngày chuyển Lưu trữ và người gửi duyệt (từ `StatusChanges`), hạn lưu trữ (theo 6 căn cứ ở câu 2: từ `Employments.resign_date`, `Applications.result_date`, hoặc ngày chuyển Lưu trữ trong `StatusChanges`; hồ sơ Lưu trữ luôn tính được).
+**Không lưu riêng, chỉ tính:** đợt làm việc hiện tại (đợt có `start_date` ≤ hôm nay và `end_date` rỗng hoặc ≥ hôm nay), mức lương và đơn giá hiện tại của đợt (dòng `SalaryHistory` của đợt có `effective_date` lớn nhất không quá hôm nay), đợt sắp đủ 12 tháng (chuỗi đợt liền nhau cùng công ty, đợt sau bắt đầu không quá 1 ngày sau khi đợt trước kết thúc; `start_date` của đợt đầu chuỗi + `assignment_limit_months` nằm trong `expiry_warning_days` ngày tới; **không có trạng thái đợt làm việc**, không tạo bộ trạng thái thứ năm), ảnh chân dung (là `WorkerDocuments` có loại `PORTRAIT`, câu 4), phòng ban (từ bộ phận), thiếu giấy tờ / hoàn thiện / sắp hết hạn, ngày chuyển Lưu trữ và người gửi duyệt (từ `StatusChanges`), hạn lưu trữ (theo 6 căn cứ ở câu 2: từ `Employments.resign_date`, `Applications.result_date`, hoặc ngày chuyển Lưu trữ trong `StatusChanges`; hồ sơ Lưu trữ luôn tính được).
 
 ## 5. Ràng buộc
 
@@ -623,15 +626,15 @@ Mã đã cấp không bao giờ cấp lại cho người khác, kể cả sau �
 - Bản ghi được xóa cứng: `IntakeSessions` (bản ghi tạm, không có bảng nào trỏ tới, xem mục 6) và `AuditPersonalValues` khi ẩn danh hóa (trên).
 
 ### Kiểm tra ở tầng ứng dụng (không biểu diễn được bằng khóa)
-- `Employments.team_id` phải thuộc `section_id`.
+- `Employments.team_id` (nếu có) phải thuộc `section_id`; có `team_id` thì phải có `section_id` (`section_id` không bắt buộc).
 - `WorkAssignments`: `end_date >= start_date`; các đợt của một công nhân không chồng lấn ngày (kiểm tra trong service, khóa dòng `Workers` khi ghi); công nhân phải có `Employments` và chưa Đã nghỉ việc; công ty và vị trí đang dùng (`is_active`) khi tạo mới.
-- `SalaryHistory`: `monthly_salary` là số nguyên VNĐ > 0; `client_unit_price` (nếu có) là số nguyên VNĐ > 0; `reason` bắt buộc; chỉ Admin, Quản lý nhân sự được thêm (câu 42).
+- `SalaryHistory`: `worker_id` phải bằng `assignment.worker_id`; `effective_date` nằm trong khoảng ngày của đợt (từ `start_date`, đến `end_date` nếu có); sửa ngày của đợt không được làm dòng lương nằm ngoài khoảng; `monthly_salary` là số nguyên VNĐ > 0; `client_unit_price` (nếu có) là số nguyên VNĐ > 0; `reason` bắt buộc; chỉ Admin, Quản lý nhân sự được thêm (câu 42).
 - `Applications.reject_reason` bắt buộc khi Không đạt; `Employments.resign_date`, `resign_reason` bắt buộc khi Đã nghỉ việc.
 - `Contracts.expiry_date` bắt buộc trừ loại không xác định thời hạn; `expiry_date > effective_date`.
 - `IdentityDocuments.issue_date > Workers.date_of_birth`.
 - `StatusChanges.reason` bắt buộc với: Chờ duyệt → Cần bổ sung, Chờ duyệt → Bị từ chối, Đã xác minh → Lưu trữ thủ công (câu 9).
 - `Contracts.document` luôn hiển thị bản hiện hành: đi theo chuỗi `WorkerDocuments.replaces` tới bản `is_current` (câu 32).
-- `Applications.expected_salary` không gửi tới Viewer ở bất kỳ trang, mảnh HTMX hay file xuất nào (câu 13).
+- `Applications.expected_salary`: từ v1.1 Viewer xem được (câu 48, sửa câu 13); file xuất vẫn không có cho Viewer (câu 18).
 
 ## 6. Bảng tạm `IntakeSessions`
 

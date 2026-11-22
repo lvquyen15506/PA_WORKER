@@ -118,19 +118,17 @@ HR được **thêm** tài liệu mới khi hồ sơ ở Đã xác minh, và tr�
   - Số CMND cũ
   - Địa chỉ thường trú/cư trú
   - Quê quán / nơi đăng ký khai sinh
-  - Ảnh CCCD
-  - **[Nội bộ]** Mức lương mong muốn (trang Tuyển dụng, tab Tuyển dụng trong chi tiết hồ sơ, file xuất)
-- **Viewer vẫn thấy:** SĐT và nơi ở hiện tại.
-- **[v1.1] Ngoại lệ cho dữ liệu lương (câu 42):** Viewer **được xem** lương tháng và đơn giá tháng (bảng `SalaryHistory`). Ngoại lệ này chỉ áp dụng cho hai trường mới đó; **mức lương mong muốn** của ứng viên (`Application.expected_salary`) vẫn ẩn với Viewer như trên **[Giả định, cần xác nhận]**.
+  - Ảnh CCCD- **Viewer vẫn thấy:** SĐT và nơi ở hiện tại.
+- **[v1.1] Thay đổi (câu 42, 48):** từ v1.1 Viewer **được xem** mọi dữ liệu lương: lương tháng, đơn giá tháng (`SalaryHistory`) **và mức lương mong muốn** (`Application.expected_salary`). Mức lương mong muốn **không còn bị ẩn** với Viewer (trang Tuyển dụng, tab Tuyển dụng, chi tiết hồ sơ); các trường còn lại ở danh sách "Viewer không thấy" giữ nguyên. File xuất vẫn không có cho Viewer (câu 18).
 - **Viewer không** xem trước và không tải được tài liệu.
 
 ### 14. Trình độ học vấn [Đồng ý]
 EducationLevels là danh mục do Admin quản lý trong Cài đặt, có thứ tự cấp bậc. Bộ lọc và báo cáo theo trình độ lấy **trình độ cao nhất** của mỗi người.
 
 ### 15. Vị trí làm việc [Đồng ý + Nội bộ]
-- Thông tin làm việc lưu **Bộ phận** và **Tổ (không bắt buộc)**. **[Giả định]** Bộ phận là bắt buộc. Nếu có chọn Tổ thì Tổ phải thuộc Bộ phận đã chọn.
-- **[Nội bộ]** Dữ liệu mẫu (`seed_demo`) phải có phòng ban "Khối văn phòng" với bộ phận **"Văn phòng"** cho nhân viên khối văn phòng (vì Bộ phận bắt buộc), và có **ít nhất 1 tài khoản Quản lý nhân sự**.
-- Phòng ban suy ra từ Bộ phận.
+- Thông tin làm việc lưu **Bộ phận** và **Tổ (không bắt buộc)**. **[v1.1, câu 48] Bộ phận không bắt buộc** (công nhân cung ứng làm tại công ty khách có thể chưa thuộc bộ phận nội bộ nào; bản v1.0 ghi bắt buộc). Chọn Tổ thì phải chọn Bộ phận, và Tổ phải thuộc Bộ phận đã chọn.
+- **[Nội bộ]** Dữ liệu mẫu (`seed_demo`) phải có phòng ban "Khối văn phòng" với bộ phận **"Văn phòng"** cho nhân viên khối văn phòng, và có **ít nhất 1 tài khoản Quản lý nhân sự**.
+- Phòng ban suy ra từ Bộ phận; chưa có Bộ phận thì chưa có Phòng ban.
 - "Người quản lý trực tiếp" liên kết tới một **hồ sơ công nhân khác**, không bắt buộc.
 
 ## B. Mặc định
@@ -272,7 +270,7 @@ Giới tính chỉ có hai giá trị Nam, Nữ, khớp thông tin trên CCCD.
 Các điểm khác:
 - Câu 5: Nháp chỉ cần họ tên + SĐT; điều kiện gửi duyệt; cảnh báo trùng theo SĐT, họ tên + ngày sinh.
 - Câu 9: HR không chuyển Lưu trữ hồ sơ Đã xác minh; QL/Admin chuyển phải ghi lý do, bị chặn khi Thử việc/Đang làm việc.
-- Câu 13: ẩn mức lương mong muốn với Viewer.
+- Câu 13: ~~ẩn mức lương mong muốn với Viewer~~ (đã bỏ ở v1.1, câu 48; mọi vai trò xem được dữ liệu lương).
 - Câu 15: dữ liệu mẫu có bộ phận "Văn phòng" và ít nhất 1 tài khoản QL.
 - Câu 25: kỹ năng là một trường văn bản.
 - Câu 26: 5 nhóm tuổi (thêm Dưới 18) và nhóm "Chưa có ngày sinh".
@@ -300,24 +298,25 @@ Nguồn: phiếu thay đổi v1.1 đã ký (`docs/yeu-cau-thay-doi-v1.1.pdf`). C
 - Mỗi đợt gồm: công ty khách hàng, vị trí, ngày bắt đầu, ngày kết thúc (**không bắt buộc**), ghi chú.
 - **Giữ lịch sử các đợt**: không ghi đè, không xóa; đợt cũ vẫn xem được.
 - **[Nội bộ]** Các đợt của một công nhân không chồng lấn ngày; ngày kết thúc là ngày làm cuối cùng của đợt đó. Chỉ có đợt cho người đã có mã NV và chưa Đã nghỉ việc. Khi trạng thái làm việc chuyển sang Đã nghỉ việc, đợt đang mở tự kết thúc vào ngày nghỉ việc.
-- **[Giả định]** "Vị trí" lấy từ danh mục Chức danh sẵn có (`Position`), không tạo danh mục mới. Thêm và sửa đợt: Admin, Quản lý nhân sự, Nhân viên HR; Viewer chỉ xem.
+- **[Nội bộ, đã đồng ý 23/11/2026]** "Vị trí" lấy từ danh mục Chức danh sẵn có (`Position`), không tạo danh mục mới. Thêm và sửa đợt: Admin, Quản lý nhân sự, Nhân viên HR; Viewer chỉ xem. Không có nút xóa đợt; nhập nhầm thì sửa.
 
 ### 41. Lương và đơn giá
 - Lưu hai khoản: **lương tháng** của công nhân và **đơn giá tháng** tính cho công ty khách hàng.
 - Mỗi thay đổi **thêm một dòng lịch sử** gồm: mức, ngày áp dụng, người sửa, lý do. **Không sửa, không xóa dòng cũ**; nhập sai thì thêm dòng mới sửa lại.
 - **Mã hóa khi lưu** (như số định danh) và **ghi nhật ký** qua `apps.audit.services.log()`; giá trị lương là trường cá nhân nên nhật ký chỉ ghi "(xem giá trị chi tiết)".
-- **[Nội bộ]** Mỗi dòng lịch sử ghi cả hai khoản tại ngày áp dụng (đổi một khoản thì khoản kia giữ giá trị cũ). Mức hiện tại là dòng có ngày áp dụng lớn nhất không quá hôm nay. Ẩn danh hóa hồ sơ thì xóa toàn bộ lịch sử lương (đã thống nhất; cần thêm vào danh sách ngoại lệ "không xóa cứng" của `CLAUDE.md`).
+- **[Nội bộ, đã đồng ý 23/11/2026]** Lương gắn với **đợt làm việc** (đơn giá phụ thuộc công ty khách): mỗi đợt có chuỗi lịch sử lương riêng; chưa có đợt thì chưa ghi lương được. Mỗi dòng ghi cả hai khoản tại ngày áp dụng (đổi một khoản thì khoản kia giữ giá trị cũ); đơn giá được để trống. Mức hiện tại của đợt là dòng có ngày áp dụng lớn nhất không quá hôm nay. Ẩn danh hóa hồ sơ thì xóa toàn bộ lịch sử lương (đã thống nhất; cần thêm vào danh sách ngoại lệ "không xóa cứng" của `CLAUDE.md`).
 
 ### 42. Quyền xem và sửa lương
 - **Mọi vai trò (Admin, Quản lý nhân sự, Nhân viên HR, Viewer) được XEM** lương và đơn giá.
 - **Chỉ Admin và Quản lý nhân sự được THÊM/SỬA** (thêm dòng lịch sử mới).
-- **Đây là thay đổi so với câu 13** đối với dữ liệu lương: câu 13 ẩn mức lương mong muốn với Viewer, còn lương tháng và đơn giá thì Viewer thấy. Mức lương mong muốn của ứng viên **không** nằm trong thay đổi này **[Giả định, cần xác nhận]**.
-- **[Nội bộ]** Xem lương không ghi nhật ký (khác xem số CCCD đầy đủ); thêm dòng lương thì ghi nhật ký. Lương không đưa vào file xuất Excel và không có chức năng nhập lương từ Excel trong v1.1.
+- **Đây là thay đổi so với câu 13** đối với dữ liệu lương: câu 13 từng ẩn mức lương mong muốn với Viewer; từ v1.1 **bỏ ẩn** (câu 48), nhất quán với việc mọi vai trò xem lương và đơn giá.
+- **[Nội bộ, đã đồng ý]** Xem lương không ghi nhật ký (khác xem số CCCD đầy đủ); thêm dòng lương thì ghi nhật ký. Lương không đưa vào file xuất Excel và không có chức năng nhập lương từ Excel trong v1.1.
 
 ### 43. Cảnh báo đợt làm việc sắp đủ 12 tháng
 - Đợt làm việc **sắp đủ 12 tháng** kể từ ngày bắt đầu được cảnh báo ở Dashboard, trong **danh sách việc cần làm**.
 - Dùng **chung ngưỡng số ngày `expiry_warning_days`** với CCCD và hợp đồng sắp hết hạn (câu 17).
 - **[Nội bộ]** Không thêm thẻ số liệu mới (9 thẻ ở mục VII giữ nguyên), theo cách đã làm với CCCD sắp hết hạn. Đợt đã quá 12 tháng mà chưa kết thúc vẫn hiện trong danh sách cho đến khi có ngày kết thúc. Con số 12 tháng cấu hình được (`assignment_limit_months`, mặc định 12).
+- **[Giả định, đã đồng ý 23/11/2026]** **Cộng dồn các đợt liền nhau cùng công ty khách**: đợt sau bắt đầu không quá 1 ngày sau ngày kết thúc đợt trước thì thuộc cùng một chuỗi; 12 tháng tính từ ngày bắt đầu của đợt đầu chuỗi. Doanh nghiệp tự đối chiếu với quy định hiện hành; phần mềm chỉ cảnh báo, không chặn. "Cùng công ty" là cùng một dòng danh mục (cùng tên và địa điểm).
 
 ### 44. Hạn lưu trữ công nhân đã nghỉ
 - **Giữ 10 năm như v1.0** (`resigned_retention_years = 10`). Mốc tính là **ngày chấm dứt hợp đồng lao động cuối cùng với bên cung ứng** (`Employment.resign_date`); **không** tính từ ngày kết thúc một đợt làm việc.
@@ -337,9 +336,16 @@ Chấm công; tính lương; bảng lương; hóa đơn, công nợ; tài khoả
 ### 47. Lưu bản gốc ngoài phần mềm
 Bản gốc hợp đồng lao động, bản cam kết và bảng lương do bên cung ứng lưu ngoài phần mềm theo quy định. Phần mềm **không thay thế** việc lưu trữ đó. **[Nội bộ]** Tệp tải lên (hợp đồng, bản cam kết) được coi là bản số tham khảo, không phải bản gốc.
 
-### Điểm [Nội bộ]/[Giả định] của mục F cần xác nhận
-1. Địa điểm công ty khách là văn bản tự nhập; vị trí của đợt dùng danh mục Chức danh (câu 39, 40).
-2. HR được thêm/sửa đợt làm việc; chỉ A, Q thêm lương (câu 40, 42).
-3. Mức lương mong muốn vẫn ẩn với Viewer (câu 13, 42).
-4. Mỗi dòng lương ghi cả lương tháng và đơn giá; xem lương không ghi nhật ký; lương không vào file xuất Excel (câu 41, 42).
-5. Đợt tự kết thúc khi nghỉ việc; con số 12 tháng cấu hình được; đợt quá 12 tháng vẫn cảnh báo (câu 40, 43).
+### 48. Quyết định bổ sung v1.1 [Nội bộ] (23/11/2026)
+Do người phụ trách dự án chốt khi rà thiết kế, **chưa xác nhận với khách hàng**:
+1. **Bộ phận không bắt buộc** (sửa câu 15). `Department`, `Section`, `Team`, `Shift` giữ nguyên làm danh mục nội bộ. Danh sách `/ho-so/`: thay cột "Bộ phận" bằng cột **"Công ty khách"** (đợt đang diễn ra), vẫn 12 cột; bộ lọc phòng ban, bộ phận giữ nguyên và thêm lựa chọn "Chưa có bộ phận". Dashboard và báo cáo theo phòng ban/bộ phận có nhóm **"Chưa có bộ phận"**. Cột "Bộ phận" của danh sách ghi ở `docs/yeu-cau.md` mục IV.7 được thay theo mục này.
+2. **Mức lương mong muốn mở cho Viewer** (bỏ ẩn ở câu 13), nhất quán với câu 42. Test kỳ vọng Viewer không thấy cột này sẽ đổi ở Phase 6.
+3. **Lương gắn với đợt làm việc** (câu 41): `SalaryHistory` có khóa ngoại bắt buộc tới `WorkAssignment`; xem `models.md` 3.9.
+4. **Quyền đợt làm việc:** A, Q, H thêm/sửa; V chỉ xem (câu 40).
+5. **Cảnh báo 12 tháng cộng dồn** các đợt liền nhau cùng công ty (câu 43).
+6. **Nhập Excel:** file mẫu phần B thêm cột "Công ty khách" (khớp tên + địa điểm trong danh mục) và "Ngày bắt đầu đợt" (bắt buộc nếu có công ty khách); nhập thì tạo `WorkAssignment`. **Không** nhập lương (`excel-mau.md`).
+7. **Ngoại lệ xóa cứng:** `SalaryHistory` chỉ bị xóa trong `anonymize()`; đã thêm vào `CLAUDE.md`.
+
+### Điểm còn mở của mục F
+1. Công ty khách có hai dòng cùng tên khác địa điểm: bộ lọc và báo cáo coi là hai công ty khác nhau (mỗi dòng một công ty). Nếu khách muốn gộp theo tên thì phải đổi thiết kế danh mục.
+2. Đợt có lương rồi thì ngày bắt đầu/kết thúc sửa lại không được làm các dòng lương nằm ngoài khoảng ngày của đợt.

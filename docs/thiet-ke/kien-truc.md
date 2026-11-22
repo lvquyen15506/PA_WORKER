@@ -1,6 +1,6 @@
 # Kiến trúc hệ thống – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md`, `models.md`, `trang.md` và `docs/lam-ro-yeu-cau.md` câu 1–38.
+Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md`, `models.md`, `trang.md` và `docs/lam-ro-yeu-cau.md` câu 1–47. Cập nhật v1.1 ngày 23/11/2026: không đổi kiến trúc (không thêm container, volume hay thư viện); 3 model mới nằm trong app `core` và `employment` có sẵn, lương dùng lại mã hóa Fernet và `FIELD_ENCRYPTION_KEY` hiện có.
 
 ## 1. Tổng quan
 

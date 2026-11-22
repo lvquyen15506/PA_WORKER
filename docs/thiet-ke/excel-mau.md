@@ -1,6 +1,6 @@
 # File Excel mẫu nhập hàng loạt – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Nháp để khách hàng duyệt (câu 21). Căn cứ: `docs/yeu-cau.md` mục IV.3, VI; `docs/lam-ro-yeu-cau.md` câu 5, 8, 9, 13, 15, 16, 25, 27, 30, 37; `docs/thiet-ke/models.md` (tên trường, mục 4.5), `trang.md` 5.4 (`/ho-so/nhap-excel/`).
+Phase 1 · Ngày 21/11/2026 · Cập nhật v1.1 ngày 23/11/2026 · Nháp để khách hàng duyệt (câu 21). Căn cứ: `docs/yeu-cau.md` mục IV.3, VI; `docs/lam-ro-yeu-cau.md` câu 1–47 (riêng câu 5, 8, 9, 13, 15, 16, 25, 27, 30, 37, 39, 40, 48 liên quan trực tiếp); `docs/thiet-ke/models.md` (tên trường, mục 4.5), `trang.md` 5.4 (`/ho-so/nhap-excel/`).
 
 ## 1. Cấu trúc file
 
@@ -12,10 +12,10 @@ Phase 1 · Ngày 21/11/2026 · Nháp để khách hàng duyệt (câu 21). Căn 
 | --- | --- |
 | `Hồ sơ` | Dòng 1 là tiêu đề cột (đúng tên ở mục 2, không đổi tên, không đổi thứ tự). Dữ liệu bắt đầu từ dòng 2. File mẫu tải về **không có dòng dữ liệu** để tránh nhập nhầm dòng ví dụ |
 | `Hướng dẫn` | Giải thích hai phần A, B; quy tắc từng cột; 2 dòng ví dụ (mục 5) |
-| `Danh mục` | Giá trị hợp lệ lấy từ hệ thống lúc tải file mẫu: phòng ban, bộ phận (kèm phòng ban), tổ (kèm bộ phận), chức danh, ca, loại giấy tờ, giới tính, trạng thái làm việc, lý do nghỉ. Các ô tương ứng ở sheet `Hồ sơ` có danh sách thả xuống lấy từ sheet này |
+| `Danh mục` | Giá trị hợp lệ lấy từ hệ thống lúc tải file mẫu: phòng ban, bộ phận (kèm phòng ban), tổ (kèm bộ phận), chức danh, ca, công ty khách (dạng "tên – địa điểm", v1.1), loại giấy tờ, giới tính, trạng thái làm việc, lý do nghỉ. Các ô tương ứng ở sheet `Hồ sơ` có danh sách thả xuống lấy từ sheet này |
 
 - **Mọi cột ở sheet `Hồ sơ` định dạng Text** trong file mẫu, gồm cả số CCCD, CMND cũ, SĐT, mã NV (giữ số 0 đầu) và các cột ngày.
-- **Cột ngày** (A3, A8, A10, B7, B8, B10): chỉ nhận chuỗi `dd/mm/yyyy`. Nếu Excel vẫn đổi thành ô kiểu ngày, hệ thống vẫn đọc được nhưng kèm **cảnh báo** "Ô ngày của Excel có thể bị đảo ngày/tháng; kiểm tra lại", vì Excel có thể hiểu `03/04` là 4 tháng 3 hoặc 3 tháng 4 tùy cài đặt máy.
+- **Cột ngày** (A3, A8, A10, B7, B8, B10, B13): chỉ nhận chuỗi `dd/mm/yyyy`. Nếu Excel vẫn đổi thành ô kiểu ngày, hệ thống vẫn đọc được nhưng kèm **cảnh báo** "Ô ngày của Excel có thể bị đảo ngày/tháng; kiểm tra lại", vì Excel có thể hiểu `03/04` là 4 tháng 3 hoặc 3 tháng 4 tùy cài đặt máy.
 - File mẫu và mọi file Excel hệ thống xuất ra đều ghi giá trị qua `apps.core.excel.safe_cell()` (mục 3.1).
 - Số dòng trong báo lỗi là **số dòng trong Excel** (dòng tiêu đề là dòng 1).
 
@@ -60,9 +60,9 @@ Dùng cho **công nhân hiện hữu** đang quản lý trên Excel (câu 27). D
 | # | Tên cột | Trường | Bắt buộc | Định dạng | Kiểm tra | Ví dụ giả |
 | --- | --- | --- | --- | --- | --- | --- |
 | B1 | Mã nhân viên | `Worker.employee_code` | Nếu có B | Text, tối đa 20 ký tự | Chỉ chữ, số, dấu gạch ngang (`^[A-Za-z0-9-]{1,20}$`). Trùng mã đã có hoặc trùng dòng khác trong file → **lỗi** | CN-00012 |
-| B2 | Phòng ban | (suy ra từ bộ phận) | | Chọn từ danh sách | Nếu điền thì phải đúng phòng ban của B3. Bắt buộc khi tên bộ phận ở B3 có ở hai phòng ban | Xưởng May |
-| B3 | Bộ phận | `Employment.section` | Nếu có B | Chọn từ danh sách | Phải khớp tên bộ phận đang dùng trong hệ thống (câu 15) | Chuyền May 1 |
-| B4 | Tổ | `Employment.team` | | Chọn từ danh sách | Nếu điền thì phải thuộc bộ phận ở B3 | Tổ 1 |
+| B2 | Phòng ban | (suy ra từ bộ phận) | | Chọn từ danh sách | Nếu điền thì phải có B3 và đúng phòng ban của B3. Bắt buộc khi tên bộ phận ở B3 có ở hai phòng ban | Xưởng May |
+| B3 | Bộ phận | `Employment.section` | | Chọn từ danh sách | **Không bắt buộc từ v1.1** (câu 48). Nếu điền thì phải khớp tên bộ phận đang dùng trong hệ thống; để trống thì hồ sơ vào nhóm "Chưa có bộ phận" | Chuyền May 1 |
+| B4 | Tổ | `Employment.team` | | Chọn từ danh sách | Nếu điền thì phải có B3 và thuộc bộ phận ở B3 | Tổ 1 |
 | B5 | Chức danh | `Employment.position` | Nếu có B | Chọn từ danh sách | Khớp tên chức danh đang dùng | Công nhân may |
 | B6 | Ca làm việc | `Employment.shift` | | Chọn từ danh sách | Khớp tên ca đang dùng | Ca 1 |
 | B7 | Ngày tiếp nhận | `Employment.received_date` | | Text dd/mm/yyyy | Để trống thì lấy bằng B8; không được sau B8 | 01/02/2023 |
@@ -70,8 +70,12 @@ Dùng cho **công nhân hiện hữu** đang quản lý trên Excel (câu 27). D
 | B9 | Trạng thái làm việc | `Employment.work_status` | Nếu có B | Chọn từ danh sách | Chờ nhận việc / Thử việc / Đang làm việc / Tạm hoãn / Đã nghỉ việc | Đang làm việc |
 | B10 | Ngày nghỉ việc | `Employment.resign_date` | Theo điều kiện | Text dd/mm/yyyy | Bắt buộc khi B9 = Đã nghỉ việc; phải sau B8 | |
 | B11 | Lý do nghỉ | `Employment.resign_reason` | Theo điều kiện | Chọn từ danh sách | Bắt buộc khi B9 = Đã nghỉ việc: Tự nghỉ / Hết hợp đồng / Chấm dứt hợp đồng / Khác | |
+| B12 | Công ty khách | `WorkAssignment.client_company` | | Chọn từ danh sách | **v1.1, câu 48.** Khớp **cả tên và địa điểm** của một dòng công ty khách đang dùng trong danh mục (ghi dạng "tên – địa điểm" như ở sheet `Danh mục`). Không bắt buộc | Công ty Mẫu A – Tỉnh Mẫu |
+| B13 | Ngày bắt đầu đợt | `WorkAssignment.start_date` | Nếu có B12 | Text dd/mm/yyyy | Bắt buộc khi có B12; phải sau ngày sinh. Không nhập khi không có B12 (báo lỗi). Đợt tạo ra có `end_date` rỗng (đang mở); nếu B9 = Đã nghỉ việc thì `end_date` = B10 | 01/03/2023 |
 
 Mã NV là bắt buộc khi có phần B vì thông tin làm việc chỉ tồn tại với hồ sơ có mã NV (`models.md` 3.8). Muốn hệ thống tự cấp mã thì không nhập phần B; sau khi hồ sơ được duyệt, dùng "Tiếp nhận vào làm" như bình thường.
+
+**Quy tắc cột v1.1 (câu 48):** "Nếu có B" của B3 đã bỏ (Bộ phận không bắt buộc); các cột bắt buộc khi có phần B còn là B1, B5, B8, B9. Vị trí của đợt làm việc tạo từ B12 lấy từ **chức danh B5**. **Không nhập lương**: file mẫu không có cột lương hay đơn giá; lương ghi trên giao diện sau khi nhập (A, Q). Việc nhập lương hàng loạt từ Excel là câu hỏi mở cho khách (`docs/tien-do.md`).
 
 ## 3. Xử lý khi nhập
 
@@ -84,7 +88,7 @@ Mã NV là bắt buộc khi có phần B vì thông tin làm việc chỉ tồn 
 - Dòng hợp lệ tạo ra:
   - `Worker` ở trạng thái **Nháp**, mã hồ sơ sinh tự động (`next_code`), `StatusChange` tạo hồ sơ, `created_by` = người nhập.
   - `IdentityDocument` nếu có bất kỳ cột A6–A14; `EmergencyContact` nếu có A17–A19.
-  - Nếu có phần B: `Worker.employee_code` = B1; `Employment`; một dòng `EmploymentHistory` loại `IMPORT`. Hồ sơ vẫn ở Nháp và phải qua duyệt như bình thường.
+  - Nếu có phần B: `Worker.employee_code` = B1; `Employment`; một dòng `EmploymentHistory` loại `IMPORT`; nếu có B12 thì thêm một `WorkAssignment` (công ty = B12, vị trí = B5, `start_date` = B13, `end_date` rỗng hoặc = B10 khi Đã nghỉ việc), ghi `CREATE` qua `log()`; **không tạo `SalaryHistory`**. Hồ sơ vẫn ở Nháp và phải qua duyệt như bình thường.
   - Dòng có trạng thái **Đã nghỉ việc** và ngày nghỉ quá 30 ngày (cấu hình `auto_archive_resigned_days`) sẽ được tác vụ hằng ngày tự chuyển Lưu trữ ở lần chạy kế tiếp, không cần duyệt (câu 9, quy tắc 1). Hạn lưu trữ 10 năm tính từ ngày nghỉ. Hồ sơ vẫn tra cứu được trong danh sách với bộ lọc Lưu trữ.
   - `IdentityFieldSource` **không** tạo (dữ liệu từ Excel coi như nhập tay).
 - Bộ đếm mã NV (`CodeSequence`): chỉ đẩy lên khi B1 khớp định dạng đang cấu hình (ví dụ `CN-00012` khi cấu hình là `CN` + 5 chữ số); mã khác định dạng (ví dụ `NV2019-A12`) vẫn được nhận nhưng không ảnh hưởng bộ đếm (câu 27).
@@ -130,7 +134,7 @@ Danh mục thông báo lỗi và cảnh báo:
 | Lỗi | A1 | Họ và tên không được để trống. |
 | Lỗi | A2 | Số điện thoại phải gồm 10 chữ số, bắt đầu bằng 0. |
 | Lỗi | A3 | Người dưới 15 tuổi không được nhập vào hệ thống. |
-| Lỗi | A3, A8, A10, B7, B8, B10 | Ngày phải theo dạng dd/mm/yyyy. |
+| Lỗi | A3, A8, A10, B7, B8, B10, B13 | Ngày phải theo dạng dd/mm/yyyy. |
 | Lỗi | A4 | Giới tính chỉ nhận Nam hoặc Nữ. |
 | Lỗi | A6 | Cần chọn loại giấy tờ khi đã nhập số định danh. |
 | Lỗi | A7 | Số CCCD phải gồm 12 chữ số. |
@@ -143,13 +147,17 @@ Danh mục thông báo lỗi và cảnh báo:
 | Lỗi | B1 | Mã nhân viên tối đa 20 ký tự, chỉ gồm chữ, số và dấu gạch ngang. |
 | Lỗi | B1 | Mã nhân viên CN-00012 đã được dùng. |
 | Lỗi | B1 | Cần nhập mã nhân viên khi có thông tin làm việc. |
-| Lỗi | B1–B11 | Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc. |
-| Lỗi | B2, B3, B4, B5, B6 | Không tìm thấy "…" trong danh mục. Hãy chọn từ sheet Danh mục. |
+| Lỗi | B1–B13 | Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc. |
+| Lỗi | B2, B3, B4, B5, B6, B12 | Không tìm thấy "…" trong danh mục. Hãy chọn từ sheet Danh mục. |
+| Lỗi | B12 | Công ty khách "…" đã ngừng sử dụng (hoặc không khớp cả tên và địa điểm). |
+| Lỗi | B13 | Cần nhập ngày bắt đầu đợt khi có công ty khách. |
+| Lỗi | B13 | Chỉ nhập ngày bắt đầu đợt khi có công ty khách. |
+| Lỗi | B2, B4 | Cần nhập bộ phận (B3) khi có phòng ban hoặc tổ. |
 | Lỗi | B2 | Bộ phận "…" không thuộc phòng ban "…". |
 | Lỗi | B2 | Có nhiều bộ phận tên "…"; hãy ghi thêm phòng ban. |
 | Lỗi | B4 | Tổ "…" không thuộc bộ phận "…". |
 | Lỗi | B10, B11 | Trạng thái Đã nghỉ việc cần ngày nghỉ và lý do nghỉ. |
-| Cảnh báo | A3, A8, A10, B7, B8, B10 | Ô ngày của Excel có thể bị đảo ngày/tháng; kiểm tra lại. |
+| Cảnh báo | A3, A8, A10, B7, B8, B10, B13 | Ô ngày của Excel có thể bị đảo ngày/tháng; kiểm tra lại. |
 | Cảnh báo | A2 | Số điện thoại trùng hồ sơ HS-2026-00045. Kiểm tra có phải cùng một người. |
 | Cảnh báo | A1, A3 | Họ tên và ngày sinh trùng hồ sơ HS-2026-00045. Kiểm tra có phải cùng một người. |
 | Cảnh báo | A3 | Người dưới 18 tuổi. Kiểm tra quy định sử dụng lao động chưa thành niên. |
@@ -189,6 +197,8 @@ Toàn bộ là **dữ liệu hư cấu**. Số định danh và CMND cũ bắt �
 | Tổ | | Tổ 1 |
 | Chức danh | | Công nhân may |
 | Ca làm việc | | Ca 1 |
+| Công ty khách | | Công ty Mẫu A – Tỉnh Mẫu |
+| Ngày bắt đầu đợt | | 01/03/2023 |
 | Ngày tiếp nhận | | 01/02/2023 |
 | Ngày vào làm | | 01/02/2023 |
 | Trạng thái làm việc | | Đang làm việc |
