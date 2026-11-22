@@ -19,8 +19,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod +x docker/entrypoint.sh \
     && mkdir -p /app/private_media \
-    && SECRET_KEY=chi-dung-luc-build python manage.py collectstatic --noinput
+    && SECRET_KEY=chi-dung-luc-build \
+       FIELD_ENCRYPTION_KEY=QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUE= \
+       HASH_KEY=QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkI= \
+       python manage.py collectstatic --noinput
+# Hai khóa ở dòng trên chỉ để lệnh collectstatic lúc build qua kiểm tra khởi động; không dùng khi chạy.
 
 EXPOSE 8000
-ENTRYPOINT ["docker/entrypoint.sh"]
+# Gọi qua sh để không phụ thuộc quyền thực thi khi mã nguồn được mount từ Windows.
+ENTRYPOINT ["sh", "docker/entrypoint.sh"]
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]

@@ -1,0 +1,22 @@
+# CHỈ DÙNG KHI PHÁT TRIỂN. Docker Compose tự đọc file này cùng docker-compose.yml.
+# Mount mã nguồn vào web và chạy gunicorn --reload để sửa code/chạy test không cần build lại image.
+# Khi nghiệm thu hoặc cài thật, chạy KHÔNG có file này:
+#   docker compose -f docker-compose.yml up -d --build
+# Chỉ service web được mount; scheduler vẫn chạy mã trong image (không cần reload).
+services:
+  web:
+    volumes:
+      - .:/app
+      - /app/staticfiles # giữ staticfiles đã collectstatic trong image, không bị thư mục máy chủ đè
+    command:
+      [
+        "gunicorn",
+        "config.wsgi:application",
+        "--bind",
+        "0.0.0.0:8000",
+        "--workers",
+        "3",
+        "--timeout",
+        "120",
+        "--reload",
+      ]
