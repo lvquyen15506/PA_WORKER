@@ -84,8 +84,8 @@ def test_cot_dung_thu_tu_theo_muc_iv_7():
         "Bộ phận",
         "Chức danh",
         "Ngày vào làm",
-        "Trạng thái hồ sơ",
-        "Trạng thái làm việc",
+        "TT hồ sơ",  # viết tắt theo phác thảo đã duyệt để 12 cột vừa khung 1366 px
+        "TT làm việc",
         "Thao tác",
     ]
 

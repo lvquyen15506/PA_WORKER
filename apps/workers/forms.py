@@ -219,8 +219,12 @@ def worker_initial(worker):
 
 # ----- Hộp lý do (gửi từ hộp xác nhận ở trang chi tiết) ---------------------------------------
 class ReasonForm(forms.Form):
-    """Lý do trả lại / từ chối / lưu trữ. Gợi ý không ghi họ tên (câu 30), không chặn lưu."""
+    """Lý do trả lại / từ chối / lưu trữ. Gợi ý không ghi họ tên (câu 30), không chặn lưu.
 
+    Không dùng thuộc tính `required` của HTML: trình duyệt sẽ chặn bằng bong bóng mặc định (không
+    phải tiếng Việt, không nằm dưới ô); lỗi do máy chủ báo ngay dưới ô."""
+
+    use_required_attribute = False
     reason = forms.CharField(
         label="Lý do",
         help_text=REASON_HINT,
@@ -237,6 +241,7 @@ class ReasonForm(forms.Form):
 class AnonymizeForm(forms.Form):
     """Ẩn danh hóa theo yêu cầu (câu 38): lý do, số/ngày đơn, gõ lại mã hồ sơ."""
 
+    use_required_attribute = False  # lỗi do máy chủ báo dưới ô (xem ReasonForm)
     reason = forms.CharField(
         label="Lý do",
         help_text=REASON_HINT,

@@ -217,6 +217,18 @@ def test_thieu_ly_do_hien_lai_hop_thoai_voi_loi_duoi_o(action, prefix, modal, re
     assert "Không ghi họ tên, chỉ dùng mã hồ sơ." in page  # gợi ý câu 30
 
 
+def test_o_ly_do_trong_hop_thoai_khong_co_thuoc_tinh_required_de_loi_hien_bang_tieng_viet():
+    # Có `required` thì trình duyệt chặn bằng bong bóng mặc định, không tới được lỗi dưới ô.
+    pending = make_worker_in_status(VS.PENDING)
+    page = text(login_client(make_user("HR_MANAGER")).get(f"/ho-so/{pending.pk}/"))
+    modal = page.split('id="return-modal"')[1].split("</form>")[0]
+    assert "<textarea" in modal and not re.search(r"<(textarea|input)[^>]*\brequired\b", modal)
+    archived = make_worker_in_status(VS.ARCHIVED)
+    page = text(login_client(make_user("ADMIN")).get(f"/ho-so/{archived.pk}/"))
+    modal = page.split('id="anonymize-modal"')[1].split("</form>")[0]
+    assert "<textarea" in modal and not re.search(r"<(textarea|input)[^>]*\brequired\b", modal)
+
+
 def test_ly_do_tra_lai_va_tu_choi_ghi_dung_vao_status_change_va_nhat_ky():
     worker = make_worker_in_status(VS.PENDING)
     post(login_client(make_user("HR_MANAGER")), worker, "tu-choi", {"reject-reason": "Giấy tờ sai"})

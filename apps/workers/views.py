@@ -32,7 +32,7 @@ from apps.documents.forms import VerifyForm
 from apps.documents.models import WorkerDocument
 from apps.workers import rules, workflow
 
-from . import services
+from . import history_labels, services
 from .forms import (
     AnonymizeForm,
     ConsentForm,
@@ -60,7 +60,7 @@ TABS = [
 TAB_KEYS = [key for key, _ in TABS]
 LIST_COLUMNS = [
     {"key": "stt", "label": "STT", "kind": "num"},
-    {"key": "employee_code", "label": "Mã NV", "kind": "text", "nowrap": True},
+    {"key": "employee_code", "label": "Mã NV", "kind": "text"},
     {"key": "full_name", "label": "Họ và tên", "kind": "text"},
     {"key": "date_of_birth", "label": "Ngày sinh", "kind": "date"},
     {"key": "gender", "label": "Giới tính", "kind": "text"},
@@ -68,8 +68,9 @@ LIST_COLUMNS = [
     {"key": "section", "label": "Bộ phận", "kind": "text"},
     {"key": "position", "label": "Chức danh", "kind": "text"},
     {"key": "start_date", "label": "Ngày vào làm", "kind": "date"},
-    {"key": "status", "label": "Trạng thái hồ sơ", "kind": "badge"},
-    {"key": "work_status", "label": "Trạng thái làm việc", "kind": "badge"},
+    # Tên viết tắt theo phác thảo đã duyệt (phac-thao-trang.md 2.3): 12 cột mới vừa khung 1366 px.
+    {"key": "status", "label": "TT hồ sơ", "kind": "badge"},
+    {"key": "work_status", "label": "TT làm việc", "kind": "badge"},
     {"key": "actions", "label": "Thao tác", "kind": "actions"},
 ]
 
@@ -832,7 +833,14 @@ def history_detail(request, pk):
                     old, new = saved.old_value_enc, saved.new_value_enc
                     if field_name in masked:
                         old, new = mask_id_number(old) or None, mask_id_number(new) or None
-            rows.append({**base, "field": field_name, "old": old, "new": new})
+            rows.append(
+                {
+                    **base,
+                    "field": history_labels.field_label(field_name, entry.object_type),
+                    "old": history_labels.value_label(field_name, entry.object_type, old),
+                    "new": history_labels.value_label(field_name, entry.object_type, new),
+                }
+            )
     return render(
         request,
         "workers/_history_detail.html",

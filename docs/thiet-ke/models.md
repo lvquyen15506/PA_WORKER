@@ -508,6 +508,14 @@ Khai báo một bảng `TRANSITIONS` trong `apps/workers/workflow.py`; hàm `tra
 
 Mọi cặp không có trong bảng: từ chối. Viewer: từ chối mọi chuyển.
 
+**Cách cài ở Phase 4 (`apps/workers/workflow.py`, `rules.py`):**
+- `transition(worker, to_status, user, reason, *, trigger, identity_fields, request)` khóa dòng hồ sơ (`select_for_update`), đọc lại trạng thái rồi mới kiểm tra, nên hai người bấm cùng lúc chỉ một lần thành công. `trigger` là `MANUAL` (người dùng), `SYSTEM` (tác vụ hằng ngày, `user = None`) hoặc `IDENTITY_EDIT` (sửa họ tên, ngày sinh, số CCCD khi Đã xác minh; chỉ cặp Đã xác minh → Chờ duyệt đi được bằng trigger này, không có đường thủ công).
+- Hai loại lỗi: `TransitionForbidden` (sai vai trò, tự duyệt, tác nhân không được phép) → view trả 403; `TransitionError` (cặp không có trong bảng, thiếu lý do, thiếu trường gửi duyệt, đang Thử việc/Đang làm việc, đã ẩn danh) → không đổi gì, báo lỗi tiếng Việt. Thứ tự kiểm: tác nhân → vai trò → không tự duyệt → điều kiện trạng thái → lý do → trường bắt buộc.
+- **Chặn Thử việc/Đang làm việc áp dụng cho MỌI đường chuyển sang Lưu trữ** (thủ công từ Nháp, Cần bổ sung, Bị từ chối, Đã xác minh và tự động), không chỉ dòng Đã xác minh: theo câu 9 (tự Lưu trữ không áp dụng cho người đang làm việc, kể cả hồ sơ nhập từ Excel đang ở Nháp) và câu 38. **[Nội bộ] cần khách xác nhận** cùng mục E của `lam-ro-yeu-cau.md`.
+- Lý do hệ thống tự điền: `Sửa trường định danh: <tên trường>` (không có giá trị), `Hệ thống tự chuyển hồ sơ <mã> sang <trạng thái>`, và với tự Lưu trữ: `Tự Lưu trữ: … (hồ sơ <mã>)`, `Hồ sơ bỏ dở (hồ sơ <mã>)`. Căn cứ "Hồ sơ bỏ dở" của `retention_info` nhận ra bằng lý do bắt đầu bằng "Hồ sơ bỏ dở" **và** người thực hiện là Hệ thống.
+- Ma trận 4.4 ở `apps/workers/rules.py` (`can_edit_profile`, `can_add_document`, `can_replace_document`, `can_verify_document`); hồ sơ đã ẩn danh hóa thì mọi hàm trả `False`.
+- Mô-đun khác: `retention.py` (hạn lưu trữ, ẩn danh hóa), `validation.py` (kiểm tra dữ liệu dùng chung cho form và service), `services.py` (tạo, sửa, liên hệ, đồng ý, mở lại), `duplicates.py`, `indicators.py`, `listing.py`, `history_labels.py`, `apps/core/dates.py` (`add_months`, `add_years`).
+
 ### 4.2 Không tự duyệt (câu 8)
 Người duyệt/trả lại/từ chối phải khác `worker.created_by` **và** khác `changed_by` của dòng `StatusChange` gần nhất có `to_status = PENDING`. Áp dụng cả với Admin.
 

@@ -138,7 +138,7 @@ Bộ lọc của 9 thẻ:
 | `/ho-so/nhap-excel/` | G, P | ✓ | ✓ | ✓ | | `IMPORT` | Báo lỗi từng dòng; phần thông tin làm việc chỉ A, Q; mã NV cũ tối đa 20 ký tự, chữ/số/gạch ngang, không trùng (câu 27) |
 | `/ho-so/nhap-excel/file-mau/` | G | ✓ | ✓ | ✓ | | | Tải file mẫu `.xlsx` (`excel-mau.md`) |
 | `/ho-so/<id>/` | G | ✓ | ✓ | ✓ | ✓ | | `?tab=ca-nhan` (mặc định), `tuyen-dung`, `lam-viec`, `tai-lieu`, `lich-su` |
-| `/ho-so/<id>/sua/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` (+ `STATUS_CHANGE` khi tự về Chờ duyệt) | Theo bảng 4.4 `models.md`; liên hệ khẩn cấp sửa cùng form |
+| `/ho-so/<id>/sua/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` (+ `STATUS_CHANGE` khi tự về Chờ duyệt) | Theo bảng 4.4 `models.md`; liên hệ khẩn cấp sửa cùng form (thêm, sửa, **xóa dòng**: dòng con không bảng nào trỏ tới, giá trị cũ ghi vào nhật ký; hồ sơ Đã xác minh vẫn phải còn ≥ 1 dòng đủ 3 trường khi gửi duyệt) |
 | `/ho-so/<id>/cccd-day-du/` | P, H | ✓ | ✓ | ✓ | | `VIEW_FULL_ID` | Nút "Hiện số đầy đủ" (câu 12) |
 | `/ho-so/<id>/dong-y/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | Ghi nhận đồng ý; hình thức Ký giấy thì bắt buộc tải tệp biên bản |
 | `/ho-so/<id>/dong-y/mau-in/` | G | ✓ | ✓ | ✓ | | `PRINT` | Văn bản đồng ý điền sẵn họ tên, mã hồ sơ (`mau-dong-y.md`) |

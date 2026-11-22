@@ -117,12 +117,19 @@ Mỗi biểu đồ có tiêu đề nói kết quả và đơn vị. Khối "Ch�
 [_table]
  STT | Mã NV | Họ và tên | Ngày sinh | Giới tính | SĐT | Bộ phận | Chức danh |
  Ngày vào làm | TT hồ sơ [_status_badge] | TT làm việc [_status_badge] | Thao tác
- ...                                   <bi-eye> <bi-pencil>{A,Q,H} <bi-archive>{theo quyền}
+ ...                                   <bi-eye> <bi-pencil>{A,Q,H}
 [_pagination] Hiển thị 1–20 / 512
 (không có kết quả -> [_empty_state] "Không có hồ sơ phù hợp." + [ Xóa lọc ])
 ```
 
-Tiêu đề cột bấm để sắp xếp. Ô tìm nhanh ở thanh trên gửi tới `?q=`. Viewer: không tìm theo CCCD, không có nút Xuất Excel, Thêm hồ sơ, Sửa.
+**Đã chốt ở Phase 4 (22/11/2026):**
+- Sắp xếp dùng ô chọn "Sắp xếp" trong thanh lọc (Họ tên, Mã NV, Ngày sinh, Ngày vào làm, tăng/giảm), vì `_table` không có tiêu đề bấm được và `/ui-kit/` đã đóng kiểu dáng.
+- Nút trên dòng chỉ có Xem và Sửa; Lưu trữ làm ở trang chi tiết (cần hộp xác nhận và lý do).
+- Tiêu đề hai cột trạng thái viết tắt "TT hồ sơ" và "TT làm việc" để 12 cột vừa khung ở 1366 px (đã đo: đủ chỗ, không cuộn ngang).
+- Bộ lọc thêm "Trạng thái tuyển dụng" (xét lần ứng tuyển gần nhất), "Hoàn thiện", khoảng ngày tiếp nhận; tham số URL tiếng Việt không dấu trùng với liên kết thẻ Dashboard.
+- Bộ lọc được giữ trong phiên, **trừ chữ tìm kiếm** (có thể là số CCCD, không lưu vào phiên); "Xóa lọc" là `?reset=1`.
+
+Ô tìm nhanh ở thanh trên gửi tới `?q=`. Viewer: không tìm theo CCCD, không có nút Xuất Excel, Thêm hồ sơ, Sửa.
 
 ### 2.4 Thêm hồ sơ `/ho-so/them/` {A,Q,H}
 
@@ -147,12 +154,11 @@ Mỗi thẻ là liên kết tới `/ho-so/them/nhap-tay/`, `/nhap-cccd/`, `/ho-s
   [_form_field] Ngày sinh          [_form_field] Giới tính
   [_form_field] Số CCCD            (kiểm tra trùng khi rời ô: HTMX, khung lỗi + [ Mở hồ sơ cũ ])
   [_form_field] Ngày cấp, Nơi cấp, Quê quán, Địa chỉ thường trú...
-[_form_section] Liên hệ khẩn cấp
-[_form_section] Thông tin ban đầu (chỉ A, Q)   Phòng ban, Bộ phận, Chức danh, Ca
+[_form_section] Liên hệ khẩn cấp   (mỗi người một khối; dòng đã lưu có ô "Xóa người liên hệ này")
                                               [ Hủy ]  [*Lưu hồ sơ*]
 ```
 
-Nháp chỉ cần họ tên + SĐT (câu 5). Tên trường chính xác lấy từ `models.md` khi làm Phase 4.
+Nháp chỉ cần họ tên + SĐT (câu 5). **Đã chốt ở Phase 4 (22/11/2026):** bỏ khối "Thông tin ban đầu (chỉ A, Q)" vì thông tin làm việc chỉ có khi hồ sơ có mã NV: nhập qua "Tiếp nhận vào làm" (Phase 6) hoặc file Excel (Phase 7). Form chia 3 nhóm trường (Thông tin cá nhân, Giấy tờ, Khác) rồi tới Liên hệ khẩn cấp.
 
 ### 2.5 Nhập từ CCCD và CV `/nhap-cccd/` → `/nhap-cccd/<uuid>/` {A,Q,H}
 
@@ -181,13 +187,15 @@ Viewer: không có cột Mức lương mong muốn.
 ```
 [_page_header] Duyệt hồ sơ
 [_filter_bar] (Người gửi)(Nguồn nhập)(Từ ngày)(đến)   [ Lọc ] [ Xóa lọc ]
-[Phỏng đoán – chốt ở Phase 4: cột và bộ lọc]
-[_table]  cũ nhất trước
- Mã hồ sơ | Họ và tên | Người gửi duyệt | Ngày gửi | Nguồn nhập |
- Trạng thái [_status_badge] | Thao tác <bi-eye>
- (dòng do chính bạn tạo/gửi: chú thích muted "Bạn không duyệt được hồ sơ này")
+[Đã chốt ở Phase 4, 22/11/2026]
+[_table]  cũ nhất trước (theo lần gửi duyệt gần nhất)
+ Mã hồ sơ | Họ và tên | Người gửi duyệt | Ngày gửi | Giấy tờ [_status_badge: Thiếu giấy tờ] |
+ Ghi chú | Thao tác <bi-eye>
+ (dòng do chính bạn tạo/gửi: Ghi chú "Bạn không duyệt được hồ sơ này")
 [_pagination]    ([_empty_state] "Không có hồ sơ chờ duyệt.")
 ```
+
+Bộ lọc: Người gửi duyệt, Từ ngày, Đến ngày (ngày gửi). **Bỏ cột "Nguồn nhập" và "Trạng thái"**: chưa có trường nào lưu nguồn nhập; mọi dòng đều Chờ duyệt.
 
 Nút Duyệt / Trả lại / Từ chối nằm ở trang chi tiết (mục 3), không đặt trong bảng.
 

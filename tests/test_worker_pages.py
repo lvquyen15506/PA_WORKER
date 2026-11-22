@@ -315,7 +315,11 @@ def test_kich_ban_14_sua_ho_ten_ho_so_da_xac_minh_ve_cho_duyet_nhat_ky_co_gia_tr
     page = body(manager.get(f"/ho-so/{worker.pk}/?tab=lich-su"))
     assert f"/ho-so/{worker.pk}/lich-su/chi-tiet/" in page
     detail = body(manager.get(f"/ho-so/{worker.pk}/lich-su/chi-tiet/"))
-    assert old_name in detail and "Nguyễn Tên Đã Sửa" in detail and "full_name" in detail
+    assert old_name in detail and "Nguyễn Tên Đã Sửa" in detail and "Họ và tên" in detail
+    # Chỉ hiện nhãn tiếng Việt, không lộ mã kỹ thuật.
+    for technical in ("full_name", "verification_status", "VERIFIED", "PENDING"):
+        assert technical not in detail
+    assert "Đã xác minh" in detail and "Chờ duyệt" in detail
     # Nhật ký chung không chứa họ tên.
     for entry in AuditLog.objects.filter(worker=worker):
         assert old_name not in f"{entry.changes} {entry.note} {entry.object_repr}"
