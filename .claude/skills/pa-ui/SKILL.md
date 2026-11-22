@@ -29,11 +29,12 @@ Trang `/ui-kit` (tạo ở phase 3) là bản chuẩn. Khi đã duyệt, **mọi
 
 - Ghi đè biến Bootstrap (`--bs-primary` = navy, `--bs-link-color` = blue, `--bs-border-radius` = 6px) trong `pa.css`. Không viết màu hex ở bất kỳ file nào khác.
 - Khoảng cách chỉ dùng thang 4, 8, 12, 16, 24, 32 px (utility Bootstrap `1`–`5`).
-- Font: một bộ font hệ thống `"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif` (hiển thị tốt tiếng Việt, không phải tải). Cỡ chữ: thân 14px, tiêu đề trang 20px/600, tiêu đề thẻ 16px/600, chữ phụ 13px màu muted.
+- Font: một bộ font hệ thống `system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif` (hiển thị tốt tiếng Việt, không tải font ngoài vì hệ thống chạy offline). Cỡ chữ: thân 14px, tiêu đề trang 20px/600, tiêu đề thẻ 16px/600, chữ phụ 13px màu muted.
 - Không đổ bóng; tách lớp bằng viền `1px solid var(--pa-border)`.
 
 ## 2. Bố cục khung (`templates/base.html`)
 
+- `base.html` có `{% block shell %}` bao sidebar + thanh trên; trang Đăng nhập làm rỗng block này (khung tối giản: tên "PA Worker" + chân trang "Phát triển bởi QQIT"), các trang khác giữ nguyên.
 - **Sidebar trái** rộng 240px, nền navy, chữ trắng 85%; mục đang chọn có nền trắng 10% và vạch trái 3px màu blue. Đầu sidebar: logo chữ "PA Worker".
 - **Thanh trên** nền trắng, viền dưới: ô tìm nhanh bên trái, tên người dùng + vai trò + nút Đăng xuất bên phải.
 - **Vùng nội dung** nền `--pa-bg`, padding 24px.
@@ -46,14 +47,14 @@ Trang `/ui-kit` (tạo ở phase 3) là bản chuẩn. Khi đã duyệt, **mọi
 | File | Dùng cho |
 | --- | --- |
 | `_page_header.html` | Tiêu đề, breadcrumb, nút thao tác của trang |
-| `_stat_card.html` | Thẻ số liệu Dashboard: nhãn, con số lớn, dòng phụ; cả thẻ là liên kết tới danh sách đã lọc |
+| `_stat_card.html` | Thẻ số liệu Dashboard: nhãn, con số lớn, dòng phụ; cả thẻ là liên kết tới danh sách đã lọc. Con số là **tùy chọn**: không truyền số thì thẻ chỉ có nhãn + dòng phụ (dùng cho 3 lựa chọn ở trang Thêm hồ sơ); không tạo component riêng cho dạng này |
 | `_filter_bar.html` | Thanh lọc phía trên bảng: các ô chọn cùng hàng, nút "Lọc" và "Xóa lọc" |
 | `_table.html` | Bảng danh sách: đầu bảng nền xám nhạt, hover dòng, cột số căn phải, cột Thao tác căn phải |
 | `_pagination.html` | Phân trang 20 dòng, hiển thị "Hiển thị 1–20 / 512" |
 | `_form_field.html` | Một trường form: nhãn trên, dấu * đỏ nếu bắt buộc, chữ gợi ý muted, lỗi đỏ ngay dưới ô |
 | `_form_section.html` | Nhóm trường có tiêu đề nhóm, lưới 2 cột trên desktop |
 | `_status_badge.html` | Nhãn trạng thái (bảng ở mục 5) |
-| `_confirm_modal.html` | Hộp xác nhận thao tác không hoàn tác được |
+| `_confirm_modal.html` | Hộp xác nhận thao tác không hoàn tác được. Có `{% block body %}` để đặt trường form (dùng `_form_field`: lý do, số đơn, gõ lại mã hồ sơ…). Nút xác nhận submit form POST có CSRF; modal chỉ là giao diện, máy chủ kiểm tra lại mọi trường |
 | `_empty_state.html` | Khi danh sách trống: một câu giải thích + một nút hành động |
 | `_alert.html` | Thông báo sau thao tác (thành công / lỗi), tự ẩn sau 5 giây |
 | `_tabs.html` | Tab trong trang chi tiết hồ sơ |
@@ -88,6 +89,18 @@ Nhãn trạng thái: nền màu nhạt (màu chính ở độ đậm 12%), chữ
 | Xám (muted) | Chưa xác minh |
 | Xanh lá (success) | Đã đối chiếu bản gốc |
 | Đỏ (danger) | Không hợp lệ |
+
+**Nhãn hiển thị (không phải bộ trạng thái):** suy ra từ trường có sẵn, dùng cùng `_status_badge` và bảng màu trên, **không** có `TextChoices` riêng.
+
+| Màu | Nhãn | Lấy từ |
+| --- | --- | --- |
+| Xanh lá | Đang hoạt động | `User.is_active = True` và không bị khóa tạm |
+| Đỏ | Bị khóa | `User.is_active = False` (Admin khóa) |
+| Vàng | Khóa tạm | `User.locked_until` còn hiệu lực |
+| Xanh lá | Đang dùng | Danh mục `is_active = True` |
+| Xám | Ngừng | Danh mục `is_active = False` |
+| Xanh lá | Thành công | `LoginHistory.success = True` |
+| Đỏ | Thất bại | `LoginHistory.success = False` |
 
 "Chờ hủy" **không** phải trạng thái, nên không có nhãn riêng. Tab "Chờ hủy" trong Cài đặt hiển thị nhãn Lưu trữ (xám) cùng cột "Hết hạn lưu trữ" (ngày dd/mm/yyyy).
 

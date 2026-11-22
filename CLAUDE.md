@@ -73,7 +73,7 @@ docker compose logs -f web
 - **Bí mật:** SECRET_KEY, mật khẩu CSDL, khóa mã hóa chỉ nằm trong `.env`. Không commit `.env`.
 - **Khóa mã hóa** (`docs/lam-ro-yeu-cau.md` câu 31): `FIELD_ENCRYPTION_KEY` và `HASH_KEY` sinh một lần khi cài, **không** nằm trong file sao lưu; script sao lưu (Phase 8) nhắc người dùng cất bản sao khóa riêng (USB/giấy niêm phong). Thiếu hoặc sai khóa thì ứng dụng từ chối khởi động với thông báo tiếng Việt rõ ràng. MVP không hỗ trợ đổi khóa (giới hạn đã biết).
 - **Không gọi dịch vụ ngoài Internet** trong chức năng bắt buộc. API OCR trả phí chỉ là tùy chọn, tắt mặc định.
-- **Trạng thái:** chỉ dùng đúng ba bộ trạng thái và ba chỉ số tự tính ở mục II của `docs/yeu-cau.md`, cộng bộ thứ tư **trạng thái xác minh tài liệu** (Chưa xác minh / Đã đối chiếu bản gốc / Không hợp lệ), bộ này chỉ dùng trong tab Tài liệu (`docs/lam-ro-yeu-cau.md` câu 3). Khai báo bằng `TextChoices`, không viết chuỗi trạng thái rải rác. "Chờ hủy" không phải trạng thái, chỉ là danh sách tính tự động.
+- **Trạng thái:** chỉ dùng đúng ba bộ trạng thái và ba chỉ số tự tính ở mục II của `docs/yeu-cau.md`, cộng bộ thứ tư **trạng thái xác minh tài liệu** (Chưa xác minh / Đã đối chiếu bản gốc / Không hợp lệ), bộ này chỉ dùng trong tab Tài liệu (`docs/lam-ro-yeu-cau.md` câu 3). Khai báo bằng `TextChoices`, không viết chuỗi trạng thái rải rác. "Chờ hủy" không phải trạng thái, chỉ là danh sách tính tự động. Quy tắc 4 bộ trạng thái áp dụng cho trạng thái nghiệp vụ được lưu; nhãn hiển thị ở pa-ui mục 5 không tính.
 
 ## Kiểm thử
 
