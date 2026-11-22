@@ -70,6 +70,7 @@ docker compose logs -f web
 - **Không xóa cứng** bản ghi có liên kết; dùng trạng thái Lưu trữ hoặc cờ ngừng sử dụng. Ngoại lệ: `IntakeSession` (bản ghi tạm), `AuditPersonalValue` khi ẩn danh hóa, và dòng con học vấn / chứng chỉ / kinh nghiệm (không bảng nào trỏ tới, giá trị cũ ghi nhật ký; xem `docs/thiet-ke/trang.md`).
 - **Kết quả OCR/QR** không bao giờ tự lưu vào hồ sơ khi HR chưa xác nhận. Không đoán chữ mờ hoặc thiếu.
 - **Tệp tải lên:** lưu ngoài thư mục public, tên ngẫu nhiên, kiểm tra định dạng thật của tệp, tối đa 10 MB, chỉ tải qua view có kiểm tra quyền.
+- **Không bao giờ ghi mật khẩu, khóa, token vào báo cáo, commit, tài liệu hay tin nhắn trả lời.** Khi cần, chỉ nói "đã in ra console" hoặc hướng dẫn lệnh để người dùng tự xem.
 - **Bí mật:** SECRET_KEY, mật khẩu CSDL, khóa mã hóa chỉ nằm trong `.env`. Không commit `.env`.
 - **Khóa mã hóa** (`docs/lam-ro-yeu-cau.md` câu 31): `FIELD_ENCRYPTION_KEY` và `HASH_KEY` sinh một lần khi cài, **không** nằm trong file sao lưu; script sao lưu (Phase 8) nhắc người dùng cất bản sao khóa riêng (USB/giấy niêm phong). Thiếu hoặc sai khóa thì ứng dụng từ chối khởi động với thông báo tiếng Việt rõ ràng. MVP không hỗ trợ đổi khóa (giới hạn đã biết).
 - **Không gọi dịch vụ ngoài Internet** trong chức năng bắt buộc. API OCR trả phí chỉ là tùy chọn, tắt mặc định.
