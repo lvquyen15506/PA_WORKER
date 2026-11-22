@@ -1,0 +1,3 @@
+{% comment %}Mảnh HTMX: các phiên bản của một tài liệu (mới nhất trước). Bản cũ vẫn xem/tải được qua view có
+   kiểm tra quyền. Dùng component _table (icon thao tác nằm trong _table theo pa-ui mục 6).{% endcomment %}
+{% include "components/_table.html" with columns=columns rows=rows empty_text="Chưa có phiên bản nào." %}

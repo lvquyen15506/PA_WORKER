@@ -28,6 +28,16 @@ def make_user(role="HR_STAFF", username=None, password=PASSWORD, must_change=Fal
     return user
 
 
+def login_client(user, **client_kwargs):
+    """Client đã đăng nhập bằng chính trang đăng nhập (không bỏ qua middleware)."""
+    from django.test import Client
+
+    client = Client(**client_kwargs)
+    response = client.post("/dang-nhap/", {"username": user.username, "password": PASSWORD})
+    assert response.status_code == 302, "đăng nhập thử nghiệm thất bại"
+    return client
+
+
 def make_worker(created_by=None, **kwargs):
     n = next(_seq)
     defaults = {
