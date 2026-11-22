@@ -154,6 +154,16 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 PRIVATE_MEDIA_ROOT = Path(_env("PRIVATE_MEDIA_ROOT", str(BASE_DIR / "private_media")))
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
+# Nhận diện CCCD/CV (Phase 5). Gunicorn timeout 120 giây nên toàn bộ một lượt nhận diện chỉ được
+# dùng tối đa 90 giây (mỗi giai đoạn lấy phần còn lại); hết thì trường chưa đọc để trống, tô vàng.
+INTAKE_TOTAL_BUDGET_SECONDS = 90
+OCR_TIMEOUT_SECONDS = 30  # tối đa cho một lần gọi Tesseract (còn bị giới hạn bởi ngân sách)
+ANTIWORD_TIMEOUT_SECONDS = 20
+MAX_IMAGE_PIXELS = 40_000_000  # ảnh lớn hơn bị từ chối trước khi giải nén
+CV_MAX_TEXT_PAGES = 10  # PDF: số trang tối đa đọc lớp chữ
+CV_MAX_OCR_PAGES = 3  # PDF scan / ảnh: số trang tối đa vẽ ra để OCR
+CV_MAX_DPI = 300
+
 # Đăng nhập, phiên (ngưỡng cố định theo yêu cầu).
 LOGIN_URL = "/dang-nhap/"
 LOGIN_REDIRECT_URL = "/"

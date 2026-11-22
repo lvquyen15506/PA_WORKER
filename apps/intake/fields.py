@@ -102,6 +102,51 @@ _NORMALIZERS = {
 }
 
 
+# Trường in trên từng mặt của mỗi mẫu thẻ (docs/yeu-cau.md mục V). Dùng để biết trường nào "phải
+# có": trường phải có mà không đọc được thì để trống và tô vàng (không đoán).
+_LEGACY_LAYOUT = {
+    "front": [
+        "id_number",
+        "full_name",
+        "date_of_birth",
+        "gender",
+        "nationality",
+        "hometown",
+        "permanent_address",
+        "expiry_date",
+    ],
+    "back": ["issue_date", "issue_place"],
+}
+CARD_FIELDS = {
+    "CCCD_2021": _LEGACY_LAYOUT,
+    "CCCD_2016": _LEGACY_LAYOUT,
+    "CAN_CUOC_2024": {
+        "front": ["id_number", "full_name", "date_of_birth", "gender", "nationality"],
+        "back": ["permanent_address", "birth_registration_place", "issue_date", "expiry_date"],
+    },
+}
+# Chưa biết mẫu thẻ: chỉ coi các trường lõi là phải có.
+UNKNOWN_CARD_FIELDS = {
+    "front": ["id_number", "full_name", "date_of_birth", "gender"],
+    "back": [],
+}
+
+# Nhãn in trên thẻ để OCR nhận ra dòng (viết không dấu, chữ thường, tách từ). Nhãn dài đứng trước.
+OCR_LABELS = {
+    "id_number": [("so", "dinh", "danh"), ("so",)],
+    "full_name": [("ho", "va", "ten"), ("ho", "ten")],
+    "date_of_birth": [("ngay", "sinh")],
+    "gender": [("gioi", "tinh")],
+    "nationality": [("quoc", "tich")],
+    "hometown": [("que", "quan")],
+    "permanent_address": [("noi", "thuong", "tru"), ("noi", "cu", "tru")],
+    "birth_registration_place": [("noi", "dang", "ky", "khai", "sinh")],
+    "issue_date": [("ngay", "cap")],
+    "issue_place": [("noi", "cap")],
+    "expiry_date": [("co", "gia", "tri", "den"), ("ngay", "het", "han")],
+}
+
+
 def normalize(name, raw, date_format="ddmmyyyy"):
     """Chuẩn hóa một giá trị thô; trả None nếu rỗng hoặc sai định dạng (để trống, không đoán)."""
     if name not in FIELD_LABELS:

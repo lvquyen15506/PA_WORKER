@@ -210,7 +210,7 @@ def _degrade(image, quality):
         height = round(image.height * LOW_RES_W / image.width)
         return image.resize((LOW_RES_W, height), Image.LANCZOS)
     if quality == "blur":
-        return image.filter(ImageFilter.GaussianBlur(radius=7))
+        return image.filter(ImageFilter.GaussianBlur(radius=3.5))
     if quality == "dark":
         return ImageEnhance.Brightness(image).enhance(0.12)
     return image
