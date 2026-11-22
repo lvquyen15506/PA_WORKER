@@ -12,3 +12,4 @@ backups/
 .DS_Store
 Thumbs.db
 .claude/settings.local.json
+private_media/
