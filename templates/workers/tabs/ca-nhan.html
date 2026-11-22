@@ -1,0 +1,31 @@
+{% include "components/_form_section.html" with title="Thông tin cơ bản" items=basic_items %}
+
+{% if paper_items %}
+  {% include "components/_form_section.html" with title="Giấy tờ" items=paper_items %}
+  {% if show_full_id %}
+  <div class="mb-3">
+    <button class="btn btn-outline-secondary btn-sm" type="button" hx-post="/ho-so/{{ worker.pk }}/cccd-day-du/" hx-target="#full-id-result" hx-swap="innerHTML">Hiện số đầy đủ</button>
+    <span id="full-id-result" class="pa-view-value"></span>
+  </div>
+  {% endif %}
+{% endif %}
+
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Liên hệ khẩn cấp</h2>
+  {% include "components/_table.html" with columns=contact_columns rows=contact_rows empty_text="Chưa có người liên hệ khẩn cấp." %}
+</section>
+
+{% if consent_items %}
+  {% include "components/_form_section.html" with title="Đồng ý xử lý dữ liệu" items=consent_items %}
+{% else %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Đồng ý xử lý dữ liệu</h2>
+  {% include "components/_empty_state.html" with text="Chưa ghi nhận đồng ý xử lý dữ liệu." %}
+</section>
+{% endif %}
+{% if can_record_consent or can_print_consent %}
+<div class="mb-3 d-flex flex-wrap gap-2">
+  {% if can_record_consent %}<a class="btn btn-outline-secondary" href="/ho-so/{{ worker.pk }}/dong-y/">Ghi nhận đồng ý</a>{% endif %}
+  {% if can_print_consent %}<a class="btn btn-outline-secondary" href="/ho-so/{{ worker.pk }}/dong-y/mau-in/" target="_blank" rel="noopener">In mẫu</a>{% endif %}
+</div>
+{% endif %}

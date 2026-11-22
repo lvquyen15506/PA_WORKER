@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title=page_title actions=print_actions %}
+<div class="mb-3 d-print-none"><button class="btn btn-primary" type="button" onclick="window.print()">In văn bản</button></div>
+<section class="pa-form-section">
+  <p><strong>[TÊN DOANH NGHIỆP]</strong></p>
+  <h2 class="pa-card-title">VĂN BẢN ĐỒNG Ý XỬ LÝ DỮ LIỆU CÁ NHÂN</h2>
+  <p><em>(Dành cho người ứng tuyển và người lao động)</em></p>
+  <p>Mã hồ sơ: <strong>{{ worker.worker_code }}</strong> · Họ và tên: <strong>{{ worker.full_name }}</strong> · Ngày sinh: <strong>{{ worker.date_of_birth|date:"d/m/Y"|default:"……/……/…………" }}</strong> · Số điện thoại: <strong>{{ worker.phone|default:"………………" }}</strong></p>
+  <p>Căn cứ Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 và Nghị định số 356/2025/NĐ-CP của Chính phủ hướng dẫn thi hành Luật (cùng có hiệu lực từ ngày 01/01/2026).</p>
+
+  <h3>1. Ai giữ và xử lý dữ liệu của bạn</h3>
+  <ul>
+    <li>Doanh nghiệp: [Tên doanh nghiệp]</li>
+    <li>Địa chỉ: [Địa chỉ]</li>
+    <li>Người liên hệ về dữ liệu cá nhân: [Họ tên, chức vụ, số điện thoại, email]</li>
+  </ul>
+
+  <h3>2. Dữ liệu dùng để làm gì</h3>
+  <p>Doanh nghiệp chỉ dùng dữ liệu của bạn để:</p>
+  <ol>
+    <li>Tuyển dụng: xem xét hồ sơ, hẹn phỏng vấn, báo kết quả.</li>
+    <li>Quản lý hồ sơ lao động: hợp đồng, nơi làm việc, chức danh, ca làm, quá trình làm việc.</li>
+    <li>Liên hệ người thân của bạn khi có việc khẩn cấp.</li>
+    <li>Lập báo cáo, thống kê nội bộ của doanh nghiệp.</li>
+  </ol>
+  <p>Doanh nghiệp <strong>không</strong> dùng dữ liệu của bạn cho mục đích khác (ví dụ quảng cáo, bán hoặc cho bên khác dùng).</p>
+
+  <h3>3. Những dữ liệu được thu thập</h3>
+  <ul>
+    <li><strong>Thông tin cá nhân:</strong> họ và tên, ngày sinh, giới tính, quốc tịch.</li>
+    <li><strong>Giấy tờ tùy thân:</strong> loại giấy tờ, số định danh cá nhân (số CCCD), số CMND cũ (nếu có), ngày cấp, nơi cấp, ngày hết hạn, quê quán hoặc nơi đăng ký khai sinh, nơi thường trú hoặc nơi cư trú; ảnh chụp hai mặt CCCD.</li>
+    <li><strong>Liên lạc:</strong> số điện thoại, email, nơi ở hiện tại.</li>
+    <li><strong>Người liên hệ khẩn cấp:</strong> họ tên, mối quan hệ, số điện thoại. (Bạn xác nhận đã báo cho người này biết việc cung cấp thông tin của họ.)</li>
+    <li><strong>Ảnh chân dung.</strong></li>
+    <li><strong>Tuyển dụng:</strong> vị trí ứng tuyển, mức lương mong muốn, ngày có thể nhận việc, ghi chú phỏng vấn, kết quả; CV hoặc đơn xin việc; học vấn, chứng chỉ, kinh nghiệm làm việc, kỹ năng.</li>
+    <li><strong>Làm việc:</strong> mã nhân viên, phòng ban, bộ phận, tổ, chức danh, ca làm, ngày vào làm, hợp đồng, quá trình điều chuyển, ngày nghỉ việc và lý do nghỉ.</li>
+    <li><strong>Giấy tờ khác bạn nộp:</strong> bằng cấp, chứng chỉ, quyết định tiếp nhận.</li>
+  </ul>
+  <p>Doanh nghiệp <strong>không thu thập</strong> tình trạng hôn nhân, dân tộc, tôn giáo, thông tin sức khỏe.</p>
+
+  <h3>4. Dữ liệu được giữ gìn thế nào</h3>
+  <ul>
+    <li>Dữ liệu lưu trên máy chủ đặt tại doanh nghiệp. Ảnh CCCD được đọc tự động ngay trên máy của doanh nghiệp, và nhân viên nhân sự kiểm tra lại trước khi lưu. Doanh nghiệp không gửi dữ liệu ra ngoài.</li>
+    <li>Số CCCD, số CMND cũ và địa chỉ thường trú được mã hóa (chuyển thành dạng không đọc được nếu không có khóa riêng của doanh nghiệp).</li>
+    <li>Chỉ người có nhiệm vụ mới xem được dữ liệu, mỗi người chỉ xem phần việc của mình.</li>
+    <li>Số CCCD mặc định bị che một phần trên màn hình, trong file xuất và bản in. Chỉ người có thẩm quyền mới xem được số đầy đủ, và mỗi lần xem đều được ghi lại.</li>
+    <li>Mọi lần tải giấy tờ, sửa hồ sơ cũng được ghi lại.</li>
+    <li>Doanh nghiệp chỉ cung cấp dữ liệu cho cơ quan nhà nước khi pháp luật yêu cầu.</li>
+  </ul>
+
+  <h3>5. Dữ liệu được giữ trong bao lâu</h3>
+  <ul>
+    <li>Nếu bạn <strong>không được tuyển</strong> hoặc không nhận việc: giữ <strong>12 tháng</strong> kể từ ngày có kết quả.</li>
+    <li>Nếu bạn <strong>đã làm việc</strong> tại doanh nghiệp: giữ <strong>10 năm</strong> kể từ ngày nghỉ việc.</li>
+    <li>Hết thời hạn, doanh nghiệp xóa thông tin cá nhân và giấy tờ của bạn. Chỉ còn giữ mã hồ sơ, mã nhân viên, các thông tin dùng cho thống kê không kèm tên (vị trí, bộ phận, trình độ, ngày tháng, số hợp đồng) và sổ ghi các thao tác.</li>
+  </ul>
+
+  <h3>6. Quyền của bạn</h3>
+  <p>Bạn có quyền:</p>
+  <ul>
+    <li>Được biết dữ liệu nào của mình đang được dùng và dùng để làm gì.</li>
+    <li>Xem dữ liệu của mình và yêu cầu sửa khi thông tin sai.</li>
+    <li>Rút lại sự đồng ý bất cứ lúc nào.</li>
+    <li>Yêu cầu xóa dữ liệu, trong phạm vi pháp luật cho phép.</li>
+    <li>Khiếu nại nếu cho rằng dữ liệu của mình bị dùng sai.</li>
+  </ul>
+  <p>Để thực hiện các quyền trên, bạn liên hệ người ở mục 1, hoặc gặp trực tiếp bộ phận nhân sự.</p>
+
+  <h3>7. Nếu bạn không đồng ý hoặc rút lại đồng ý</h3>
+  <ul>
+    <li>Bạn có thể không đồng ý. Khi đó doanh nghiệp vẫn giữ tạm hồ sơ bạn đã nộp nhưng <strong>chưa thể chuyển hồ sơ sang bước xét duyệt</strong>, nên chưa tiếp tục được việc tuyển dụng hoặc quản lý hồ sơ lao động trên phần mềm. Bạn có thể yêu cầu nhận lại hoặc xóa giấy tờ đã nộp bằng cách liên hệ bộ phận nhân sự.</li>
+    <li>Nếu bạn rút lại đồng ý, doanh nghiệp ngừng xử lý dữ liệu kể từ khi nhận yêu cầu, trừ phần pháp luật bắt buộc phải lưu giữ. Việc rút lại không làm thay đổi những gì đã xử lý hợp lệ trước đó.</li>
+  </ul>
+
+  <h3>8. Xác nhận</h3>
+  <p>Tôi đã đọc và hiểu nội dung văn bản này. Tôi chọn:</p>
+  <p>☐ <strong>Đồng ý</strong> cho doanh nghiệp xử lý dữ liệu cá nhân của tôi như trên.</p>
+  <p>☐ <strong>Không đồng ý.</strong></p>
+  <table class="table table-bordered">
+    <thead>
+      <tr><th scope="col">Người ứng tuyển / người lao động</th><th scope="col">Cha/mẹ/người giám hộ (nếu người lao động dưới 16 tuổi)</th><th scope="col">Người tiếp nhận (bộ phận nhân sự)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Họ và tên: ………………………</td><td>Họ và tên: ………………………</td><td>Họ và tên: ………………………</td></tr>
+      <tr><td>Ngày ……/……/…………</td><td>Quan hệ: ………………………</td><td>Chức vụ: ………………………</td></tr>
+      <tr><td>Chữ ký:<br><br></td><td>Chữ ký:<br><br></td><td>Chữ ký:<br><br></td></tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}

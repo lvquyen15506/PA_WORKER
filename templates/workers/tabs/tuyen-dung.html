@@ -1,0 +1,20 @@
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Lần ứng tuyển</h2>
+  {% include "components/_table.html" with columns=app_columns rows=app_rows empty_text="Chưa có lần ứng tuyển nào." %}
+</section>
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Học vấn</h2>
+  {% include "components/_table.html" with columns=education_columns rows=education_rows empty_text="Chưa có thông tin học vấn." %}
+</section>
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Chứng chỉ</h2>
+  {% include "components/_table.html" with columns=certificate_columns rows=certificate_rows empty_text="Chưa có chứng chỉ nào." %}
+</section>
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Kinh nghiệm làm việc</h2>
+  {% include "components/_table.html" with columns=experience_columns rows=experience_rows empty_text="Chưa có kinh nghiệm làm việc nào." %}
+</section>
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Kỹ năng</h2>
+  {% if skills %}<p class="pa-view-value">{{ skills|linebreaksbr }}</p>{% else %}{% include "components/_empty_state.html" with text="Chưa ghi kỹ năng." %}{% endif %}
+</section>

@@ -1,0 +1,19 @@
+{% if missing_groups %}
+  {% include "components/_alert.html" with kind="warning" text=missing_text %}
+{% endif %}
+{% if can_upload %}
+<div class="mb-3"><a class="btn btn-outline-secondary" href="{{ upload_url }}">Tải tài liệu lên</a></div>
+{% endif %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Tài liệu hiện hành</h2>
+  {% include "components/_table.html" with columns=doc_columns rows=doc_rows modal_id="doc-verify-modal" empty_text="Chưa có tài liệu nào." %}
+</section>
+{% if old_doc_rows %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Phiên bản cũ</h2>
+  {% include "components/_table.html" with columns=doc_columns rows=old_doc_rows empty_text="Không có phiên bản cũ." %}
+</section>
+{% endif %}
+{% if can_verify %}
+  {% include "components/_confirm_modal.html" with id="doc-verify-modal" title="Xác minh tài liệu" message="Chọn trạng thái xác minh cho tài liệu này." action="" confirm_label="Lưu trạng thái" fields=modals.document %}
+{% endif %}

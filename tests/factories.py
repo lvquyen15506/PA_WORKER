@@ -113,6 +113,47 @@ def advance_to(worker, status, *, submitter=None, reviewer=None):
     return worker
 
 
+SENSITIVE = {
+    "id_number": "999314159265",
+    "old_id_number": "999271828",
+    "permanent_address": "Số 9 ngõ Bí Mật, phường Thường Trú Giả",
+    "hometown": "Làng Quê Quán Kín",
+    "birth_registration_place": "Xã Nơi Khai Sinh Kín",
+    "salary": 13579246,
+    "salary_text": "13.579.246",
+    "file_name": "TenTepRieng.pdf",
+}
+
+
+def make_sensitive_worker(status="DRAFT"):
+    """Hồ sơ đủ trường, mọi giá trị Viewer không được thấy (câu 13) là chuỗi dễ nhận ra, kèm
+    ứng tuyển có mức lương, học vấn, tài liệu và hợp đồng."""
+    from apps.core.models import EducationLevel
+    from apps.recruitment.models import Application, Education
+    from apps.workers.models import IdentityDocument
+
+    worker = make_worker_full()
+    identity = IdentityDocument.objects.get(worker=worker)
+    identity.id_number_enc = SENSITIVE["id_number"]
+    identity.old_id_number_enc = SENSITIVE["old_id_number"]
+    identity.permanent_address_enc = SENSITIVE["permanent_address"]
+    identity.hometown = SENSITIVE["hometown"]
+    identity.birth_registration_place = SENSITIVE["birth_registration_place"]
+    identity.issue_place = "Cục Cấp Giả"
+    identity.save()
+    application = make_application(worker, "NEW")
+    Application.objects.filter(pk=application.pk).update(expected_salary=SENSITIVE["salary"])
+    Education.objects.create(
+        worker=worker,
+        education_level=EducationLevel.objects.get(rank=4),
+        school_name="Trường Giả",
+        start_year=2010,
+        end_year=2013,
+    )
+    make_document(worker, "CCCD_FRONT", name=SENSITIVE["file_name"])
+    return advance_to(worker, status)
+
+
 def make_worker_in_status(status, **kwargs):
     """Hồ sơ đủ trường, đã đưa tới `status` bằng workflow (người tạo/gửi là một HR)."""
     return advance_to(make_worker_full(**kwargs), status)

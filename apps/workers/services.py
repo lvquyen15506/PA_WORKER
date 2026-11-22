@@ -16,6 +16,7 @@ from apps.audit.services import log
 from apps.core.choices import AuditAction, CodeType, ConsentMethod, VerificationStatus
 from apps.core.codes import next_code
 from apps.core.models import ApplicationSource, DocumentType, Position
+from apps.core.storage import private_storage
 from apps.recruitment.models import Application
 
 from . import rules, workflow
@@ -371,6 +372,49 @@ def record_consent(user, worker, *, consented, consent_date, method, document=No
             request=request,
         )
     return consent
+
+
+def record_consent_with_file(
+    user, worker, *, consented, consent_date, method, uploaded=None, request=None
+):
+    """Như record_consent, nhưng tự tải tệp biên bản (loại Văn bản đồng ý) khi Ký giấy. Tải tệp
+    và ghi nhận nằm trong một giao dịch: lỗi ở bước nào thì không còn dòng hay tệp mồ côi."""
+    from apps.documents import services as document_services
+
+    method = ConsentMethod(method)
+    if method != ConsentMethod.PAPER:
+        return record_consent(
+            user,
+            worker,
+            consented=consented,
+            consent_date=consent_date,
+            method=method,
+            request=request,
+        )
+    if uploaded is None:
+        raise WorkerDataError({"file": "Ký giấy: tải lên tệp biên bản đã ký."})
+    consent_type = DocumentType.objects.get(system_code="CONSENT")
+    with transaction.atomic():
+        try:
+            document = document_services.upload_document(
+                user, worker, consent_type, uploaded, request=request
+            )
+        except document_services.DocumentError as exc:
+            raise WorkerDataError({"file": exc.message}) from exc
+        try:
+            return record_consent(
+                user,
+                worker,
+                consented=consented,
+                consent_date=consent_date,
+                method=method,
+                document=document,
+                request=request,
+            )
+        except Exception:
+            # Hủy giao dịch sẽ bỏ dòng tài liệu; tệp trên đĩa phải xóa tay.
+            private_storage.delete(document.stored_file.name)
+            raise
 
 
 def reopen_worker(user, worker, *, position, source, request=None):

@@ -1,0 +1,10 @@
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Dòng thời gian trạng thái</h2>
+  {% include "components/_table.html" with columns=timeline_columns rows=timeline_rows empty_text="Chưa có lịch sử trạng thái." %}
+</section>
+{% if can_see_changes %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Chi tiết thay đổi từng trường</h2>
+  <div hx-get="/ho-so/{{ worker.pk }}/lich-su/chi-tiet/" hx-trigger="load" hx-swap="innerHTML"></div>
+</section>
+{% endif %}

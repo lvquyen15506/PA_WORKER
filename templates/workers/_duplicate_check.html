@@ -1,0 +1,8 @@
+{% comment %}Kết quả kiểm tra trùng. Tham số: duplicate (hồ sơ đang giữ số CCCD trùng), warnings (danh sách chuỗi),
+   errors (danh sách chuỗi lỗi, dùng cho mảnh HTMX khi rời ô). Dùng được cả khi dựng trang lẫn làm mảnh HTMX.{% endcomment %}
+{% for e in errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% if duplicate %}
+  {% include "components/_alert.html" with kind="danger" text="Số CCCD này đã có hồ sơ. Mở hồ sơ cũ để cập nhật, không tạo hồ sơ mới." %}
+  <p><a class="btn btn-outline-secondary" href="/ho-so/{{ duplicate.pk }}/">Mở hồ sơ cũ</a></p>
+{% endif %}
+{% for w in warnings %}{% include "components/_alert.html" with kind="warning" text=w %}{% endfor %}

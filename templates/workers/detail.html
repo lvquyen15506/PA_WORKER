@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ worker.worker_code }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title=title breadcrumbs=crumbs actions=actions %}
+<p class="pa-small">
+  {% include "components/_status_badge.html" with value=worker.verification_status %}
+  {% if work_status %}{% include "components/_status_badge.html" with value=work_status %}{% endif %}
+  <span class="pa-muted">Mã hồ sơ {{ worker.worker_code }}{% if worker.employee_code %} · Mã nhân viên {{ worker.employee_code }}{% endif %}</span>
+</p>
+{% if worker.anonymized_at %}{% include "components/_alert.html" with kind="info" text="Hồ sơ đã được ẩn danh hóa: thông tin cá nhân và tệp đã bị xóa." %}{% endif %}
+{% if status_note %}{% include "components/_alert.html" with kind="warning" text=status_note %}{% endif %}
+{% if own_pending %}{% include "components/_alert.html" with kind="info" text="Bạn đã tạo hoặc gửi duyệt hồ sơ này nên không duyệt được. Hãy nhờ người khác." %}{% endif %}
+{% include "components/_tabs.html" with tabs=tabs %}
+<div>{% include tab_template %}</div>
+
+{% if "return-modal" in modal_ids %}
+  {% include "components/_confirm_modal.html" with id="return-modal" title="Trả lại hồ sơ" message="Hồ sơ chuyển sang Cần bổ sung và quay về người nhập. Ghi rõ nội dung cần bổ sung." action=return_url confirm_label="Trả lại" fields=modals.return %}
+{% endif %}
+{% if "reject-modal" in modal_ids %}
+  {% include "components/_confirm_modal.html" with id="reject-modal" title="Từ chối hồ sơ" message="Hồ sơ chuyển sang Bị từ chối, chỉ còn xem và Lưu trữ. Thao tác này không hoàn tác được." action=reject_url confirm_label="Từ chối" danger=True fields=modals.reject %}
+{% endif %}
+{% if "archive-modal" in modal_ids %}
+  {% include "components/_confirm_modal.html" with id="archive-modal" title="Lưu trữ hồ sơ" message="Hồ sơ chuyển sang Lưu trữ và chỉ còn xem." action=archive_url confirm_label="Lưu trữ hồ sơ" danger=True fields=modals.archive %}
+{% endif %}
+{% if "anonymize-modal" in modal_ids %}
+  {% include "components/_confirm_modal.html" with id="anonymize-modal" title="Ẩn danh hóa hồ sơ" message="Thao tác này không hoàn tác được. Thông tin cá nhân, giấy tờ và giá trị chi tiết trong nhật ký của hồ sơ sẽ bị xóa." action=anonymize_url confirm_label="Ẩn danh hóa" danger=True fields=modals.anonymize %}
+{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if open_modal %}<script>document.addEventListener("DOMContentLoaded", function () { bootstrap.Modal.getOrCreateInstance(document.getElementById("{{ open_modal }}")).show(); });</script>{% endif %}
+{% endblock %}

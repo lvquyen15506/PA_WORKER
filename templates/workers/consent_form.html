@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title=page_title breadcrumbs=crumbs %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-lg-6">
+    {% include "components/_form_section.html" with fields=form.visible_fields single=True %}
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Hủy</a>
+      <button class="btn btn-primary" type="submit">Lưu ghi nhận</button>
+    </div>
+  </div></div>
+</form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title=page_title breadcrumbs=crumbs %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% if form.errors or formset.total_error_count %}
+  {% include "components/_alert.html" with kind="danger" text="Có ô chưa đúng. Kiểm tra các ô báo lỗi bên dưới." %}
+{% endif %}
+<div id="duplicate-check">{% include "workers/_duplicate_check.html" with duplicate=duplicate warnings=warnings %}</div>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% for title, fields in form.sections %}
+    {% include "components/_form_section.html" with title=title fields=fields %}
+  {% endfor %}
+  {{ formset.management_form }}
+  {% for title, fields, cform in contact_sections %}
+    {{ cform.id }}
+    {% include "components/_form_section.html" with title=title fields=fields %}
+  {% endfor %}
+  <div class="pa-form-actions">
+    <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Hủy</a>
+    <button class="btn btn-primary" type="submit">Lưu hồ sơ</button>
+  </div>
+</form>
+{% endblock %}

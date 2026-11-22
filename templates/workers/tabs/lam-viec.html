@@ -1,0 +1,16 @@
+{% if employment_items %}
+  {% include "components/_form_section.html" with title="Thông tin hiện tại" items=employment_items %}
+{% else %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Thông tin hiện tại</h2>
+  {% include "components/_empty_state.html" with text="Chưa có thông tin làm việc. Thông tin này được tạo khi tiếp nhận vào làm." %}
+</section>
+{% endif %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Lịch sử điều chuyển</h2>
+  {% include "components/_table.html" with columns=history_columns rows=history_rows empty_text="Chưa có lịch sử điều chuyển." %}
+</section>
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Hợp đồng</h2>
+  {% include "components/_table.html" with columns=contract_columns rows=contract_rows empty_text="Chưa có hợp đồng nào." %}
+</section>

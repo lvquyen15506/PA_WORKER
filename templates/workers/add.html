@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Thêm hồ sơ{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Thêm hồ sơ" breadcrumbs=crumbs %}
+<div class="row g-3">
+  <div class="col-md-4">
+    {% include "components/_stat_card.html" with label="Nhập tay" sub="Nhập thông tin từng ô; chỉ cần họ tên và số điện thoại để lưu Nháp." url="/ho-so/them/nhap-tay/" %}
+  </div>
+  <div class="col-md-4">
+    {% include "components/_stat_card.html" with label="Từ CCCD và CV" sub="Tải ảnh CCCD và CV để hệ thống điền sẵn, bạn đối chiếu rồi lưu." url="/nhap-cccd/" %}
+  </div>
+  <div class="col-md-4">
+    {% include "components/_stat_card.html" with label="Từ file Excel" sub="Nhập nhiều hồ sơ một lần từ file Excel mẫu." url="/ho-so/nhap-excel/" %}
+  </div>
+</div>
+{% endblock %}
