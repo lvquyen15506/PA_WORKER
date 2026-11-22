@@ -82,6 +82,19 @@ def test_thao_tac_thay_doi_chi_nhan_post(url):
 
 
 # --- khóa / mở khóa qua giao diện, kèm nhật ký ------------------------------------------
+def test_khoa_tai_khoan_huy_phien_dang_nhap_mo_khoa_khong_song_lai():
+    admin = make_user("ADMIN", username="ad")
+    target = make_user(username="nv1")
+    other = make_user(username="nv2")
+    c_target, c_other = login(target), login(other)
+    assert c_target.get("/").status_code == 200
+    login(admin).post(f"/tai-khoan/{target.pk}/khoa/")
+    login(admin).post(f"/tai-khoan/{target.pk}/mo-khoa/")
+    assert c_target.get("/").status_code == 302  # phiên cũ đã bị hủy, phải đăng nhập lại
+    assert c_other.get("/").status_code == 200  # phiên người khác không bị ảnh hưởng
+    assert login(target).get("/").status_code == 200  # đăng nhập mới vẫn được
+
+
 def test_admin_khoa_va_mo_khoa_ghi_nhat_ky():
     admin = make_user("ADMIN", username="ad")
     target = make_user(username="nv1")

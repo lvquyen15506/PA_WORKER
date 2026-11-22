@@ -152,7 +152,7 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | --- | --- | --- |
 | `audit_log` | `FK(AuditLog, related_name="personal_values")` | |
 | `worker` | `FK(Worker, db_index)` | Để xóa theo hồ sơ khi ẩn danh hóa |
-| `field_name` | `CharField(80)` | Ví dụ `full_name`, `identity.id_number`, `emergency_contacts[2].phone` |
+| `field_name` | `CharField(80)` | Ví dụ `full_name`, `identity.id_number`, `emergency_contacts[2].phone`. Chỉ số trong ngoặc vuông là `pk` của dòng con (không phải `sort_order`), vì `pk` ổn định khi dòng bị xóa hoặc đổi thứ tự. Tiền tố: `identity.` (IdentityDocument), `employment.` (Employment), `emergency_contacts[pk].`, `applications[pk].`, `education[pk].`, `certificates[pk].`, `work_experiences[pk].`, `contracts[pk].`; trường của chính hồ sơ không có tiền tố |
 | `old_value_enc` | `EncryptedTextField(null)` | Fernet |
 | `new_value_enc` | `EncryptedTextField(null)` | Fernet |
 
@@ -171,6 +171,20 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `Employment`, `Contract` | `resign_note`, `note` |
 
 Ghi nhật ký qua một hàm duy nhất `apps.audit.services.log(...)`, không tạo `AuditLog` trực tiếp ở view. Hàm này tự tách trường cá nhân sang `AuditPersonalValue` theo `PERSONAL_FIELDS`.
+
+Chữ ký (đã cài ở Phase 2, `apps/audit/services.py`):
+
+```python
+log(action, *, user=None, obj=None, worker=None, changes=None, note="", request=None,
+    object_type=None, object_id=None, object_repr=None)
+```
+
+- `action`: một giá trị `AuditAction`. `user = None` ghi "Hệ thống". Hàm chạy trong một giao dịch: lỗi giữa chừng thì không còn dòng nhật ký mồ côi.
+- `obj`: đối tượng bị tác động; `object_type`, `object_id`, `object_repr` suy ra từ `obj` (`object_repr = str(obj)`). **`__str__` của mọi model chỉ chứa mã hoặc trường không cá nhân**, không chứa giá trị thuộc `PERSONAL_FIELDS` (có test), vì `__str__` dễ lọt vào nhật ký, log và trang lỗi.
+- `object_type`, `object_id`, `object_repr`: chỉ dùng cho sự kiện **không có `obj`** (xuất báo cáo, đăng nhập...); `object_repr` là mã hoặc tên báo cáo.
+- `worker`: hồ sơ liên quan; mặc định là `obj` nếu là `Worker`, hoặc `obj.worker`.
+- `changes`: `{tên logic: (giá trị cũ, giá trị mới)}`, truyền **giá trị rõ**. Tên logic theo `PERSONAL_FIELDS` ở trên (`id_number`, không phải `id_number_enc`); ánh xạ sang tên cột khai báo một chỗ ở `LOGICAL_TO_ATTR` trong `apps/audit/personal_fields.py`. Tên không có trong model, hoặc trường cá nhân không gắn được với hồ sơ, thì báo `ValueError` và không ghi gì.
+- **Câu 30 áp dụng cho nơi gọi:** `note` và `object_repr` do người gọi truyền (lý do, tham số lọc, tên báo cáo) **không được chứa họ tên, số CCCD, tên tệp gốc**; chỉ dùng mã hồ sơ. `log()` không tự kiểm được chuỗi tự do nên đây là quy ước bắt buộc khi viết code và khi review.
 
 ### 3.3 `apps/core`
 
@@ -539,7 +553,7 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Ẩn danh hóa (câu 2, 30, 38): xem 4.7; xóa mọi `AuditPersonalValue` của hồ sơ, ghi 1 dòng `AuditLog` `ANONYMIZE` | `apps.workers.retention.anonymize` |
 | Ẩn danh hóa theo yêu cầu (câu 38): chỉ Admin; hồ sơ `ARCHIVED`, chưa ẩn danh; bắt buộc lý do + `request_ref`; **kiểm tra mã hồ sơ gõ lại ở máy chủ**; gọi `anonymize()` với `kind = SUBJECT_REQUEST`, sinh biên bản 1 hồ sơ; biên bản ghi "Xóa sớm theo yêu cầu – lẽ ra lưu đến dd/mm/yyyy" (`AnonymizationItem.retention_expired_on`). Test: vai trò khác bị chặn, hồ sơ chưa Lưu trữ hoặc đã ẩn danh bị chặn, thiếu lý do/số đơn bị chặn, mã gõ lại sai bị chặn | `apps.workers.retention.anonymize_on_request` |
 | Khóa tạm do sai mật khẩu, tự đăng xuất, buộc đổi mật khẩu | `apps.accounts` (backend + middleware) |
-| Admin khóa / mở khóa (câu 28): khóa đặt `is_active = False`; mở khóa đặt `is_active = True`, `locked_until = None`, `failed_login_count = 0` | `apps.accounts.services.lock_user`, `unlock_user` |
+| Admin khóa / mở khóa (câu 28): khóa đặt `is_active = False` **và hủy mọi phiên đăng nhập đang có của người đó** (để phiên cũ không sống lại khi mở khóa); mở khóa đặt `is_active = True`, `locked_until = None`, `failed_login_count = 0` | `apps.accounts.services.lock_user`, `unlock_user` |
 | Bảo vệ quyền quản trị (câu 29): Admin không tự khóa, không tự đổi vai trò; không ai khóa hoặc hạ vai trò Admin cuối cùng đang hoạt động (`role = ADMIN`, `is_active = True`). Test cho từng trường hợp | `apps.accounts.services` |
 | Viewer không thấy trường nhạy cảm, kể cả mức lương mong muốn (câu 13) | context của view chi tiết, danh sách, Tuyển dụng, mảnh HTMX, xuất Excel |
 | Nhập Excel (câu 27): mã NV cũ khớp `^[A-Za-z0-9-]{1,20}$`, không trùng (CSDL và trong cùng file); chỉ Admin/QL được nhập phần làm việc; danh mục khớp tên; đẩy `CodeSequence` chỉ khi mã khớp định dạng đang cấu hình (xem `CodeSequence`) | `apps.reports.importer` |

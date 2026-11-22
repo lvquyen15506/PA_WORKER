@@ -12,6 +12,7 @@ import string
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.sessions.models import Session
 from django.db import transaction
 from django.utils import timezone
 
@@ -126,6 +127,13 @@ def _would_remove_last_admin(target):
     return target.pk in admins and len(admins) <= 1
 
 
+def end_sessions(user):
+    """Xóa mọi phiên đăng nhập còn hiệu lực của người dùng."""
+    for session in Session.objects.filter(expire_date__gt=timezone.now()):
+        if session.get_decoded().get("_auth_user_id") == str(user.pk):
+            session.delete()
+
+
 @transaction.atomic
 def create_user(actor, *, username, full_name, role, request=None):
     """Tạo tài khoản với mật khẩu tạm (hiện một lần). Trả (user, mật khẩu tạm)."""
@@ -166,6 +174,7 @@ def lock_user(actor, target, *, request=None):
         raise AccountError(MSG_LAST_ADMIN)
     target.is_active = False
     target.save(update_fields=["is_active"])
+    end_sessions(target)  # phiên cũ không được "sống lại" khi mở khóa
     log(AuditAction.ACCOUNT_LOCK, user=actor, obj=target, request=request, note="Admin khóa")
     return target
 

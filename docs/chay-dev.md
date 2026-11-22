@@ -34,4 +34,4 @@ docker compose exec web python manage.py seed_demo
 
 ## Chạy thử bằng SQLite (không Docker)
 
-Ghi đầy đủ ở Bước 8 (trình tự: `make_env.py`, `migrate`, `check_keys` bắt buộc trước `runserver`, `seed_demo`, `runserver`).
+Xem `docs/chay-sqlite.md` (trình tự: `make_env.py`, `migrate`, `check_keys` bắt buộc trước `runserver`, `collectstatic`, `seed_demo`, `runserver`).

@@ -71,7 +71,7 @@ Ký hiệu cột phương thức: G = GET, P = POST, H = trả mảnh HTML cho H
 | `/tai-khoan/` | G | ✓ | | | | | Tab Danh sách; cột Trạng thái: Đang hoạt động / Bị khóa (Admin khóa) / Khóa tạm đến hh:mm (sai mật khẩu) |
 | `/tai-khoan/them/` | G, P | ✓ | | | | `CREATE` | Mật khẩu tạm, `must_change_password = True` |
 | `/tai-khoan/<id>/sua/` | G, P | ✓ | | | | `UPDATE` | Họ tên, vai trò. Ô vai trò bị khóa khi sửa chính mình; máy chủ chặn hạ vai trò Admin cuối cùng đang hoạt động |
-| `/tai-khoan/<id>/khoa/` | P | ✓ | | | | `ACCOUNT_LOCK` | Đặt `is_active = False`: khóa **vô thời hạn** đến khi Admin mở. Chặn tự khóa chính mình và chặn khóa Admin cuối cùng đang hoạt động |
+| `/tai-khoan/<id>/khoa/` | P | ✓ | | | | `ACCOUNT_LOCK` | Đặt `is_active = False`: khóa **vô thời hạn** đến khi Admin mở; hủy luôn các phiên đăng nhập đang có của người đó. Chặn tự khóa chính mình và chặn khóa Admin cuối cùng đang hoạt động |
 | `/tai-khoan/<id>/mo-khoa/` | P | ✓ | | | | `ACCOUNT_UNLOCK` | Đặt `is_active = True`, xóa `locked_until`, `failed_login_count = 0`. Dùng được cho cả tài khoản bị Admin khóa lẫn tài khoản đang khóa tạm |
 | `/tai-khoan/<id>/dat-lai-mat-khau/` | P | ✓ | | | | `PASSWORD_RESET` | Hiện mật khẩu tạm một lần |
 | `/tai-khoan/lich-su-dang-nhap/` | G | ✓ | | | | | Trang phụ, lọc theo tài khoản, kết quả, khoảng ngày |

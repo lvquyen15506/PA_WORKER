@@ -22,7 +22,8 @@ def _load_dotenv(path):
         os.environ.setdefault(key.strip(), value.strip().strip("'\""))
 
 
-_load_dotenv(BASE_DIR / ".env")
+# ENV_FILE cho phép trỏ tới tệp môi trường khác (ví dụ bản chạy thử SQLite) thay vì .env.
+_load_dotenv(Path(os.environ.get("ENV_FILE") or BASE_DIR / ".env"))
 
 
 def _env(name, default=""):
@@ -122,7 +123,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": _env("SQLITE_PATH") or BASE_DIR / "db.sqlite3",
         }
     }
 

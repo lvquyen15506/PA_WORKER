@@ -248,7 +248,7 @@ flowchart LR
 | Host hợp lệ | `ALLOWED_HOSTS` đọc từ `.env`, không dùng `*` |
 | Lỗi web phổ biến | SQL injection: chỉ dùng ORM, không ghép chuỗi SQL. XSS: template tự escape, không dùng `safe` với dữ liệu người dùng. CSRF: middleware Django, mọi thao tác thay đổi dữ liệu là POST. Clickjacking: `X-Frame-Options: DENY`, riêng view xem trước tài liệu dùng `SAMEORIGIN` để nhúng PDF trong trang |
 | Tách bí mật theo container | Khóa mã hóa và `SECRET_KEY` chỉ vào `web` và `scheduler`; `db` chỉ nhận ba biến CSDL |
-| Nhật ký | `apps.audit.services.log()`; trường cá nhân tách sang `AuditPersonalValue` mã hóa; `AuditLog` có trigger chặn `UPDATE`/`DELETE` (câu 30) |
+| Nhật ký | `apps.audit.services.log()`; trường cá nhân tách sang `AuditPersonalValue` mã hóa; `AuditLog` có trigger chặn `UPDATE`/`DELETE`, `AuditPersonalValue` có trigger chặn `UPDATE` (câu 30). Trigger chỉ có trên PostgreSQL; **trigger chặn `DELETE` không chặn `TRUNCATE`** (Django dùng `TRUNCATE` để dọn DB test, và quản trị CSDL vẫn có thể dùng); `LoginHistory`, `StatusChange`, `EmploymentHistory` chỉ chặn sửa/xóa ở tầng model và QuerySet, không có trigger |
 
 ## 7. Cất giữ khóa mã hóa (câu 31)
 
@@ -283,6 +283,10 @@ flowchart TB
 - **Sao lưu** (Phase 8): file sao lưu gồm `pg_dump` + thư mục `media`, **không** gồm `.env` và hai khóa. Script in nhắc: "File sao lưu không chứa khóa mã hóa. Phục hồi cần đúng khóa đã cất riêng (USB hoặc giấy niêm phong); mất khóa thì không đọc lại được số định danh, địa chỉ thường trú và giá trị nhật ký đã mã hóa."
 - **Phục hồi** trên máy mới: chép `.env` (hoặc nhập lại hai khóa từ bản đã cất) trước, rồi mới phục hồi dữ liệu; `check_keys` xác nhận khóa khớp bản sao lưu (giá trị kiểm tra nằm trong CSDL được phục hồi).
 - **Giới hạn đã biết:** MVP không hỗ trợ đổi khóa (xoay khóa). Muốn đổi khóa phải có công cụ giải mã/mã hóa lại toàn bộ, nằm ngoài phạm vi.
+- **Ba lớp kiểm tra (đã cài ở Phase 2):** (1) `AppConfig.ready` của app `core` kiểm tra định dạng hai khóa trong **mọi** tiến trình (Gunicorn, `runserver`, scheduler, `pytest`); (2) `check_keys` đầy đủ (so khớp giá trị kiểm tra trong `Settings`) chạy ở entrypoint của `web` sau `migrate` và ở đầu mỗi vòng của `scheduler`; (3) giá trị kiểm tra do `check_keys` ghi ở lần chạy đầu (không do data migration). Thử trên Docker thật: thiếu khóa, sai định dạng, sai riêng `FIELD_ENCRYPTION_KEY`, sai riêng `HASH_KEY` đều bị từ chối bằng tiếng Việt.
+- **Bản SQLite dự phòng:** `runserver` không tự chạy `check_keys`, nên hướng dẫn bắt buộc chạy `python manage.py check_keys` (đầy đủ) trước `runserver` (`docs/chay-sqlite.md`).
+- **Chỉ `web` chạy `migrate`:** entrypoint chỉ migrate khi lệnh là Gunicorn; `scheduler` tự kiểm tra khóa và chờ migration trong `run_scheduler`.
+- **Dữ liệu mẫu** (`seed_demo`) không chạy lúc khởi động container, để mật khẩu tạm không nằm trong `docker compose logs`.
 
 ## 8. Thư viện và gói thêm (đã duyệt 21/11/2026)
 
