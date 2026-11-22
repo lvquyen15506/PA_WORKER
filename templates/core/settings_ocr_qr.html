@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Cài đặt OCR và QR{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% if form.errors %}{% include "components/_alert.html" with kind="danger" text="Cài đặt chưa được lưu. Kiểm tra các ô báo lỗi bên dưới." %}{% endif %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-xl-8">
+    {% include "components/_form_section.html" with title="Nhận diện chữ (OCR)" fields=form.ocr_fields single=True %}
+
+    {% include "components/_alert.html" with kind="info" text="Cấu trúc QR của CCCD dưới đây là giả định chưa kiểm chứng bằng thẻ thật. Khi thử thẻ thật chỉ cần sửa cấu hình, không cần sửa mã nguồn. Mẫu thẻ 2016 không có QR chứa thông tin nên không có cấu hình." %}
+    {% for title, fields in form.format_sections %}
+      {% include "components/_form_section.html" with title=title fields=fields %}
+    {% endfor %}
+
+    {% include "components/_form_section.html" with title="API OCR bên ngoài (tùy chọn)" fields=form.external_fields single=True %}
+    {% if api_key_set %}
+      <p class="pa-small pa-muted">Khóa API: đã khai báo trong tệp .env.</p>
+    {% else %}
+      <p class="pa-small pa-muted">Khóa API: chưa khai báo trong tệp .env.</p>
+    {% endif %}
+    {% if external_enabled %}
+      {% include "components/_alert.html" with kind="warning" text="API OCR bên ngoài đang bật: ảnh giấy tờ sẽ được gửi ra khỏi máy chủ này tới dịch vụ của bên thứ ba. Mỗi lần gửi đều được ghi vào nhật ký. Chỉ bật khi đã có đồng ý của người lao động và quyết định của đơn vị." %}
+    {% endif %}
+
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="{% url 'settings_ocr_qr' %}">Hủy</a>
+      <button class="btn btn-primary" type="submit">Lưu cài đặt</button>
+    </div>
+  </div></div>
+</form>
+{% endblock %}
