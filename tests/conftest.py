@@ -13,3 +13,5 @@ def khoa_test(settings, tmp_path):
     settings.FIELD_ENCRYPTION_KEY = TEST_FIELD_KEY
     settings.HASH_KEY = TEST_HASH_KEY
     settings.PRIVATE_MEDIA_ROOT = tmp_path / "private_media"
+    # Băm nhanh chỉ trong test để chạy nhanh; cấu hình thật dùng PBKDF2 (có test riêng).
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

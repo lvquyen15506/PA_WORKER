@@ -1,0 +1,24 @@
+{% extends "base_tam.html" %}
+{% block title %}{% if creating %}Thêm tài khoản{% else %}Sửa tài khoản{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6 col-lg-5">
+  <h1 class="h4 mb-3">{% if creating %}Thêm tài khoản{% else %}Sửa tài khoản {{ target.username }}{% endif %}</h1>
+  {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+  <form method="post" novalidate class="card card-body">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="mb-3">
+      <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }} <span class="text-danger">*</span></label>
+      {{ field }}
+      {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+      {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+    {% if creating %}<p class="small text-muted">Hệ thống tạo mật khẩu tạm và chỉ hiện một lần sau khi lưu.</p>{% endif %}
+    <div class="text-end">
+      <a class="btn btn-outline-secondary" href="{% url 'user_list' %}">Hủy</a>
+      <button class="btn btn-primary" type="submit">Lưu tài khoản</button>
+    </div>
+  </form>
+</div></div>
+{% endblock %}

@@ -82,6 +82,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.accounts.middleware.ForcePasswordChangeMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -127,7 +128,11 @@ else:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_PASSWORD_VALIDATORS = []  # Bổ sung validator riêng (≥ 8 ký tự, có chữ và số) ở apps.accounts.
+# Mật khẩu: tối thiểu 8 ký tự, có chữ và số.
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "apps.accounts.validators.MinLengthValidator"},
+    {"NAME": "apps.accounts.validators.LetterAndDigitValidator"},
+]
 
 LANGUAGE_CODE = "vi"
 TIME_ZONE = "Asia/Ho_Chi_Minh"

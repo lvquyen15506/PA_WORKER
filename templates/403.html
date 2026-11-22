@@ -1,0 +1,9 @@
+{% extends "base_tam.html" %}
+{% block title %}Không có quyền{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="h4">Bạn không có quyền thực hiện thao tác này.</h1>
+  <p class="text-muted">Hãy liên hệ Admin nếu bạn cần quyền truy cập.</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">Về trang chủ</a>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+<div class="d-flex justify-content-between align-items-center mt-3 small text-muted">
+  <span>Hiển thị {{ page.start_index }}–{{ page.end_index }} / {{ page.paginator.count }}</span>
+  <span>
+    {% if page.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?{% if query %}{{ query }}&{% endif %}trang={{ page.previous_page_number }}">Trang trước</a>{% endif %}
+    {% if page.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?{% if query %}{{ query }}&{% endif %}trang={{ page.next_page_number }}">Trang sau</a>{% endif %}
+  </span>
+</div>

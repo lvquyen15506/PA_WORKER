@@ -8,13 +8,21 @@ from apps.workers.models import Worker
 _seq = itertools.count(1)
 
 
-def make_user(role="HR_STAFF", username=None):
+PASSWORD = "Mk123456a"  # mật khẩu giả dùng trong test
+
+
+def make_user(role="HR_STAFF", username=None, password=PASSWORD, must_change=False, **kwargs):
     n = next(_seq)
-    return User.objects.create(
+    user = User(
         username=username or f"user{n}",
         full_name=f"Người Dùng Giả {n}",
         role=Role.objects.get(code=role),
+        must_change_password=must_change,
+        **kwargs,
     )
+    user.set_password(password)
+    user.save()
+    return user
 
 
 def make_worker(created_by=None, **kwargs):

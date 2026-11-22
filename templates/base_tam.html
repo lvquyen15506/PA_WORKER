@@ -1,0 +1,40 @@
+{% load static %}<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PA Worker{% endblock %} – PA Worker</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+</head>
+<body class="bg-light">
+{# Giao diện tạm của Phase 2; Phase 3 thay bằng base.html chuẩn theo skill pa-ui. #}
+{% if request.user.is_authenticated %}
+<nav class="navbar navbar-expand navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">PA Worker</a>
+    <ul class="navbar-nav me-auto">
+      {% if request.user.role.code == "ADMIN" %}
+      <li class="nav-item"><a class="nav-link" href="{% url 'user_list' %}">Tài khoản</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'login_history' %}">Lịch sử đăng nhập</a></li>
+      {% endif %}
+    </ul>
+    <span class="navbar-text me-3">{{ request.user.full_name }} · {{ request.user.role.name }}</span>
+    <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+      <button class="btn btn-outline-light btn-sm" type="submit">Đăng xuất</button>
+    </form>
+  </div>
+</nav>
+{% endif %}
+<main class="container py-4">
+  {% for message in messages %}
+  <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="container pb-4 small text-muted">
+  PA Worker v1.0 · Phát triển bởi QQIT{% if request.user.is_authenticated %} · <a href="{% url 'about' %}">Giới thiệu</a>{% endif %}
+</footer>
+<script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

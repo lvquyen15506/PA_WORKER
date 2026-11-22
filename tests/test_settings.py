@@ -28,6 +28,16 @@ def test_phien_30_phut_va_gia_han_moi_request():
     assert settings.SESSION_SAVE_EVERY_REQUEST is True
 
 
+def test_mat_khau_that_dung_pbkdf2():
+    """Cấu hình thật không ghi đè PASSWORD_HASHERS: Django mặc định PBKDF2."""
+    from django.conf import global_settings
+
+    import config.settings as cfg
+
+    assert not hasattr(cfg, "PASSWORD_HASHERS")
+    assert global_settings.PASSWORD_HASHERS[0].endswith("PBKDF2PasswordHasher")
+
+
 def test_khong_co_media_url_cong_khai():
     """Không khai báo MEDIA_URL: tệp tải lên không có URL public."""
     import config.settings as cfg
