@@ -144,5 +144,6 @@ def test_run_scheduler_cho_khi_con_migration(monkeypatch):
     assert "Còn migration chưa áp dụng" in out and IntakeSession.objects.count() == 1
 
 
-def test_auto_archive_la_khung_tra_ve_0():
+def test_auto_archive_khong_co_ho_so_nao_thi_tra_ve_0():
+    # Hành vi thật của auto_archive: tests/test_auto_archive.py (4 quy tắc, ranh giới, loại trừ).
     assert jobs.auto_archive() == 0

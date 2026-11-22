@@ -37,7 +37,7 @@
 - Trang Cài đặt (trước đây chưa phase nào nhận) đã được giao trong `docs/phases.md` (22/11/2026): Phase 5 làm khung `/cai-dat/` và tab OCR/QR; Phase 6 làm danh mục, sinh mã, ngưỡng; Phase 7 làm Chờ hủy và Biên bản hủy (dùng `expired_queryset`, `anonymize` của Phase 4).
 - Phase 3: các mục sidebar chưa có trang (`/ho-so/`, `/tuyen-dung/`, `/cai-dat/`…) hiện trả 404 cho đến phase làm trang đó. `/ui-kit/` truy cập bằng URL, chưa có liên kết trong menu.
 - Cột bảng của Tuyển dụng (Phase 6), Duyệt hồ sơ (Phase 4), Nhật ký (Phase 7) là phỏng đoán, xem `phac-thao-trang.md`.
-- Phase 4: `auto_archive` trong `run_daily_jobs` mới là khung (trả 0), cần `workflow.transition`; `/ho-so/` chưa có nên "thấy ~500 hồ sơ" (kịch bản 1) hiện chỉ kiểm chứng bằng `seed_demo` và test đếm bản ghi.
+- Phase 4: `/ho-so/` chưa có nên "thấy ~500 hồ sơ" (kịch bản 1) hiện chỉ kiểm chứng bằng `seed_demo` và test đếm bản ghi; sẽ kiểm chứng trên giao diện khi xong Phase 4 bước 5.
 - `seed_demo`: chưa có `WorkerDocument` (mọi hồ sơ mẫu "thiếu giấy tờ"), chưa gán người quản lý trực tiếp; số điện thoại giả sinh ngẫu nhiên có thể trùng số thật, chỉ dùng cho dữ liệu mẫu.
 - Bộ test chạy khoảng 40 giây vì các test `seed_demo` nạp 500 hồ sơ; có thể gom lại nếu chậm hơn khi thêm phase.
 - Môi trường dev có hai cách chạy: có override (`docker compose up`) để sửa code chạy ngay, và không override (`docker compose -f docker-compose.yml ...`) cho nghiệm thu; xem `docs/chay-dev.md`.

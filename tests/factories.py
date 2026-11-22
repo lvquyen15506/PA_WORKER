@@ -1,7 +1,9 @@
 """Hàm dựng dữ liệu giả cho test. Mọi số CCCD giả bắt đầu bằng 999, tên là tên hư cấu."""
 
+import contextlib
 import datetime
 import itertools
+from unittest import mock
 
 from apps.accounts.models import Role, User
 from apps.workers.models import Worker
@@ -104,6 +106,59 @@ def advance_to(worker, status, *, submitter=None, reviewer=None):
 def make_worker_in_status(status, **kwargs):
     """Hồ sơ đủ trường, đã đưa tới `status` bằng workflow (người tạo/gửi là một HR)."""
     return advance_to(make_worker_full(**kwargs), status)
+
+
+@contextlib.contextmanager
+def freeze_time(moment):
+    """Mọi timezone.now() trong khối này trả `moment` (aware). Dùng để tạo bản ghi "trong quá
+    khứ" (auto_now_add) mà không sửa dữ liệu chỉ-thêm."""
+    with mock.patch("django.utils.timezone.now", return_value=moment):
+        yield
+
+
+def at(year, month, day, hour=10, minute=0):
+    """Thời điểm giờ Việt Nam (aware)."""
+    from django.utils import timezone
+
+    return timezone.make_aware(datetime.datetime(year, month, day, hour, minute))
+
+
+def make_application(worker, status="NEW", result_date=None, applied_date=None, created_by=None):
+    from apps.core.models import ApplicationSource, Position
+    from apps.recruitment.models import Application
+
+    position, _ = Position.objects.get_or_create(name="Chức danh test")
+    source, _ = ApplicationSource.objects.get_or_create(name="Nguồn test")
+    return Application.objects.create(
+        worker=worker,
+        position=position,
+        source=source,
+        applied_date=applied_date or datetime.date.today(),
+        status=status,
+        result_date=result_date,
+        created_by=created_by or worker.created_by,
+    )
+
+
+def make_document(worker, type_code="CCCD_FRONT", *, content=b"%PDF-1.4 test", name="a.pdf", **kw):
+    """Tài liệu có tệp thật trong kho riêng (PRIVATE_MEDIA_ROOT của test)."""
+    from django.core.files.base import ContentFile
+
+    from apps.core.models import DocumentType
+    from apps.documents.models import WorkerDocument
+
+    doc = WorkerDocument(
+        worker=worker,
+        document_type=DocumentType.objects.get(system_code=type_code),
+        original_name=name,
+        mime_type="application/pdf",
+        size_bytes=len(content),
+        uploaded_by=worker.created_by,
+        **kw,
+    )
+    doc.stored_file.save(name, ContentFile(content), save=False)
+    doc.save()
+    return doc
 
 
 def make_employment(worker, work_status="ACTIVE"):
