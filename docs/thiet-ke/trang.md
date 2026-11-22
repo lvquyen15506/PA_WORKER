@@ -94,7 +94,7 @@ Trang admin của Django không được bật.
 
 | URL | PT | A | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- |
-| `/cai-dat/` | G | ✓ | | Chuyển tới tab Danh mục |
+| `/cai-dat/` | G | ✓ | | Chuyển tới tab đầu tiên đang có (Phase 5: OCR và QR; Phase 6 đổi về Danh mục). Danh sách tab khai báo một chỗ: `SETTINGS_TABS` ở `apps/core/settings_views.py` |
 | `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu` |
 | `/cai-dat/danh-muc/<loai>/them/`, `/<id>/sua/` | G, P | ✓ | `CREATE`, `UPDATE` | |
 | `/cai-dat/danh-muc/<loai>/<id>/ngung/`, `/<id>/dung-lai/` | P | ✓ | `UPDATE` | Không có nút xóa |
@@ -173,6 +173,8 @@ V thấy danh sách tài liệu (loại, ngày, trạng thái) nhưng không có
 | `/nhap-cccd/<uuid>/tep/<loai>/` | G | người tạo phiên, A | | | | Ảnh/CV của phiên (`mat-truoc`, `mat-sau`, `cv`) |
 | `/nhap-cccd/<uuid>/kiem-tra-trung/` | P, H | người tạo phiên, A | | | | Như `/ho-so/kiem-tra-trung/` |
 | `/nhap-cccd/<uuid>/huy/` | P | người tạo phiên, A | | | `INTAKE_CANCEL` | Xóa phiên, ảnh và kết quả ngay |
+| `/nhap-cccd/<uuid>/xoay/<loai>/` | P | người tạo phiên, A | | | | `<loai>`: `mat-truoc`, `mat-sau`. Xoay ảnh 90° rồi nhận diện lại, ngân sách thời gian riêng của request (Phase 5) |
+| `/nhap-cccd/<uuid>/mo-ho-so-cu/<id>/` | P | người tạo phiên, A | | | `INTAKE_CANCEL` | Nút "Mở hồ sơ cũ" khi trùng CCCD: đóng phiên (ghi hồ sơ cũ), không tạo hồ sơ mới, không lưu ảnh (Phase 5) |
 
 - **Chủ ý thiết kế:** một phiên nhận diện **chỉ người tạo phiên và Admin mở được**, kể cả QL hay HR khác cũng không mở được. Lý do: phiên chứa ảnh CCCD và kết quả nhận diện chưa được xác nhận, chỉ người đang nhập cần thấy; giảm số người tiếp xúc dữ liệu chưa kiểm soát. Người khác gọi URL phiên → 404 (không để lộ phiên tồn tại).
 - **Phiên bỏ dở tự xóa sau 24 giờ** (cấu hình ở `/cai-dat/nguong/`, `Settings.intake_ttl_hours`): lệnh `run_daily_jobs` xóa dòng phiên, ảnh, CV và kết quả mã hóa, ghi nhật ký `INTAKE_EXPIRE` với người thực hiện "Hệ thống". Phiên cũng bị xóa ngay khi HR lưu hồ sơ hoặc bấm hủy.

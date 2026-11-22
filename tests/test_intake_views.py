@@ -322,6 +322,49 @@ def test_xoay_anh_doi_chieu_dai_va_nhan_dien_lai():
     assert fields["id_number"]["value"] is None and fields["id_number"]["low"]
 
 
+def test_xoay_anh_loi_giua_chung_thi_giu_anh_goc(monkeypatch, settings):
+    user = make_user("HR_STAFF")
+    session = make_session(user, "12")
+    original = card_bytes("12")
+    names_before = sorted(p.name for p in intake_files(settings))
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("lỗi giả lập")
+
+    monkeypatch.setattr(services, "recognize", boom)
+    client = login_client(user)
+    client.raise_request_exception = False
+    assert client.post(f"/nhap-cccd/{session.pk}/xoay/mat-truoc/").status_code == 500
+    session = IntakeSession.objects.get(pk=session.pk)
+    with session.front_image.open("rb") as handle:
+        assert handle.read() == original  # ảnh gốc còn nguyên, phiên vẫn mở được
+    assert sorted(p.name for p in intake_files(settings)) == names_before  # không để lại ảnh mới
+    monkeypatch.undo()
+    assert client.get(f"/nhap-cccd/{session.pk}/tep/mat-truoc/").status_code == 200
+
+
+def test_xoay_anh_ghi_nhat_ky():
+    user = make_user("HR_STAFF")
+    session = make_session(user, "12")
+    login_client(user).post(f"/nhap-cccd/{session.pk}/xoay/mat-truoc/")
+    entry = AuditLog.objects.get(action="UPDATE", object_type="intake.IntakeSession")
+    assert entry.user == user and "Xoay ảnh" in entry.note
+
+
+def test_cv_loi_la_khong_lam_hong_phien_co_anh(monkeypatch):
+    from apps.intake import cv
+
+    def weird(*args, **kwargs):
+        raise KeyError("cấu trúc lạ")
+
+    monkeypatch.setattr(cv, "_from_docx", weird)
+    session = make_session(make_user("HR_STAFF"), "12", cv=cv_upload())  # không ném lỗi
+    info = session.get_result()["cv"]
+    assert info["text"] == "" and cv.MSG_CV_FAILED in info["warnings"][0]
+    with pytest.raises(services.IntakeError):  # chỉ có CV hỏng thì báo lỗi
+        make_session(make_user("HR_STAFF"), cv=cv_upload())
+
+
 def test_xoay_bon_lan_tra_ve_anh_ban_dau_va_doc_lai_duoc():
     user = make_user("HR_STAFF")
     session = make_session(user, "12", sides=("front",))

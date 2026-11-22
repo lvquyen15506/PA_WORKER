@@ -269,6 +269,28 @@ def test_mo_ho_so_cu_dong_phien_khong_tao_ho_so_moi(django_capture_on_commit_cal
     assert not old.documents.exists()  # ảnh của phiên không được lưu vào hồ sơ cũ
 
 
+def test_khong_mo_duoc_ho_so_cu_da_an_danh():
+    hr = make_user("HR_STAFF")
+    old = existing_worker(hr)
+    Worker.objects.filter(pk=old.pk).update(anonymized_at=timezone.now())
+    session = make_session(hr, "02")
+    response = login_client(hr).post(f"/nhap-cccd/{session.pk}/mo-ho-so-cu/{old.pk}/")
+    assert response.status_code == 404 and IntakeSession.objects.filter(pk=session.pk).exists()
+
+
+def test_thieu_loai_tai_lieu_he_thong_bao_loi_tieng_viet_va_giu_phien():
+    from apps.core.models import DocumentType
+
+    hr = make_user("HR_STAFF")
+    session = make_session(hr, "02")
+    DocumentType.objects.filter(system_code="CCCD_FRONT").delete()
+    response = post_review(login_client(hr), session)
+    assert (
+        response.status_code == 200 and "Thiếu loại tài liệu hệ thống" in response.content.decode()
+    )
+    assert Worker.objects.count() == 0 and IntakeSession.objects.filter(pk=session.pk).exists()
+
+
 def test_trung_sdt_hoac_ten_ngay_sinh_chi_canh_bao_khong_chan():
     hr = make_user("HR_STAFF")
     make_worker(hr, phone=PHONE, full_name="Nguyễn Văn Giả")

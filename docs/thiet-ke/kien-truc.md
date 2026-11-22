@@ -207,7 +207,13 @@ Quy tắc của luồng:
 - Trước khi HR bấm "Lưu hồ sơ", **không có gì** được ghi vào `Workers` hay bảng con; kết quả chỉ nằm trong `IntakeSession.result_enc` (mã hóa).
 - Trường OCR có độ tin cậy dưới `Settings.ocr_confidence_threshold` (mặc định 80%) được tô vàng và phải tích "Đã kiểm tra". Chữ mờ hoặc thiếu thì để trống, không đoán.
 - Không có QR (CCCD 2016, hoặc QR không đọc được): bỏ qua bước tách QR, OCR toàn bộ.
-- Xử lý đồng bộ trong request (đọc QR một ảnh dưới 5 giây theo yêu cầu; OCR có thể lâu hơn, nên Gunicorn để timeout 120 giây); không cần hàng đợi.
+- Xử lý đồng bộ trong request, không cần hàng đợi. Gunicorn timeout 120 giây nên cả một lượt (kiểm tra ảnh + QR + OCR hai mặt + CV) có **ngân sách 90 giây** (`INTAKE_TOTAL_BUDGET_SECONDS`, `apps/intake/budget.py`); mỗi giai đoạn chỉ dùng phần còn lại, mỗi lần gọi Tesseract tối đa `OCR_TIMEOUT_SECONDS = 30`. Hết ngân sách thì trường chưa đọc để trống, tô vàng, kèm cảnh báo "Hết thời gian xử lý, vui lòng kiểm tra tay." Nút Xoay ảnh dùng ngân sách riêng của request đó.
+- Ảnh tối đa `MAX_IMAGE_PIXELS = 40_000_000` điểm ảnh, kiểm tra từ header trước khi giải nén và trước OpenCV. PDF scan chỉ vẽ tối đa 3 trang, ≤ 300 dpi (hạ dpi nếu ảnh vẽ ra vượt giới hạn điểm ảnh).
+- Chất lượng ảnh (`imaging.check_quality`): rộng ≥ 1000 px, phương sai Laplacian ≥ 60 (đo trên ảnh chuẩn hóa rộng 1000 px), độ sáng trung bình 70–253. Ảnh kém chỉ có cảnh báo, vẫn cho đi tiếp.
+- Mẫu thẻ: HR chọn ở trang tải ảnh (mặc định Tự nhận biết). Tự nhận biết: OCR tiêu đề (CĂN CƯỚC CÔNG DÂN → mẫu 2021 nếu có QR, ngược lại CCCD 2016; CĂN CƯỚC → Căn cước 2024), rồi tách QR bằng `QrFormat` của mẫu đó (không khớp thì thử mọi cấu hình đang bật).
+- Vùng QR (tọa độ do pyzbar trả về) được tô trắng trước khi OCR, vì Tesseract đọc nhiễu từ khối QR. OCR chỉ dùng cho trường QR không có.
+- Quy tắc tô vàng (`low`): trường OCR có độ tin cậy (thấp nhất trong các từ của trường) dưới `ocr_confidence_threshold`; hoặc trường mà mẫu thẻ phải có (`fields.CARD_FIELDS`, chỉ tính mặt đã tải) không đọc được hoặc sai định dạng. Độ tin cậy dưới 30% thì để trống thay vì hiện chữ rác. Trường QR hợp lệ không tô vàng. Máy chủ kiểm tra lại mọi trường `low` đã được tích Đã kiểm tra dựa trên kết quả lưu của phiên.
+- Ảnh/CV của phiên được lưu thành `WorkerDocument` khi Lưu hồ sơ; ảnh được xoay theo EXIF rồi ghi lại không còn EXIF/GPS. Tệp của phiên chỉ bị xóa sau khi giao dịch lưu thành công (`IntakeSession.close(after_commit=True)`).
 - Phiên chỉ người tạo và Admin mở được; phiên bỏ dở tự xóa sau 24 giờ (`trang.md` 5.6).
 - API OCR trả phí: **tắt mặc định**. Chỉ khi Admin bật ở `/cai-dat/ocr-qr/` mới có thêm nút "Gửi ảnh tới dịch vụ ngoài", kèm cảnh báo ảnh sẽ rời khỏi máy và mỗi lần gửi ghi `EXTERNAL_OCR_SEND`.
 

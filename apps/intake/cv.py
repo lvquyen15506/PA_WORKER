@@ -25,6 +25,9 @@ MSG_NO_TEXT = "Không đọc được chữ trong CV. Hãy nhập tay các mục
 MSG_DOC_FAILED = "Không đọc được tệp .doc này. Hãy lưu lại thành .docx hoặc PDF rồi tải lên."
 MSG_PDF_FAILED = "Không mở được tệp PDF. Tệp có thể bị hỏng hoặc có mật khẩu."
 MSG_DOCX_FAILED = "Không mở được tệp .docx. Tệp có thể bị hỏng."
+MSG_CV_FAILED = "Không đọc được CV này. Tệp có thể bị hỏng; hãy lưu lại thành PDF rồi tải lên."
+MSG_DOCX_TOO_BIG = "Tệp .docx quá lớn khi giải nén. Hãy lưu lại thành PDF rồi tải lên."
+MAX_DOCX_EXPANDED_BYTES = 100 * 1024 * 1024
 WARN_PARTIAL = "CV dài hoặc quét ảnh: chỉ đọc các trang đầu."
 WARN_TIMEOUT = "Hết thời gian xử lý, vui lòng kiểm tra tay."
 
@@ -79,7 +82,12 @@ def _from_pdf(data, budget, engine, result):
         raise CvError(MSG_PDF_FAILED) from exc
     with pdf:
         pages = pdf.pages
-        parts = [page.extract_text() or "" for page in pages[: settings.CV_MAX_TEXT_PAGES]]
+        parts = []
+        for page in pages[: settings.CV_MAX_TEXT_PAGES]:
+            if budget.expired:  # PDF nhiều bảng dày có thể chạy lâu: dừng khi hết ngân sách
+                budget.mark_exhausted()
+                break
+            parts.append(page.extract_text() or "")
         text = "\n".join(parts)
         if len(pages) > settings.CV_MAX_TEXT_PAGES:
             result.warnings.append(WARN_PARTIAL)
@@ -101,8 +109,17 @@ def _from_pdf(data, budget, engine, result):
 
 
 def _from_docx(data):
+    import zipfile
+
     import docx
 
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            expanded = sum(info.file_size for info in archive.infolist())
+    except (zipfile.BadZipFile, ValueError, OSError) as exc:
+        raise CvError(MSG_DOCX_FAILED) from exc
+    if expanded > MAX_DOCX_EXPANDED_BYTES:  # chống tệp nén nhỏ nhưng bung ra rất lớn
+        raise CvError(MSG_DOCX_TOO_BIG)
     try:
         document = docx.Document(io.BytesIO(data))
     except Exception as exc:
@@ -146,16 +163,21 @@ def extract_text(data, kind, budget=None, engine=None):
     imaging.ImageRejected khi tệp không dùng được."""
     budget = budget or Budget()
     result = CvText()
-    if kind == "PDF":
-        raw = _from_pdf(data, budget, engine, result)
-    elif kind == "DOCX":
-        raw = _from_docx(data)
-    elif kind == "DOC":
-        raw = _from_doc(data, budget)
-    elif kind in ("JPG", "PNG"):
-        raw = _ocr_image(imaging.load_image(data), budget, engine, result)
-    else:
-        raise CvError("CV chỉ nhận PDF, DOC, DOCX, JPG hoặc PNG.")
+    try:
+        if kind == "PDF":
+            raw = _from_pdf(data, budget, engine, result)
+        elif kind == "DOCX":
+            raw = _from_docx(data)
+        elif kind == "DOC":
+            raw = _from_doc(data, budget)
+        elif kind in ("JPG", "PNG"):
+            raw = _ocr_image(imaging.load_image(data), budget, engine, result)
+        else:
+            raise CvError("CV chỉ nhận PDF, DOC, DOCX, JPG hoặc PNG.")
+    except (CvError, imaging.ImageRejected):
+        raise
+    except Exception as exc:  # thư viện đọc tệp ném lỗi lạ với tệp hỏng một phần
+        raise CvError(MSG_CV_FAILED) from exc
     if budget.exhausted and WARN_TIMEOUT not in result.warnings:
         result.warnings.append(WARN_TIMEOUT)
     result.text = _clean(raw)

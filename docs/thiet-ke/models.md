@@ -313,7 +313,7 @@ Truy cập giá trị rõ chỉ qua thuộc tính có kiểm tra quyền ở t�
 | `worker` | `FK(Worker)` | |
 | `field_name` | `CharField(50)` | `full_name`, `date_of_birth`, `gender`, `nationality`, `identity.id_number`, `identity.issue_date`… |
 | `source` | `CharField(10, choices=FieldSource)` | Sửa tay sau này thì đổi thành `MANUAL` |
-| `confidence` | `DecimalField(5,2, null)` | Chỉ với OCR |
+| `confidence` | `DecimalField(5,2, null)` | Chỉ với OCR: độ tin cậy **thấp nhất** trong các từ của trường (0–100). Trường đọc được bằng máy rồi HR sửa thì `source = MANUAL`, `edited_by_user = True`; trường máy không đọc được mà HR gõ thì `MANUAL`, `edited_by_user = False`. `confirmed_by/at` ghi cho mọi dòng khi bấm Lưu hồ sơ. Sau này `update_worker` sửa trường có dòng nguồn máy đọc cũng đổi thành `MANUAL` |
 | `edited_by_user` | `BooleanField(default=False)` | HR sửa giá trị máy đọc |
 | `confirmed_by` | `FK(User)` | Người xác nhận ở màn hình đối chiếu |
 | `confirmed_at` | `DateTimeField` | |
@@ -400,7 +400,7 @@ Unique (`worker`, `field_name`).
 | `result_enc` | `EncryptedTextField(null)` | JSON mã hóa Fernet: kết quả kiểm tra ảnh, chuỗi QR, giá trị từng trường kèm nguồn và độ tin cậy, văn bản CV |
 
 Vòng đời (khớp `erd.md` mục 6):
-- `IntakeSession.close()` xóa tệp của phiên rồi xóa dòng; gọi khi HR **lưu hồ sơ** (sau khi đã chuyển ảnh/CV được giữ thành `WorkerDocument`, cùng một giao dịch) hoặc **hủy phiên**.
+- `IntakeSession.close()` xóa tệp của phiên rồi xóa dòng; gọi khi HR **hủy phiên**, mở hồ sơ cũ, hoặc phiên hết hạn. Khi HR **lưu hồ sơ** (ảnh/CV được giữ đã thành `WorkerDocument` trong cùng giao dịch) gọi `close(after_commit=True)`: dòng phiên bị xóa trong giao dịch, tệp chỉ bị xóa sau khi giao dịch thành công (lỗi giữa chừng thì phiên và ảnh còn nguyên). `get_result()`/`set_result()` đọc/ghi `result_enc` dạng JSON: `{"recognition": {doc_type, qr, quality, warnings, fields{tên: value, source, confidence, low}, timings}, "cv": {text, warnings, hints}, "doc_type_choice"}`.
 - `run_daily_jobs` gọi `close()` cho mọi phiên có `expires_at < now`, ghi nhật ký `INTAKE_EXPIRE` với `actor_label = "Hệ thống"`.
 - Không có trường trạng thái (tránh tạo bộ trạng thái thứ năm): phiên còn dòng nghĩa là đang mở.
 

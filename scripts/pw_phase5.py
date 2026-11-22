@@ -94,7 +94,8 @@ def gen_cards(offset=None):
 def db(code):
     """Chạy đoạn Python trong manage.py shell của container web, trả stdout (đã cắt trắng)."""
     run = compose("exec", "-T", "web", "python", "manage.py", "shell", "-c", code)
-    return run.stdout.strip()
+    lines = [line for line in run.stdout.splitlines() if line.strip()]
+    return lines[-1].strip() if lines else ""  # bỏ dòng "N objects imported automatically"
 
 
 def count_by_id(id_number):

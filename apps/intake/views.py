@@ -281,6 +281,6 @@ def rotate(request, pk, slot):
 @require_POST
 def open_existing(request, pk, worker_pk):
     session = _session(request, pk)
-    worker = get_object_or_404(Worker, pk=worker_pk)
+    worker = get_object_or_404(Worker, pk=worker_pk, anonymized_at__isnull=True)
     services.open_existing(request.user, session, worker, request=request)
     return redirect(worker_url(worker))

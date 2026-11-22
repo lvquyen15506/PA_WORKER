@@ -98,7 +98,8 @@ def create_session(user, *, front=None, back=None, cv=None, doc_type="", request
         if slot in files
     }
 
-    threshold = SystemSetting.load().ocr_confidence_threshold
+    system = SystemSetting.load()
+    threshold = system.ocr_confidence_threshold
     recognition = None
     if images:
         recognition = recognize(
@@ -121,7 +122,7 @@ def create_session(user, *, front=None, back=None, cv=None, doc_type="", request
 
     session = IntakeSession(
         created_by=user,
-        expires_at=timezone.now() + datetime.timedelta(hours=SystemSetting.load().intake_ttl_hours),
+        expires_at=timezone.now() + datetime.timedelta(hours=system.intake_ttl_hours),
     )
     session.set_result({"recognition": recognition, "cv": cv_info, "doc_type_choice": doc_type})
     saved = []
@@ -179,25 +180,38 @@ def rotate_image(user, session, slot, *, request=None):
     rotated = imaging.strip_metadata(imaging.rotate(_open(data, SLOTS[slot][1])), kind)
     old_name = field.name
     field.save(f"tep.{kind.lower()}", ContentFile(rotated), save=False)
-    private_storage.delete(old_name)
-
-    images = {}
-    for name in ("mat-truoc", "mat-sau"):
-        current = stored_file(session, name)
-        if current:
-            with current.open("rb") as handle:
-                images[name] = _open(handle.read(), SLOTS[name][1])
-    result = session.get_result()
-    threshold = SystemSetting.load().ocr_confidence_threshold
-    result["recognition"] = recognize(
-        images.get("mat-truoc"),
-        images.get("mat-sau"),
-        result.get("doc_type_choice", ""),
-        threshold=threshold,
-        budget=Budget(),  # ngân sách riêng của lần xoay này
-    )
-    session.set_result(result)
-    session.save()
+    new_name = field.name
+    try:
+        images = {}
+        for name in ("mat-truoc", "mat-sau"):
+            current = stored_file(session, name)
+            if current:
+                with current.open("rb") as handle:
+                    images[name] = _open(handle.read(), SLOTS[name][1])
+        result = session.get_result()
+        result["recognition"] = recognize(
+            images.get("mat-truoc"),
+            images.get("mat-sau"),
+            result.get("doc_type_choice", ""),
+            threshold=SystemSetting.load().ocr_confidence_threshold,
+            budget=Budget(),  # ngân sách riêng của lần xoay này
+        )
+        session.set_result(result)
+        with transaction.atomic():
+            session.save()
+            log(
+                AuditAction.UPDATE,
+                user=user,
+                obj=session,
+                note="Xoay ảnh của phiên nhận diện và nhận diện lại",
+                request=request,
+            )
+    except Exception:
+        # Lỗi giữa chừng: giữ ảnh gốc, bỏ ảnh mới, phiên không đổi.
+        setattr(session, SLOTS[slot][0], old_name)
+        private_storage.delete(new_name)
+        raise
+    private_storage.delete(old_name)  # chỉ xóa ảnh cũ khi mọi thứ đã lưu xong
     return session
 
 
@@ -258,7 +272,7 @@ def _field_sources(user, worker, fields, data, now):
 def _attach_documents(user, worker, session, request, saved):
     """Ảnh/CV của phiên thành tài liệu hồ sơ; ảnh được xoay theo EXIF và xóa EXIF/GPS.
     Tên tệp đã lưu được thêm ngay vào `saved` để người gọi dọn khi giao dịch lỗi giữa chừng."""
-    for attr, _label, system_code, base in SLOTS.values():
+    for attr, label, system_code, base in SLOTS.values():
         field = getattr(session, attr)
         if not field:
             continue
@@ -267,8 +281,16 @@ def _attach_documents(user, worker, session, request, saved):
         ext = "." + field.name.rsplit(".", 1)[-1].lower()
         if ext in (".jpg", ".jpeg", ".png"):
             kind = "PNG" if ext == ".png" else "JPG"
-            data = imaging.strip_metadata(imaging.load_image(data), kind)
-        document_type = DocumentType.objects.get(system_code=system_code)
+            try:
+                data = imaging.strip_metadata(imaging.load_image(data), kind)
+            except imaging.ImageRejected as exc:
+                raise IntakeError(f"{label}: {exc}") from exc
+        try:
+            document_type = DocumentType.objects.get(system_code=system_code)
+        except DocumentType.DoesNotExist as exc:
+            raise IntakeError(
+                "Thiếu loại tài liệu hệ thống cho ảnh CCCD/CV. Liên hệ Admin kiểm tra danh mục."
+            ) from exc
         document = document_services.upload_document(
             user, worker, document_type, SimpleUploadedFile(base + ext, data), request=request
         )

@@ -140,6 +140,27 @@ def test_tep_hong_bao_loi_tieng_viet():
         extract_text(b"\xd0\xcf\x11\xe0 hong", "DOC")
 
 
+def test_docx_bung_ra_qua_lon_bi_tu_choi(monkeypatch):
+    monkeypatch.setattr(cv, "MAX_DOCX_EXPANDED_BYTES", 1000)
+    with pytest.raises(CvError) as exc:
+        extract_text(read("cv-mau.docx"), "DOCX")
+    assert str(exc.value) == cv.MSG_DOCX_TOO_BIG
+
+
+def test_docx_nen_nho_bung_ra_lon_bi_tu_choi():
+    import zipfile
+
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("[Content_Types].xml", "<x/>")
+        archive.writestr("word/document.xml", "<x/>")
+        archive.writestr("word/lon.bin", b"0" * (101 * 1024 * 1024))  # nén còn rất nhỏ
+    assert buffer.tell() < 1024 * 1024
+    with pytest.raises(CvError) as exc:
+        extract_text(buffer.getvalue(), "DOCX")
+    assert str(exc.value) == cv.MSG_DOCX_TOO_BIG
+
+
 def test_antiword_qua_gio(monkeypatch):
     def boom(*args, **kwargs):
         raise subprocess.TimeoutExpired(cmd="antiword", timeout=1)
