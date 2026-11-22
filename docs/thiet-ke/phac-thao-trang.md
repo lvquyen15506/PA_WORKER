@@ -50,11 +50,11 @@ Màn hình rộng (≥ 992px):
 - Mục đang chọn: nền trắng 10% + vạch trái 3px (kiểu dáng ở `pa.css`).
 - Mục menu theo vai trò: A thấy cả 9; Q thấy 7 (không Tài khoản, Cài đặt); H thấy 5 (Tổng quan, Hồ sơ công nhân, Thêm hồ sơ, Tuyển dụng, Báo cáo); V thấy 4 (Tổng quan, Hồ sơ công nhân, Tuyển dụng, Báo cáo).
 
-Màn hình hẹp (< 992px, ví dụ 390px): sidebar ẩn, thanh trên có nút mở menu bên trái; ô tìm nhanh nằm trong menu mở ra; bảng cuộn ngang trong khung riêng (không cuộn ngang cả trang).
+Màn hình hẹp (< 992px, ví dụ 390px): sidebar ẩn, thanh trên có nút chữ "Menu" (không icon, đã chốt 22/11/2026 vì dễ hiểu với người dùng không rành máy tính) bên trái; ô tìm nhanh nằm trong menu mở ra; bảng cuộn ngang trong khung riêng (không cuộn ngang cả trang).
 
 ```
 +------------------------------------+
-| [<bi-list>] PA Worker   [Menu v]   |
+| [Menu]  PA Worker   [Tên v]        |
 |------------------------------------|
 | [_page_header]  (nút xuống dòng)   |
 | nội dung xếp một cột               |
