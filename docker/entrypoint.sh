@@ -4,6 +4,9 @@
 # Không nạp dữ liệu mẫu ở đây: mật khẩu tạm sẽ lọt vào nhật ký của container.
 set -e
 python manage.py check_keys --format
-python manage.py migrate --noinput
-python manage.py check_keys
+# Chỉ web (Gunicorn) migrate; scheduler tự kiểm tra khóa và chờ migration trong run_scheduler.
+if [ "$1" = "gunicorn" ]; then
+    python manage.py migrate --noinput
+    python manage.py check_keys
+fi
 exec "$@"
