@@ -18,7 +18,7 @@ Web app quản lý hồ sơ công nhân cho doanh nghiệp sản xuất. Đơn v
 3. Kết thúc phase: chạy test, chạy lint, chụp màn hình các trang mới (skill `webapp-testing`), cập nhật `docs/tien-do.md`, rồi **dừng lại báo cáo**. Không tự sang phase sau.
 4. Không báo "xong" khi test còn lỗi hoặc chức năng chưa chạy thật trên Docker.
 5. Commit sau mỗi phần hoàn chỉnh, thông điệp tiếng Việt, ngắn gọn.
-6. Sửa mọi file (`.md`, `.py`, `.html`…) chỉ dùng công cụ Edit (từng đoạn), không dùng python/sed/regex để ghi đè file và không ghi lại cả file từ bộ nhớ, để không làm mất nội dung đã có. Tạo file mới thì dùng Write.
+6. Sửa mọi file (`.md`, `.py`, `.html`…) chỉ dùng công cụ Edit (từng đoạn), không dùng python/sed/regex để ghi đè file và không ghi lại cả file từ bộ nhớ, để không làm mất nội dung đã có. Tạo file mới thì dùng Write. Ngoại lệ: được chạy `ruff format .` (công cụ định dạng, kết quả xác định, chỉ đổi khoảng trắng); quy tắc này chỉ cấm tự viết lại file bằng python/sed/regex/Write.
 
 ## Công nghệ (đã chốt, không đổi nếu chưa được duyệt)
 

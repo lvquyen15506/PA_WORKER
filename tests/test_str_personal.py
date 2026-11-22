@@ -6,7 +6,7 @@ import datetime
 import pytest
 from django.apps import apps
 
-from apps.audit.personal_fields import PERSONAL_FIELDS
+from apps.audit.personal_fields import PERSONAL_FIELDS, attr_name
 from apps.core.models import ApplicationSource, Department, EducationLevel, Position, Section
 from apps.employment.models import Contract, Employment
 from apps.recruitment.models import Application, Certificate, Education, WorkExperience
@@ -26,9 +26,10 @@ def _text_values(label, model_cls):
     """Giá trị giả có dấu hiệu nhận biết cho mọi trường chữ cá nhân của model."""
     values = {}
     for name in PERSONAL_FIELDS[label]:
-        field = model_cls._meta.get_field(name)
+        attr = attr_name(label, name)
+        field = model_cls._meta.get_field(attr)
         if field.get_internal_type() in {"CharField", "TextField", "EmailField"}:
-            values[name] = _marker(label, name)[: field.max_length or 500]
+            values[attr] = _marker(label, name)[: field.max_length or 500]
     return values
 
 
@@ -120,7 +121,7 @@ def _forbidden_values(obj, label):
     """Mọi giá trị cá nhân của đối tượng dưới dạng chuỗi (cả định dạng ngày dd/mm/yyyy)."""
     out = []
     for name in PERSONAL_FIELDS[label]:
-        value = getattr(obj, name)
+        value = getattr(obj, attr_name(label, name))
         if value in (None, ""):
             continue
         out.append(str(value))
@@ -135,7 +136,7 @@ def test_moi_model_co_truong_ca_nhan_deu_duoc_kiem_tra():
     for label in PERSONAL_FIELDS:  # mọi nhãn model tồn tại, mọi tên trường tồn tại
         model = apps.get_model(label)
         for name in PERSONAL_FIELDS[label]:
-            model._meta.get_field(name)
+            model._meta.get_field(attr_name(label, name))
 
 
 def test_str_khong_chua_gia_tri_ca_nhan():

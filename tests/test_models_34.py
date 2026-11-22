@@ -27,20 +27,41 @@ pytestmark = pytest.mark.django_db
 
 # Bảng ánh xạ ở models.md mục 1.
 EXPECTED_TABLES = {
-    "accounts_role", "accounts_user", "accounts_loginhistory",
-    "audit_auditlog", "audit_auditpersonalvalue",
-    "core_department", "core_section", "core_team", "core_position", "core_shift",
-    "core_applicationsource", "core_educationlevel", "core_requireddocumentgroup",
-    "core_documenttype", "core_systemsetting", "core_codesequence", "core_qrformat",
-    "workers_worker", "workers_identitydocument", "workers_identityfieldsource",
-    "workers_emergencycontact", "workers_dataconsent", "workers_statuschange",
-    "workers_anonymizationrecord", "workers_anonymizationitem",
+    "accounts_role",
+    "accounts_user",
+    "accounts_loginhistory",
+    "audit_auditlog",
+    "audit_auditpersonalvalue",
+    "core_department",
+    "core_section",
+    "core_team",
+    "core_position",
+    "core_shift",
+    "core_applicationsource",
+    "core_educationlevel",
+    "core_requireddocumentgroup",
+    "core_documenttype",
+    "core_systemsetting",
+    "core_codesequence",
+    "core_qrformat",
+    "workers_worker",
+    "workers_identitydocument",
+    "workers_identityfieldsource",
+    "workers_emergencycontact",
+    "workers_dataconsent",
+    "workers_statuschange",
+    "workers_anonymizationrecord",
+    "workers_anonymizationitem",
     "documents_workerdocument",
     "intake_intakesession",
-    "recruitment_application", "recruitment_education", "recruitment_certificate",
+    "recruitment_application",
+    "recruitment_education",
+    "recruitment_certificate",
     "recruitment_workexperience",
-    "employment_employment", "employment_employmenthistory", "employment_contract",
-}  # fmt: skip
+    "employment_employment",
+    "employment_employmenthistory",
+    "employment_contract",
+}
 
 # erd.md mục 5 "Mã hóa và băm".
 EXPECTED_ENCRYPTED = {
@@ -59,9 +80,21 @@ EXPECTED_HASH = {
 
 
 def _project_models():
-    return [m for m in apps.get_models() if m._meta.app_label in {
-        "accounts", "audit", "core", "workers", "documents", "intake", "recruitment", "employment",
-    }]  # fmt: skip
+    return [
+        m
+        for m in apps.get_models()
+        if m._meta.app_label
+        in {
+            "accounts",
+            "audit",
+            "core",
+            "workers",
+            "documents",
+            "intake",
+            "recruitment",
+            "employment",
+        }
+    ]
 
 
 def test_dung_34_model_dung_ten_bang():
