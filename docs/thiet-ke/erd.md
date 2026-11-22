@@ -1,6 +1,6 @@
 # Sơ đồ ERD – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Căn cứ: `docs/yeu-cau.md` mục VI, `docs/lam-ro-yeu-cau.md` câu 1–38.
+Phase 1 · Ngày 21/11/2026 · Cập nhật v1.1 ngày 23/11/2026 · Căn cứ: `docs/yeu-cau.md` mục VI, `docs/lam-ro-yeu-cau.md` câu 1–47 (câu 39–47 là phiếu thay đổi v1.1).
 
 Tài liệu này là **nguồn gốc** cho `models.md` và `trang.md`: tên bảng, tên cột và quan hệ ở hai tài liệu đó phải khớp với tài liệu này.
 
@@ -56,6 +56,12 @@ erDiagram
     Workers ||--o{ EmploymentHistory : "lịch sử"
     Workers ||--o{ Contracts : "hợp đồng"
     WorkerDocuments |o--o{ Contracts : "tệp đính kèm"
+
+    Workers ||--o{ WorkAssignments : "đợt làm việc"
+    ClientCompanies ||--o{ WorkAssignments : "làm tại"
+    Positions ||--o{ WorkAssignments : "vị trí"
+    Workers ||--o{ SalaryHistory : "lịch sử lương"
+    Users ||--o{ SalaryHistory : "ghi"
 
     Departments ||--o{ Sections : "gồm"
     Sections ||--o{ Teams : "gồm"
@@ -294,6 +300,12 @@ erDiagram
     Users ||--o{ EmploymentHistory : "ghi"
     Workers ||--o{ Contracts : "hợp đồng"
     WorkerDocuments |o--o{ Contracts : "tệp đính kèm"
+    Workers ||--o{ WorkAssignments : "đợt làm việc"
+    ClientCompanies ||--o{ WorkAssignments : "làm tại"
+    Positions ||--o{ WorkAssignments : "vị trí"
+    Users ||--o{ WorkAssignments : "ghi"
+    Workers ||--o{ SalaryHistory : "lịch sử lương"
+    Users ||--o{ SalaryHistory : "ghi"
 
     Applications {
         bigint id PK
@@ -391,6 +403,28 @@ erDiagram
         bigint created_by_id FK
         datetime created_at
     }
+    WorkAssignments {
+        bigint id PK
+        bigint worker_id FK "công nhân phải có mã NV"
+        bigint client_company_id FK "ClientCompanies"
+        bigint position_id FK "Positions: vị trí tại công ty khách"
+        date start_date "bắt buộc"
+        date end_date "không bắt buộc; null = đang mở; UK (worker_id) khi null"
+        text note "trường cá nhân: ghi nhật ký qua AuditPersonalValues"
+        bigint created_by_id FK
+        datetime created_at
+        datetime updated_at
+    }
+    SalaryHistory {
+        bigint id PK
+        bigint worker_id FK
+        text monthly_salary_enc "lương tháng, VNĐ, mã hóa"
+        text client_unit_price_enc "đơn giá tháng tính cho công ty khách, VNĐ, mã hóa; có thể rỗng"
+        date effective_date "ngày áp dụng"
+        text reason "lý do thay đổi"
+        bigint created_by_id FK "người sửa"
+        datetime created_at
+    }
 ```
 
 ### 3d. Danh mục và cài đặt
@@ -401,6 +435,7 @@ erDiagram
     Sections ||--o{ Teams : "gồm"
     RequiredDocumentGroups |o--o{ DocumentTypes : "nhóm bắt buộc"
     Users |o--o{ Settings : "cập nhật"
+    ClientCompanies ||--o{ WorkAssignments : "làm tại"
 
     Departments {
         bigint id PK
@@ -444,6 +479,12 @@ erDiagram
         int rank UK "số lớn là trình độ cao hơn"
         bool is_active
     }
+    ClientCompanies {
+        bigint id PK
+        varchar name "UK cùng location"
+        varchar location "tỉnh/thành; mỗi địa điểm một dòng (câu 39)"
+        bool is_active "ngừng sử dụng thay cho xóa"
+    }
     RequiredDocumentGroups {
         bigint id PK
         varchar name UK "CCCD mặt trước, CCCD mặt sau, Ảnh chân dung, CV hoặc Đơn xin việc"
@@ -466,7 +507,8 @@ erDiagram
         varchar employee_code_prefix "CN"
         bool employee_code_use_year "false"
         int employee_code_digits "5"
-        int expiry_warning_days "30"
+        int expiry_warning_days "30; dùng chung cho CCCD, hợp đồng, đợt làm việc sắp đủ 12 tháng (câu 17, 43)"
+        int assignment_limit_months "12; thời hạn một đợt làm việc để cảnh báo (câu 43)"
         int ocr_confidence_threshold "80"
         int failed_retention_months "12"
         int resigned_retention_years "10"
@@ -514,6 +556,16 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 | `AnonymizationRecords`, `AnonymizationItems` | Câu 2, 38: mỗi lần hủy (ẩn danh hóa hết hạn hoặc theo yêu cầu của chủ thể) sinh biên bản ghi loại, ai, khi nào, những hồ sơ nào |
 | `AuditPersonalValues` | Câu 30: giá trị trước/sau của trường cá nhân tách khỏi `AuditLogs` và mã hóa, để ẩn danh hóa xóa được mà `AuditLogs` vẫn chỉ thêm |
 
+**Bảng thêm theo phiếu thay đổi v1.1** (câu 39–42, 44; 3 bảng, nâng tổng lên 37):
+
+| Bảng | Lý do |
+| --- | --- |
+| `ClientCompanies` | Câu 39: danh mục công ty khách hàng, chỉ tên + địa điểm, mỗi địa điểm một dòng, ngừng sử dụng thay cho xóa |
+| `WorkAssignments` | Câu 40: đợt làm việc của công nhân tại một công ty khách; mỗi lúc một công ty; giữ lịch sử. Tách khỏi `Employments` vì `Employments` là quan hệ lao động với bên cung ứng (1 dòng/người), còn đợt là quan hệ 1-nhiều theo thời gian |
+| `SalaryHistory` | Câu 41, 42: lịch sử lương tháng và đơn giá tháng, chỉ thêm, cột mã hóa, xóa khi ẩn danh hóa |
+
+`Employments` giữ nguyên là quan hệ lao động với bên cung ứng (ngày bắt đầu, trạng thái làm việc, ngày nghỉ việc = ngày chấm dứt hợp đồng lao động, câu 44). **Bộ phận (`Sections`), Tổ (`Teams`), Ca (`Shifts`), Phòng ban (`Departments`) nội bộ giữ nguyên trong v1.1**, vì phiếu không bỏ chúng và yêu cầu v1.0 còn dùng chúng cho bộ lọc, Dashboard và báo cáo; chúng mô tả bộ phận nội bộ của bên cung ứng, còn nơi làm việc thực tế là `WorkAssignments`. Có thể cho `Employments.section_id` thành không bắt buộc nếu khách xác nhận công nhân cung ứng không thuộc bộ phận nội bộ nào (xem `lam-ro-yeu-cau.md` mục F và báo cáo thay đổi).
+
 **Điều chỉnh:**
 
 | Mục VI | Thiết kế | Lý do |
@@ -526,7 +578,7 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 
 **Một cột tính sẵn:** `Workers.name_search` (họ tên bỏ dấu, chữ thường) lặp lại thông tin của `full_name`. Lý do: tìm không dấu phải chạy được trên cả PostgreSQL lẫn SQLite (bản dự phòng không Docker) và dưới 2 giây với 500 hồ sơ. Giá trị luôn được tính lại khi lưu, không cho sửa tay.
 
-**Không lưu riêng, chỉ tính:** ảnh chân dung (là `WorkerDocuments` có loại `PORTRAIT`, câu 4), phòng ban (từ bộ phận), thiếu giấy tờ / hoàn thiện / sắp hết hạn, ngày chuyển Lưu trữ và người gửi duyệt (từ `StatusChanges`), hạn lưu trữ (theo 6 căn cứ ở câu 2: từ `Employments.resign_date`, `Applications.result_date`, hoặc ngày chuyển Lưu trữ trong `StatusChanges`; hồ sơ Lưu trữ luôn tính được).
+**Không lưu riêng, chỉ tính:** đợt làm việc hiện tại (đợt có `start_date` ≤ hôm nay và `end_date` rỗng hoặc ≥ hôm nay), mức lương và đơn giá hiện tại (dòng `SalaryHistory` có `effective_date` lớn nhất không quá hôm nay), đợt sắp đủ 12 tháng (`start_date` + `assignment_limit_months` nằm trong `expiry_warning_days` ngày tới; **không có trạng thái đợt làm việc**, không tạo bộ trạng thái thứ năm), ảnh chân dung (là `WorkerDocuments` có loại `PORTRAIT`, câu 4), phòng ban (từ bộ phận), thiếu giấy tờ / hoàn thiện / sắp hết hạn, ngày chuyển Lưu trữ và người gửi duyệt (từ `StatusChanges`), hạn lưu trữ (theo 6 căn cứ ở câu 2: từ `Employments.resign_date`, `Applications.result_date`, hoặc ngày chuyển Lưu trữ trong `StatusChanges`; hồ sơ Lưu trữ luôn tính được).
 
 ## 5. Ràng buộc
 
@@ -539,6 +591,8 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 | `Roles` | `code` |
 | `Employments` | `worker_id`; `application_id` |
 | `Contracts` | `contract_no` |
+| `ClientCompanies` | (`name`, `location`) |
+| `WorkAssignments` | `worker_id` **có điều kiện** `end_date IS NULL` (mỗi công nhân tối đa một đợt đang mở; ràng buộc một phần, chạy được trên PostgreSQL và SQLite) |
 | `AnonymizationRecords` | `record_no` |
 | `AnonymizationItems` | `worker_id` |
 | `CodeSequences` | (`code_type`, `year`) |
@@ -552,7 +606,7 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 Mã đã cấp không bao giờ cấp lại cho người khác, kể cả sau ẩn danh hóa: `worker_code`, `employee_code` không bị xóa khi ẩn danh; `CodeSequences.last_number` chỉ tăng; bộ sinh mã kiểm tra mã chưa tồn tại trước khi cấp, tồn tại thì tăng tiếp (câu 27). `employee_code` nhận mã cũ từ Excel: tối đa 20 ký tự, chữ/số/gạch ngang.
 
 ### Mã hóa và băm
-- Mã hóa: `IdentityDocuments.id_number_enc`, `old_id_number_enc`, `permanent_address_enc`; `IntakeSessions.result_enc`; `AuditPersonalValues.old_value_enc`, `new_value_enc`; `Settings.key_check_enc`.
+- Mã hóa: `IdentityDocuments.id_number_enc`, `old_id_number_enc`, `permanent_address_enc`; `SalaryHistory.monthly_salary_enc`, `client_unit_price_enc` (câu 41); `IntakeSessions.result_enc`; `AuditPersonalValues.old_value_enc`, `new_value_enc`; `Settings.key_check_enc`.
 - Băm: `IdentityDocuments.id_number_hash`; `Settings.key_check_hash`. Hai khóa khác nhau: lộ khóa băm không giải mã được dữ liệu, và dùng HMAC có khóa nên không dò ngược được từ 12 chữ số.
 - Hai khóa sinh một lần khi cài, không nằm trong file sao lưu; thiếu khóa thì ứng dụng không khởi động (câu 31, `kien-truc.md`).
 - `AuditLogs.changes` không bao giờ chứa giá trị của trường cá nhân: chỉ ghi tên trường và "(xem giá trị chi tiết)"; giá trị nằm ở `AuditPersonalValues` (câu 30). `AuditLogs.object_repr` và lý do hệ thống tự điền ở `StatusChanges.reason` chỉ dùng mã hồ sơ, không họ tên.
@@ -562,12 +616,16 @@ Mã đã cấp không bao giờ cấp lại cho người khác, kể cả sau �
 - `Workers`: không xóa; đóng bằng trạng thái Lưu trữ; hủy theo câu 2 là **ẩn danh hóa** (`anonymized_at`): xóa giá trị cá nhân, xóa tệp, giữ dòng, mã và nhật ký.
 - `WorkerDocuments`: thay thế thì giữ bản cũ (`is_current = false`).
 - `Users`: khóa bằng `is_active = false`.
+- `ClientCompanies`: `is_active = false` (ngừng sử dụng); công ty đã có đợt làm việc không xóa được. `WorkAssignments`: không xóa; đợt kết thúc bằng `end_date`, nhập sai thì sửa (giá trị cũ ghi nhật ký).
+- `SalaryHistory`: **chỉ thêm**, không sửa, không xóa dòng cũ (model chặn, PostgreSQL có trigger chặn `UPDATE`). Ngoại lệ duy nhất: xóa toàn bộ dòng của hồ sơ khi ẩn danh hóa (câu 41, `models.md` 4.7); cần thêm vào danh sách ngoại lệ của `CLAUDE.md`.
 - `AuditLogs`, `LoginHistory`, `StatusChanges`, `EmploymentHistory`: **chỉ thêm**. Ứng dụng chặn sửa/xóa ở model; CSDL PostgreSQL có trigger chặn `UPDATE`/`DELETE` trên `AuditLogs`.
 - `AuditPersonalValues`: không sửa (trigger chặn `UPDATE`); chỉ bị xóa khi ẩn danh hóa hồ sơ tương ứng, kèm một dòng `AuditLogs` `ANONYMIZE` (câu 30, 38).
 - Bản ghi được xóa cứng: `IntakeSessions` (bản ghi tạm, không có bảng nào trỏ tới, xem mục 6) và `AuditPersonalValues` khi ẩn danh hóa (trên).
 
 ### Kiểm tra ở tầng ứng dụng (không biểu diễn được bằng khóa)
 - `Employments.team_id` phải thuộc `section_id`.
+- `WorkAssignments`: `end_date >= start_date`; các đợt của một công nhân không chồng lấn ngày (kiểm tra trong service, khóa dòng `Workers` khi ghi); công nhân phải có `Employments` và chưa Đã nghỉ việc; công ty và vị trí đang dùng (`is_active`) khi tạo mới.
+- `SalaryHistory`: `monthly_salary` là số nguyên VNĐ > 0; `client_unit_price` (nếu có) là số nguyên VNĐ > 0; `reason` bắt buộc; chỉ Admin, Quản lý nhân sự được thêm (câu 42).
 - `Applications.reject_reason` bắt buộc khi Không đạt; `Employments.resign_date`, `resign_reason` bắt buộc khi Đã nghỉ việc.
 - `Contracts.expiry_date` bắt buộc trừ loại không xác định thời hạn; `expiry_date > effective_date`.
 - `IdentityDocuments.issue_date > Workers.date_of_birth`.

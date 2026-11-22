@@ -1,6 +1,6 @@
 # Danh sách URL và trang – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/thiet-ke/models.md`. Quyền theo `docs/yeu-cau.md` mục III, sửa bởi `docs/lam-ro-yeu-cau.md` câu 1–38.
+Phase 1 · Ngày 21/11/2026 · Cập nhật v1.1 ngày 23/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/thiet-ke/models.md`. Quyền theo `docs/yeu-cau.md` mục III, sửa bởi `docs/lam-ro-yeu-cau.md` câu 1–47.
 
 ## 1. Quy ước
 
@@ -11,7 +11,7 @@ Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/thie
 - **Nhật ký:** cột "Nhật ký" ghi mã `AuditAction` được ghi khi gọi URL đó.
 - **Component** là tên file trong `templates/components/` (skill `pa-ui` mục 3). Mọi trang kế thừa `base.html` và có `_page_header`, nên không ghi lại hai thứ này ở từng dòng. Riêng trang Đăng nhập dùng khung tối giản không có sidebar.
 - Người dùng có `must_change_password = True` bị chuyển tới `/doi-mat-khau/` ở mọi URL khác (trừ đăng xuất).
-- **Trường ẩn với Viewer** (câu 13 `lam-ro-yeu-cau.md`): số CCCD (chỉ dạng che), số CMND cũ, địa chỉ thường trú/cư trú, quê quán / nơi đăng ký khai sinh, ảnh CCCD, **mức lương mong muốn**. Ẩn ở mọi trang, mảnh HTMX và file xuất; Viewer vẫn thấy SĐT và nơi ở hiện tại.
+- **Trường ẩn với Viewer** (câu 13 `lam-ro-yeu-cau.md`): số CCCD (chỉ dạng che), số CMND cũ, địa chỉ thường trú/cư trú, quê quán / nơi đăng ký khai sinh, ảnh CCCD, **mức lương mong muốn**. Ẩn ở mọi trang, mảnh HTMX và file xuất; Viewer vẫn thấy SĐT và nơi ở hiện tại. **Ngoại lệ v1.1 (câu 42):** lương tháng và đơn giá tháng mọi vai trò đều xem được (tab Quá trình làm việc); chỉ A, Q thêm.
 
 ## 2. Menu sidebar
 
@@ -95,11 +95,11 @@ Trang admin của Django không được bật.
 | URL | PT | A | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- |
 | `/cai-dat/` | G | ✓ | | Chuyển tới tab đầu tiên đang có (Phase 5: OCR và QR; Phase 6 đổi về Danh mục). Danh sách tab khai báo một chỗ: `SETTINGS_TABS` ở `apps/core/settings_views.py` |
-| `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu` |
+| `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu`, `cong-ty-khach` (v1.1, câu 39: 10 loại; bảng có cột Tên và Địa điểm; hai dòng không trùng cả tên lẫn địa điểm; ngừng sử dụng thay cho xóa) |
 | `/cai-dat/danh-muc/<loai>/them/`, `/<id>/sua/` | G, P | ✓ | `CREATE`, `UPDATE` | |
 | `/cai-dat/danh-muc/<loai>/<id>/ngung/`, `/<id>/dung-lai/` | P | ✓ | `UPDATE` | Không có nút xóa |
 | `/cai-dat/sinh-ma/` | G, P | ✓ | `UPDATE` | Tiền tố, có năm, số chữ số cho mã hồ sơ và mã NV; xem trước mã kế tiếp |
-| `/cai-dat/nguong/` | G, P | ✓ | `UPDATE` | Ngưỡng sắp hết hạn, thời hạn lưu trữ (12 tháng / 10 năm), số ngày tự Lưu trữ (30 / 30), số tháng hồ sơ bỏ dở (6), thời hạn phiên nhận diện (24 giờ) |
+| `/cai-dat/nguong/` | G, P | ✓ | `UPDATE` | Ngưỡng sắp hết hạn (dùng chung cho CCCD, hợp đồng, đợt làm việc), số tháng của đợt làm việc để cảnh báo (12), thời hạn lưu trữ (12 tháng / 10 năm), số ngày tự Lưu trữ (30 / 30), số tháng hồ sơ bỏ dở (6), thời hạn phiên nhận diện (24 giờ) |
 | `/cai-dat/ocr-qr/` | G, P | ✓ | `UPDATE` | Ngưỡng tin cậy OCR, `QrFormat` theo mẫu thẻ, API OCR ngoài (tắt mặc định, bật thì hiện cảnh báo gửi ảnh ra ngoài) |
 | `/cai-dat/cho-huy/` | G | ✓ | | Trang phụ: hồ sơ Lưu trữ quá hạn lưu trữ; cột "Căn cứ lưu trữ" (6 căn cứ, câu 2) và "Hết hạn lưu trữ" |
 | `/cai-dat/cho-huy/huy/` | P | ✓ | `ANONYMIZE` (mỗi hồ sơ) | Chọn nhiều hồ sơ, hộp xác nhận; sinh `AnonymizationRecord` |
@@ -110,7 +110,9 @@ Trang admin của Django không được bật.
 
 | URL | PT | A | Q | H | V | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- |
-| `/` | G | ✓ | ✓ | ✓ | ✓ | 9 thẻ, mỗi thẻ là liên kết tới `/ho-so/?...` (hoặc `/tuyen-dung/?...`) với bộ lọc tương ứng, số dòng bằng số trên thẻ. 4 biểu đồ: vào làm/nghỉ việc 12 tháng; theo phòng ban/bộ phận; giới tính, 5 nhóm tuổi + "Chưa có ngày sinh" (câu 26), trình độ cao nhất; theo trạng thái xác minh. Việc cần làm: Chờ duyệt, Cần bổ sung, CCCD sắp hết hạn |
+| `/` | G | ✓ | ✓ | ✓ | ✓ | 9 thẻ, mỗi thẻ là liên kết tới `/ho-so/?...` (hoặc `/tuyen-dung/?...`) với bộ lọc tương ứng, số dòng bằng số trên thẻ. 4 biểu đồ: vào làm/nghỉ việc 12 tháng; theo phòng ban/bộ phận; giới tính, 5 nhóm tuổi + "Chưa có ngày sinh" (câu 26), trình độ cao nhất; theo trạng thái xác minh. Việc cần làm: Chờ duyệt, Cần bổ sung, CCCD sắp hết hạn, **Đợt làm việc sắp đủ 12 tháng** (v1.1, câu 43; không thêm thẻ, vẫn 9 thẻ) |
+
+Khối việc cần làm "Đợt làm việc sắp đủ 12 tháng" liên kết tới `/ho-so/?dot_sap_du_han=1` (số dòng bằng số trong khối).
 
 Bộ lọc của 9 thẻ:
 
@@ -130,7 +132,7 @@ Bộ lọc của 9 thẻ:
 
 | URL | PT | A | Q | H | V | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/ho-so/` | G | ✓ | ✓ | ✓ | ✓ | | Cột theo mục IV.7; lọc: phòng ban, bộ phận, chức danh, trình độ, 3 bộ trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày tiếp nhận; `q` tìm mã hồ sơ, mã NV, họ tên không dấu, SĐT; `q` 12 chữ số tìm theo băm CCCD **chỉ với A, Q, H**; sắp xếp theo cột; 20 dòng/trang; bộ lọc giữ trong phiên |
+| `/ho-so/` | G | ✓ | ✓ | ✓ | ✓ | | Cột theo mục IV.7; lọc: phòng ban, bộ phận, chức danh, trình độ, 3 bộ trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày tiếp nhận, **công ty khách hàng** (`?cong_ty_khach=<id>`, theo đợt đang diễn ra) và **đợt sắp đủ 12 tháng** (`?dot_sap_du_han=1`) (v1.1); `q` tìm mã hồ sơ, mã NV, họ tên không dấu, SĐT; `q` 12 chữ số tìm theo băm CCCD **chỉ với A, Q, H**; sắp xếp theo cột; 20 dòng/trang; bộ lọc giữ trong phiên |
 | `/ho-so/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | Cùng tham số lọc với `/ho-so/`; CCCD che theo quyền |
 | `/ho-so/them/` | G | ✓ | ✓ | ✓ | | | Chọn cách thêm |
 | `/ho-so/them/nhap-tay/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | Lưu Nháp: chỉ cần họ tên + SĐT; sinh mã hồ sơ |
@@ -199,6 +201,9 @@ Mức lương mong muốn ẩn với V ở trang Tuyển dụng, tab Tuyển d�
 | `/ho-so/<id>/lam-viec/thay-doi/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` | Điều chuyển, đổi chức danh, đổi ca, đổi trạng thái làm việc; ngày hiệu lực, số quyết định, lý do; thêm dòng `EmploymentHistory` |
 | `/ho-so/<id>/hop-dong/them/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | Kèm tệp (tạo `WorkerDocument` loại Hợp đồng) |
 | `/hop-dong/<id>/sua/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` | |
+| `/ho-so/<id>/dot-lam-viec/them/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | v1.1, câu 40. Công ty khách (đang dùng), vị trí, ngày bắt đầu, ngày kết thúc (không bắt buộc), ghi chú. Đang có đợt mở thì phải nhập ngày kết thúc cho đợt cũ; không chồng lấn ngày. Chỉ công nhân có mã NV, chưa Đã nghỉ việc |
+| `/dot-lam-viec/<id>/sua/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` | Sửa (kể cả đặt ngày kết thúc); không có nút xóa; giá trị cũ ghi nhật ký |
+| `/ho-so/<id>/luong/them/` | G, P | ✓ | ✓ | | | `CREATE` | v1.1, câu 41, 42. Lương tháng, đơn giá tháng, ngày áp dụng, lý do (bắt buộc; gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"); **thêm dòng mới, không có URL sửa/xóa**. H và V gọi → 403. Mọi vai trò xem lịch sử lương ở tab Quá trình làm việc (không cần URL riêng) |
 
 Tệp đính kèm hợp đồng (ở tab Quá trình làm việc và form sửa) luôn là **bản hiện hành** của chuỗi thay thế (`Contract.current_document`, câu 32).
 
@@ -207,7 +212,7 @@ Tệp đính kèm hợp đồng (ở tab Quá trình làm việc và form sửa)
 | URL | PT | A | Q | H | V | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/duyet-ho-so/` | G | ✓ | ✓ | | | | Hồ sơ Chờ duyệt, cũ nhất trước; dòng mình tạo/gửi có ghi chú "Bạn không duyệt được hồ sơ này" |
-| `/bao-cao/` | G | ✓ | ✓ | ✓ | ✓ | | Chọn loại báo cáo, khoảng thời gian, phòng ban |
+| `/bao-cao/` | G | ✓ | ✓ | ✓ | ✓ | | Chọn loại báo cáo, khoảng thời gian, phòng ban. v1.1 (câu 45): thêm loại báo cáo "Công nhân đang làm theo công ty khách hàng" (số người theo từng công ty và địa điểm, tính theo đợt làm việc đang diễn ra; số liệu mỗi công ty liên kết tới `/ho-so/?cong_ty_khach=<id>`) |
 | `/bao-cao/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | |
 | `/bao-cao/in/` | G | ✓ | ✓ | ✓ | | `PRINT` | Bản in: tiêu đề, ngày lập, người lập |
 | `/nhat-ky/` | G | ✓ | ✓ | | | | Lọc theo người, hồ sơ, hành động, khoảng thời gian. Không có nút sửa/xóa. Trường cá nhân hiện "(xem giá trị chi tiết)", bấm mở giá trị trước/sau từ `AuditPersonalValue`, giải mã khi hiển thị, chỉ A, Q (câu 30); số CCCD/CMND cũ vẫn hiện dạng che; hồ sơ đã ẩn danh hiện "(đã ẩn danh)" |

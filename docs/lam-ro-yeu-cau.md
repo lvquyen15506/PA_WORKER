@@ -1,6 +1,6 @@
 # Làm rõ yêu cầu – PA Worker
 
-Ngày chốt: 21/11/2026 · Kết quả Phase 0 và rà thiết kế Phase 1 · Áp dụng cho `docs/yeu-cau.md` v1.0
+Ngày chốt: 21/11/2026 (mục F: 23/11/2026) · Kết quả Phase 0 và rà thiết kế Phase 1 · Áp dụng cho `docs/yeu-cau.md` v1.0 và phiếu thay đổi v1.1 (mục F)
 
 Tài liệu này ghi các quyết định trả lời câu hỏi Phase 0 và các quyết định phát sinh khi thiết kế. `docs/yeu-cau.md` là bản khách hàng đã ký, **không sửa**. Khi tài liệu này khác `docs/yeu-cau.md` thì **theo tài liệu này**.
 
@@ -26,13 +26,13 @@ Mẫu ở mục III (`0791•••••2345`) dài 13 ký tự, không khớp 
 - Admin duyệt hủy từ danh sách hồ sơ hết hạn. Mỗi lần hủy sinh **biên bản hủy** (ai, khi nào, những hồ sơ nào) và ghi nhật ký.
 - Thời hạn lưu trữ theo mục VIII:
   - Ứng viên không đạt: 12 tháng kể từ ngày có kết quả.
-  - Công nhân đã nghỉ: 10 năm kể từ ngày nghỉ.
+  - Công nhân đã nghỉ: 10 năm kể từ ngày chấm dứt hợp đồng lao động cuối cùng với bên cung ứng (câu 44, v1.1); không tính từ ngày kết thúc một đợt làm việc.
   - Cả hai cấu hình được.
 - **[Nội bộ] Mọi hồ sơ Lưu trữ đều có ngày hết hạn lưu trữ tính được.** Căn cứ xét theo thứ tự trong bảng, gặp dòng đầu tiên khớp thì dùng:
 
   | Căn cứ | Điều kiện | Mốc tính | Thời hạn |
   | --- | --- | --- | --- |
-  | Công nhân đã nghỉ | Có mã NV và có ngày nghỉ việc | Ngày nghỉ việc | 10 năm |
+  | Công nhân đã nghỉ | Có mã NV và có ngày nghỉ việc | Ngày nghỉ việc (`Employment.resign_date` = ngày chấm dứt HĐLĐ với bên cung ứng, câu 44) | 10 năm |
   | Công nhân lưu trữ khác | Có mã NV, không có ngày nghỉ việc | Ngày chuyển Lưu trữ | 10 năm |
   | Ứng viên không được tuyển | Chưa có mã NV, lần ứng tuyển gần nhất Không đạt hoặc Ứng viên từ chối, có ngày kết quả | Ngày có kết quả | 12 tháng |
   | Hồ sơ bị từ chối | Chưa có mã NV, chuyển Lưu trữ từ Bị từ chối | Ngày chuyển Lưu trữ | 12 tháng |
@@ -121,6 +121,7 @@ HR được **thêm** tài liệu mới khi hồ sơ ở Đã xác minh, và tr�
   - Ảnh CCCD
   - **[Nội bộ]** Mức lương mong muốn (trang Tuyển dụng, tab Tuyển dụng trong chi tiết hồ sơ, file xuất)
 - **Viewer vẫn thấy:** SĐT và nơi ở hiện tại.
+- **[v1.1] Ngoại lệ cho dữ liệu lương (câu 42):** Viewer **được xem** lương tháng và đơn giá tháng (bảng `SalaryHistory`). Ngoại lệ này chỉ áp dụng cho hai trường mới đó; **mức lương mong muốn** của ứng viên (`Application.expected_salary`) vẫn ẩn với Viewer như trên **[Giả định, cần xác nhận]**.
 - **Viewer không** xem trước và không tải được tài liệu.
 
 ### 14. Trình độ học vấn [Đồng ý]
@@ -283,3 +284,62 @@ Các điểm khác:
 - Câu 33–37: "Ứng viên từ chối" lưu 12 tháng; chỉ QL/Admin xác minh tài liệu; Bị từ chối chỉ xem; Chờ duyệt chỉ khóa phần được duyệt; giới tính Nam/Nữ.
 - Câu 9 (làm rõ ở Phase 4) [Nội bộ]: chặn Lưu trữ khi trạng thái làm việc là Thử việc hoặc Đang làm việc áp dụng cho **mọi** đường chuyển sang Lưu trữ (thủ công từ Nháp, Cần bổ sung, Bị từ chối, Đã xác minh, và tự động), không chỉ từ Đã xác minh.
 - Câu 5/9 (làm rõ ở Phase 4) [Nội bộ]: sửa hồ sơ đang Đã xác minh phải giữ đủ các trường bắt buộc khi gửi duyệt (không cho xóa trắng ngày sinh, giới tính, nơi ở, loại giấy tờ, số CCCD...).
+- **v1.1 (mục F) đã ký ngày 23/11/2026: không cần xác nhận lại** các câu 39–47. Riêng các chi tiết thiết kế do đơn vị phát triển điền thêm, đánh dấu [Nội bộ] hoặc [Giả định] trong mục F, vẫn cần xác nhận cùng các điểm trên (danh sách ở cuối mục F).
+
+## F. Thay đổi v1.1 (đã ký 23/11/2026)
+
+Nguồn: phiếu thay đổi v1.1 đã ký (`docs/yeu-cau-thay-doi-v1.1.pdf`). Câu 39–47 là nội dung phiếu; phần đánh dấu [Nội bộ] hoặc [Giả định] là chi tiết đơn vị phát triển điền thêm để thiết kế, chưa có trong phiếu. **Khi mục F khác câu 2 hoặc câu 13 thì theo mục F.** Bối cảnh: bên cung ứng đưa công nhân sang làm tại công ty khách hàng; `Employment` vẫn là quan hệ lao động giữa công nhân và bên cung ứng.
+
+### 39. Công ty khách hàng
+- Danh mục **công ty khách hàng** chỉ có **tên** và **địa điểm** (tỉnh/thành). Mỗi địa điểm là **một dòng** (một công ty có hai địa điểm thì có hai dòng).
+- **Ngừng sử dụng** thay cho xóa (như các danh mục khác).
+- **[Nội bộ]** Do Admin quản lý trong Cài đặt như mọi danh mục. Hai dòng không được trùng cả tên lẫn địa điểm. Địa điểm là văn bản tự nhập, không phải danh sách tỉnh/thành cố định.
+
+### 40. Đợt làm việc
+- **Mỗi lúc một công nhân chỉ làm cho một công ty khách hàng.**
+- Mỗi đợt gồm: công ty khách hàng, vị trí, ngày bắt đầu, ngày kết thúc (**không bắt buộc**), ghi chú.
+- **Giữ lịch sử các đợt**: không ghi đè, không xóa; đợt cũ vẫn xem được.
+- **[Nội bộ]** Các đợt của một công nhân không chồng lấn ngày; ngày kết thúc là ngày làm cuối cùng của đợt đó. Chỉ có đợt cho người đã có mã NV và chưa Đã nghỉ việc. Khi trạng thái làm việc chuyển sang Đã nghỉ việc, đợt đang mở tự kết thúc vào ngày nghỉ việc.
+- **[Giả định]** "Vị trí" lấy từ danh mục Chức danh sẵn có (`Position`), không tạo danh mục mới. Thêm và sửa đợt: Admin, Quản lý nhân sự, Nhân viên HR; Viewer chỉ xem.
+
+### 41. Lương và đơn giá
+- Lưu hai khoản: **lương tháng** của công nhân và **đơn giá tháng** tính cho công ty khách hàng.
+- Mỗi thay đổi **thêm một dòng lịch sử** gồm: mức, ngày áp dụng, người sửa, lý do. **Không sửa, không xóa dòng cũ**; nhập sai thì thêm dòng mới sửa lại.
+- **Mã hóa khi lưu** (như số định danh) và **ghi nhật ký** qua `apps.audit.services.log()`; giá trị lương là trường cá nhân nên nhật ký chỉ ghi "(xem giá trị chi tiết)".
+- **[Nội bộ]** Mỗi dòng lịch sử ghi cả hai khoản tại ngày áp dụng (đổi một khoản thì khoản kia giữ giá trị cũ). Mức hiện tại là dòng có ngày áp dụng lớn nhất không quá hôm nay. Ẩn danh hóa hồ sơ thì xóa toàn bộ lịch sử lương (đã thống nhất; cần thêm vào danh sách ngoại lệ "không xóa cứng" của `CLAUDE.md`).
+
+### 42. Quyền xem và sửa lương
+- **Mọi vai trò (Admin, Quản lý nhân sự, Nhân viên HR, Viewer) được XEM** lương và đơn giá.
+- **Chỉ Admin và Quản lý nhân sự được THÊM/SỬA** (thêm dòng lịch sử mới).
+- **Đây là thay đổi so với câu 13** đối với dữ liệu lương: câu 13 ẩn mức lương mong muốn với Viewer, còn lương tháng và đơn giá thì Viewer thấy. Mức lương mong muốn của ứng viên **không** nằm trong thay đổi này **[Giả định, cần xác nhận]**.
+- **[Nội bộ]** Xem lương không ghi nhật ký (khác xem số CCCD đầy đủ); thêm dòng lương thì ghi nhật ký. Lương không đưa vào file xuất Excel và không có chức năng nhập lương từ Excel trong v1.1.
+
+### 43. Cảnh báo đợt làm việc sắp đủ 12 tháng
+- Đợt làm việc **sắp đủ 12 tháng** kể từ ngày bắt đầu được cảnh báo ở Dashboard, trong **danh sách việc cần làm**.
+- Dùng **chung ngưỡng số ngày `expiry_warning_days`** với CCCD và hợp đồng sắp hết hạn (câu 17).
+- **[Nội bộ]** Không thêm thẻ số liệu mới (9 thẻ ở mục VII giữ nguyên), theo cách đã làm với CCCD sắp hết hạn. Đợt đã quá 12 tháng mà chưa kết thúc vẫn hiện trong danh sách cho đến khi có ngày kết thúc. Con số 12 tháng cấu hình được (`assignment_limit_months`, mặc định 12).
+
+### 44. Hạn lưu trữ công nhân đã nghỉ
+- **Giữ 10 năm như v1.0** (`resigned_retention_years = 10`). Mốc tính là **ngày chấm dứt hợp đồng lao động cuối cùng với bên cung ứng** (`Employment.resign_date`); **không** tính từ ngày kết thúc một đợt làm việc.
+- **Ứng viên không được tuyển giữ 12 tháng**, không đổi.
+- Lý do: quy định lưu hợp đồng lao động 10 năm kể từ ngày chấm dứt (khách hàng đã đồng ý đổi từ 1 năm, có ký nháy).
+- Quay lại làm việc = **"Mở lại hồ sơ"** (câu 6); dùng được trong suốt thời hạn lưu trữ, tới khi hồ sơ bị ẩn danh hóa.
+- Không thêm căn cứ lưu trữ mới (`RetentionBasis` giữ 6 căn cứ ở câu 2).
+
+### 45. Bản cam kết, báo cáo và bộ lọc theo công ty khách
+- Thêm loại tài liệu **"Bản cam kết"** vào danh mục loại tài liệu (không thuộc nhóm bắt buộc **[Giả định]**).
+- Báo cáo thêm **số công nhân đang làm theo công ty khách hàng**.
+- Danh sách hồ sơ công nhân **lọc được theo công ty khách hàng** (theo đợt đang diễn ra **[Giả định]**).
+
+### 46. Ngoài phạm vi v1.1
+Chấm công; tính lương; bảng lương; hóa đơn, công nợ; tài khoản đăng nhập cho công ty khách hàng; thông tin công ty khách hàng ngoài tên và địa điểm.
+
+### 47. Lưu bản gốc ngoài phần mềm
+Bản gốc hợp đồng lao động, bản cam kết và bảng lương do bên cung ứng lưu ngoài phần mềm theo quy định. Phần mềm **không thay thế** việc lưu trữ đó. **[Nội bộ]** Tệp tải lên (hợp đồng, bản cam kết) được coi là bản số tham khảo, không phải bản gốc.
+
+### Điểm [Nội bộ]/[Giả định] của mục F cần xác nhận
+1. Địa điểm công ty khách là văn bản tự nhập; vị trí của đợt dùng danh mục Chức danh (câu 39, 40).
+2. HR được thêm/sửa đợt làm việc; chỉ A, Q thêm lương (câu 40, 42).
+3. Mức lương mong muốn vẫn ẩn với Viewer (câu 13, 42).
+4. Mỗi dòng lương ghi cả lương tháng và đơn giá; xem lương không ghi nhật ký; lương không vào file xuất Excel (câu 41, 42).
+5. Đợt tự kết thúc khi nghỉ việc; con số 12 tháng cấu hình được; đợt quá 12 tháng vẫn cảnh báo (câu 40, 43).

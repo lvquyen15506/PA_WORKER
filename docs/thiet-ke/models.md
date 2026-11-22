@@ -1,6 +1,6 @@
 # Danh sách model Django – PA Worker
 
-Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/lam-ro-yeu-cau.md` câu 1–38. Tên bảng, cột, quan hệ phải **khớp** với ERD; khi sửa một bên phải sửa bên kia.
+Phase 1 · Ngày 21/11/2026 · Cập nhật v1.1 ngày 23/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/lam-ro-yeu-cau.md` câu 1–47 (câu 39–47 là phiếu thay đổi v1.1). Tên bảng, cột, quan hệ phải **khớp** với ERD; khi sửa một bên phải sửa bên kia.
 
 ## 1. Quy ước
 
@@ -34,6 +34,7 @@ Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/lam-
 | core | `Shift` | Shifts | `core_shift` |
 | core | `ApplicationSource` | ApplicationSources | `core_applicationsource` |
 | core | `EducationLevel` | EducationLevels | `core_educationlevel` |
+| core | `ClientCompany` | ClientCompanies | `core_clientcompany` |
 | core | `RequiredDocumentGroup` | RequiredDocumentGroups | `core_requireddocumentgroup` |
 | core | `DocumentType` | DocumentTypes | `core_documenttype` |
 | core | `SystemSetting` | Settings | `core_systemsetting` |
@@ -56,9 +57,11 @@ Phase 1 · Ngày 21/11/2026 · Dựa trên `docs/thiet-ke/erd.md` và `docs/lam-
 | employment | `Employment` | Employments | `employment_employment` |
 | employment | `EmploymentHistory` | EmploymentHistory | `employment_employmenthistory` |
 | employment | `Contract` | Contracts | `employment_contract` |
+| employment | `WorkAssignment` | WorkAssignments | `employment_workassignment` |
+| employment | `SalaryHistory` | SalaryHistory | `employment_salaryhistory` |
 | reports | — | — | không có model |
 
-34 model. `workers` và `documents` trỏ lẫn nhau (`DataConsent.document` → `WorkerDocument`, `WorkerDocument.worker` → `Worker`); khai báo bằng chuỗi `"documents.WorkerDocument"` để tránh import vòng.
+37 model (34 của v1.0 + `ClientCompany`, `WorkAssignment`, `SalaryHistory` của v1.1). `workers` và `documents` trỏ lẫn nhau (`DataConsent.document` → `WorkerDocument`, `WorkerDocument.worker` → `Worker`); khai báo bằng chuỗi `"documents.WorkerDocument"` để tránh import vòng.
 
 ## 2. TextChoices
 
@@ -73,6 +76,8 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `WorkStatus` | `AWAITING` Chờ nhận việc · `PROBATION` Thử việc · `ACTIVE` Đang làm việc · `SUSPENDED` Tạm hoãn · `RESIGNED` Đã nghỉ việc | `Employment.work_status`, `EmploymentHistory.from_work_status/to_work_status` |
 | `DocumentVerificationStatus` | `UNVERIFIED` Chưa xác minh · `MATCHED` Đã đối chiếu bản gốc · `INVALID` Không hợp lệ | `WorkerDocument.verification_status` (chỉ tab Tài liệu) |
 
+**v1.1 không thêm `TextChoices` nào**: `ClientCompany`, `WorkAssignment`, `SalaryHistory` không có trường trạng thái. "Đang diễn ra / đã kết thúc" của đợt làm việc suy ra từ `start_date`/`end_date` và hiển thị bằng chữ thường hoặc nhãn "Sắp hết hạn" sẵn có (pa-ui mục 5), không thêm nhãn, không lưu, không tạo bộ trạng thái thứ năm. `AuditAction` dùng `CREATE`, `UPDATE` có sẵn; `RetentionBasis` giữ nguyên 6 căn cứ (câu 44: mốc 10 năm vẫn là ngày nghỉ việc).
+
 ### Danh sách giá trị khác (không phải trạng thái)
 
 | TextChoices | Mã → Nhãn |
@@ -85,7 +90,7 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `ResignReason` | `SELF` Tự nghỉ · `CONTRACT_END` Hết hợp đồng · `TERMINATED` Chấm dứt hợp đồng · `OTHER` Khác |
 | `ContractType` | `PROBATION` Thử việc · `FIXED_TERM` Xác định thời hạn · `INDEFINITE` Không xác định thời hạn |
 | `EmploymentChangeType` | `ONBOARD` Tiếp nhận vào làm · `TRANSFER` Điều chuyển · `POSITION_CHANGE` Đổi chức danh · `SHIFT_CHANGE` Đổi ca · `STATUS_CHANGE` Đổi trạng thái làm việc · `IMPORT` Nhập từ Excel |
-| `RetentionBasis` | `RESIGNED` Công nhân đã nghỉ · `EMPLOYEE_OTHER` Công nhân lưu trữ khác · `FAILED_CANDIDATE` Ứng viên không được tuyển · `REJECTED` Hồ sơ bị từ chối · `ABANDONED` Hồ sơ bỏ dở · `CANDIDATE_OTHER` Ứng viên lưu trữ khác (thứ tự xét theo câu 2) |
+| `RetentionBasis` | `RESIGNED` Công nhân đã nghỉ (mốc: ngày chấm dứt HĐLĐ với bên cung ứng = `Employment.resign_date`, câu 44; **không** phải ngày kết thúc đợt làm việc) · `EMPLOYEE_OTHER` Công nhân lưu trữ khác · `FAILED_CANDIDATE` Ứng viên không được tuyển · `REJECTED` Hồ sơ bị từ chối · `ABANDONED` Hồ sơ bỏ dở · `CANDIDATE_OTHER` Ứng viên lưu trữ khác (thứ tự xét theo câu 2) |
 | `CodeType` | `WORKER` Mã hồ sơ · `EMPLOYEE` Mã nhân viên |
 | `AnonymizationKind` | `EXPIRED` Hết hạn lưu trữ · `SUBJECT_REQUEST` Theo yêu cầu của chủ thể (câu 38) |
 | `AuditAction` | `CREATE` Tạo · `UPDATE` Sửa · `STATUS_CHANGE` Đổi trạng thái · `REOPEN` Mở lại hồ sơ · `VIEW_FULL_ID` Xem số CCCD đầy đủ · `VIEW_FILE` Xem tài liệu · `DOWNLOAD_FILE` Tải tài liệu · `UPLOAD_FILE` Tải lên tài liệu · `REPLACE_FILE` Thay thế tài liệu · `EXPORT` Xuất Excel · `PRINT` In báo cáo · `IMPORT` Nhập Excel · `ANONYMIZE` Ẩn danh hóa · `INTAKE_CREATE` Tạo phiên nhận diện · `INTAKE_SAVE` Lưu từ phiên nhận diện · `INTAKE_CANCEL` Hủy phiên nhận diện · `INTAKE_EXPIRE` Phiên nhận diện hết hạn · `EXTERNAL_OCR_SEND` Gửi ảnh tới API OCR · `ACCOUNT_LOCK` Khóa tài khoản · `ACCOUNT_UNLOCK` Mở khóa tài khoản · `PASSWORD_RESET` Đặt lại mật khẩu |
@@ -152,7 +157,7 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | --- | --- | --- |
 | `audit_log` | `FK(AuditLog, related_name="personal_values")` | |
 | `worker` | `FK(Worker, db_index)` | Để xóa theo hồ sơ khi ẩn danh hóa |
-| `field_name` | `CharField(80)` | Ví dụ `full_name`, `identity.id_number`, `emergency_contacts[2].phone`. Chỉ số trong ngoặc vuông là `pk` của dòng con (không phải `sort_order`), vì `pk` ổn định khi dòng bị xóa hoặc đổi thứ tự. Tiền tố: `identity.` (IdentityDocument), `employment.` (Employment), `emergency_contacts[pk].`, `applications[pk].`, `education[pk].`, `certificates[pk].`, `work_experiences[pk].`, `contracts[pk].`; trường của chính hồ sơ không có tiền tố |
+| `field_name` | `CharField(80)` | Ví dụ `full_name`, `identity.id_number`, `emergency_contacts[2].phone`. Chỉ số trong ngoặc vuông là `pk` của dòng con (không phải `sort_order`), vì `pk` ổn định khi dòng bị xóa hoặc đổi thứ tự. Tiền tố: `identity.` (IdentityDocument), `employment.` (Employment), `emergency_contacts[pk].`, `applications[pk].`, `education[pk].`, `certificates[pk].`, `work_experiences[pk].`, `contracts[pk].`, `work_assignments[pk].`, `salary_history[pk].`; trường của chính hồ sơ không có tiền tố |
 | `old_value_enc` | `EncryptedTextField(null)` | Fernet |
 | `new_value_enc` | `EncryptedTextField(null)` | Fernet |
 
@@ -169,6 +174,10 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `Application` | `expected_salary`, `interview_notes`, `reject_reason` |
 | `Education`, `Certificate`, `WorkExperience` | mọi trường chữ (`school_name`, `major`, `name`, `issuer`, `company_name`, `job_title`, `description`, `note`) |
 | `Employment`, `Contract` | `resign_note`, `note` |
+| `WorkAssignment` (v1.1) | `note` (công ty, vị trí, ngày không phải trường cá nhân: dùng cho thống kê) |
+| `SalaryHistory` (v1.1) | `monthly_salary`, `client_unit_price`, `reason` (câu 41: giá trị lương **không** vào `AuditLog.changes`; `effective_date` không phải trường cá nhân) |
+
+Tên logic mới ở `LOGICAL_TO_ATTR`: `monthly_salary` → `monthly_salary_enc`, `client_unit_price` → `client_unit_price_enc`.
 
 Ghi nhật ký qua một hàm duy nhất `apps.audit.services.log(...)`, không tạo `AuditLog` trực tiếp ở view. Hàm này tự tách trường cá nhân sang `AuditPersonalValue` theo `PERSONAL_FIELDS`.
 
@@ -199,13 +208,14 @@ Danh mục chung: mọi danh mục có `is_active = BooleanField(default=True)`.
 | `Shift` | `name CharField(50)`, `time_range CharField(20, blank)` | `name` unique |
 | `ApplicationSource` | `name CharField(100)` | `name` unique |
 | `EducationLevel` | `name CharField(100)`, `rank PositiveSmallIntegerField` | `name`, `rank` unique; số lớn = cao hơn (câu 14) |
+| `ClientCompany` (v1.1) | `name CharField(150)`, `location CharField(100)` (tỉnh/thành, văn bản tự nhập) | unique (`name`, `location`); mỗi địa điểm một dòng (câu 39). Công ty đã có đợt làm việc thì chỉ ngừng sử dụng, không xóa. `__str__` = `"<name> – <location>"` |
 | `RequiredDocumentGroup` | `name CharField(100)`, `sort_order` | `name` unique |
 | `DocumentType` | `name CharField(100)`, `system_code CharField(30, null)`, `required_group FK(RequiredDocumentGroup, null)`, `sort_order` | `name` unique; `system_code` unique khi khác rỗng |
 
 **Dữ liệu danh mục nạp sẵn** (data migration, Admin sửa được sau):
 
 - `RequiredDocumentGroup`: CCCD mặt trước · CCCD mặt sau · Ảnh chân dung · CV hoặc Đơn xin việc (câu 4).
-- `DocumentType` (`system_code` → nhóm): CCCD mặt trước (`CCCD_FRONT` → CCCD mặt trước) · CCCD mặt sau (`CCCD_BACK` → CCCD mặt sau) · Ảnh chân dung (`PORTRAIT` → Ảnh chân dung) · CV (`CV` → CV hoặc Đơn xin việc) · Đơn xin việc (`APPLICATION_LETTER` → CV hoặc Đơn xin việc) · Bằng cấp · Chứng chỉ · Hợp đồng (`CONTRACT`) · Quyết định tiếp nhận · Văn bản đồng ý xử lý dữ liệu (`CONSENT`) · Khác. `system_code` không sửa được trên giao diện vì mã nguồn dùng nó (ảnh chân dung, lưu ảnh từ phiên nhận diện, tệp hợp đồng, biên bản đồng ý).
+- `DocumentType` (`system_code` → nhóm): CCCD mặt trước (`CCCD_FRONT` → CCCD mặt trước) · CCCD mặt sau (`CCCD_BACK` → CCCD mặt sau) · Ảnh chân dung (`PORTRAIT` → Ảnh chân dung) · CV (`CV` → CV hoặc Đơn xin việc) · Đơn xin việc (`APPLICATION_LETTER` → CV hoặc Đơn xin việc) · Bằng cấp · Chứng chỉ · Hợp đồng (`CONTRACT`) · Quyết định tiếp nhận · Văn bản đồng ý xử lý dữ liệu (`CONSENT`) · **Bản cam kết** (v1.1, câu 45; không `system_code`, không thuộc nhóm bắt buộc; thêm bằng data migration mới vì các nơi đã cài đã chạy migration nạp danh mục cũ) · Khác. `system_code` không sửa được trên giao diện vì mã nguồn dùng nó (ảnh chân dung, lưu ảnh từ phiên nhận diện, tệp hợp đồng, biên bản đồng ý).
 - `EducationLevel` (rank): Chưa qua đào tạo (1) · Tiểu học (2) · THCS (3) · THPT (4) · Trung cấp (5) · Cao đẳng (6) · Đại học (7) · Sau đại học (8).
 - Phòng ban, bộ phận, tổ, chức danh, ca, nguồn ứng tuyển mẫu: do `seed_demo` (Phase 2) tạo, **bắt buộc** có phòng ban "Khối văn phòng" → bộ phận "Văn phòng" (câu 15).
 
@@ -219,10 +229,11 @@ Danh mục chung: mọi danh mục có `is_active = BooleanField(default=True)`.
 | `employee_code_prefix` | `CharField(10)` | `CN` | |
 | `employee_code_use_year` | `BooleanField` | `False` | `CN-00456` |
 | `employee_code_digits` | `PositiveSmallIntegerField` | `5` | 3–8 |
-| `expiry_warning_days` | `PositiveSmallIntegerField` | `30` | CCCD và hợp đồng sắp hết hạn (câu 17) |
+| `expiry_warning_days` | `PositiveSmallIntegerField` | `30` | CCCD và hợp đồng sắp hết hạn (câu 17); **dùng chung** cho đợt làm việc sắp đủ 12 tháng (câu 43) |
+| `assignment_limit_months` | `PositiveSmallIntegerField` | `12` | v1.1, câu 43: số tháng của một đợt làm việc để tính cảnh báo; 1–60 **[Nội bộ]** |
 | `ocr_confidence_threshold` | `PositiveSmallIntegerField` | `80` | % |
 | `failed_retention_months` | `PositiveSmallIntegerField` | `12` | Câu 2 |
-| `resigned_retention_years` | `PositiveSmallIntegerField` | `10` | Câu 2 |
+| `resigned_retention_years` | `PositiveSmallIntegerField` | `10` | Câu 2, câu 44: tính từ ngày chấm dứt HĐLĐ cuối cùng với bên cung ứng (`Employment.resign_date`), không từ ngày kết thúc đợt làm việc |
 | `auto_archive_resigned_days` | `PositiveSmallIntegerField` | `30` | Câu 9 |
 | `auto_archive_failed_days` | `PositiveSmallIntegerField` | `30` | Câu 9, quy tắc 2 và 3 |
 | `stale_draft_months` | `PositiveSmallIntegerField` | `6` | Câu 9, quy tắc 4 (hồ sơ bỏ dở) |
@@ -485,6 +496,50 @@ Không sửa trực tiếp `section`, `team`, `position`, `shift`, `work_status`
 | `created_by` | `FK(User)` | Tự động | |
 | `created_at` | `DateTimeField(auto_now_add)` | Tự động | |
 
+**Quan hệ giữa `Employment` và công ty khách hàng (v1.1):** `Employment` vẫn là quan hệ lao động giữa công nhân và **bên cung ứng** (1-1 với `Worker`): `start_date` là ngày bắt đầu với bên cung ứng, `resign_date` là ngày chấm dứt hợp đồng lao động (mốc hạn lưu trữ 10 năm, câu 44). Nơi làm việc tại công ty khách là `WorkAssignment` (1-nhiều theo thời gian). **`Section`, `Team`, `Shift`, `Department` nội bộ giữ nguyên** (đề xuất): phiếu v1.1 không bỏ chúng, yêu cầu v1.0 còn dùng cho bộ lọc, Dashboard, báo cáo, và Phase 4 đã làm xong. Chúng mô tả bộ phận nội bộ của bên cung ứng (đội quản lý, tổ trực thuộc), không mô tả nơi làm việc thực tế. Nếu khách xác nhận công nhân cung ứng không thuộc bộ phận nội bộ nào thì đổi `Employment.section` thành không bắt buộc (một migration, sửa câu 15, form và file Excel mẫu); chưa làm khi chưa có xác nhận.
+
+### 3.9 Đợt làm việc và lương (v1.1, `apps/employment`)
+
+**`WorkAssignment`** – đợt làm việc của công nhân tại một công ty khách hàng (câu 40). Mỗi lúc một công nhân chỉ một công ty; giữ lịch sử, không ghi đè.
+
+| Trường | Kiểu | Bắt buộc | Ghi chú |
+| --- | --- | --- | --- |
+| `worker` | `FK(Worker, related_name="work_assignments")` | Có | Phải có `Employment` (có mã NV) và chưa Đã nghỉ việc khi tạo mới |
+| `client_company` | `FK(ClientCompany)` | Có | Đang dùng (`is_active`) khi tạo mới; đợt cũ vẫn hiện công ty đã ngừng |
+| `position` | `FK(Position)` | Có | Vị trí tại công ty khách, dùng danh mục Chức danh sẵn có **[Giả định]** |
+| `start_date` | `DateField` | Có | |
+| `end_date` | `DateField(null)` | Không | Ngày làm cuối cùng của đợt; rỗng = đang mở. `>= start_date` |
+| `note` | `TextField(blank)` | Không | Trường cá nhân (`PERSONAL_FIELDS`) |
+| `created_by` | `FK(User)` | Tự động | |
+| `created_at`, `updated_at` | `DateTimeField` | Tự động | |
+
+- Ràng buộc CSDL: `CheckConstraint(end_date IS NULL OR end_date >= start_date)`; `UniqueConstraint(fields=["worker"], condition=Q(end_date__isnull=True))` (tối đa một đợt đang mở).
+- Không chồng lấn ngày (đợt khác của cùng công nhân không có khoảng ngày giao nhau): kiểm tra trong `apps.employment.services` khi thêm, sửa; khóa dòng `Worker` bằng `select_for_update()` để hai người ghi cùng lúc không tạo trùng.
+- Mọi thay đổi đi qua `apps.employment.services.add_assignment(...)`, `update_assignment(...)`; ghi `AuditLog` `CREATE`/`UPDATE` với `worker`. Thêm đợt mới khi đang có đợt mở: bắt buộc nhập ngày kết thúc cho đợt cũ ở cùng thao tác (đóng đợt cũ rồi mở đợt mới), hoặc báo lỗi tiếng Việt **[Nội bộ]**.
+- Khi `change_employment` đổi sang Đã nghỉ việc: đợt đang mở tự có `end_date = resign_date` (ghi nhật ký `UPDATE`, người thực hiện là người đổi trạng thái) **[Nội bộ]**.
+- Không có nút xóa; nhập nhầm thì sửa (giá trị cũ ghi nhật ký). **Không** thêm `TextChoices`: "Đang diễn ra" suy ra từ ngày.
+- Đợt hiện tại: `start_date <= hôm nay` và (`end_date` rỗng hoặc `end_date >= hôm nay`). Đợt "sắp đủ 12 tháng" (câu 43): đợt hiện tại có `ngày đủ hạn = add_months(start_date, assignment_limit_months)` trong vòng `expiry_warning_days` ngày tới (hoặc đã qua), và `end_date` rỗng hoặc sau `ngày đủ hạn`; tính ở `apps.workers.indicators`, dùng `apps/core/dates.add_months`.
+- `__str__` = `"Đợt làm việc <id> của <mã hồ sơ>"` (không họ tên, không lương).
+
+**`SalaryHistory`** – lịch sử lương tháng và đơn giá tháng tính cho công ty khách (câu 41, 42). **Chỉ thêm**.
+
+| Trường | Kiểu | Bắt buộc | Ghi chú |
+| --- | --- | --- | --- |
+| `worker` | `FK(Worker, related_name="salary_history")` | Có | Phải có `Employment` |
+| `monthly_salary_enc` | `EncryptedTextField` | Có | Lương tháng, số nguyên VNĐ > 0, lưu chuỗi số mã hóa Fernet |
+| `client_unit_price_enc` | `EncryptedTextField(null)` | Không | Đơn giá tháng tính cho công ty khách, số nguyên VNĐ > 0; rỗng = chưa có (ví dụ chưa có đợt làm việc) **[Nội bộ]** |
+| `effective_date` | `DateField` | Có | Ngày áp dụng; cho phép ngày tương lai (hẹn trước) |
+| `reason` | `TextField` | Có | Lý do thay đổi; dòng đầu có thể ghi "Thiết lập ban đầu". Trường cá nhân; ô nhập gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ" |
+| `created_by` | `FK(User)` | Tự động | Người sửa |
+| `created_at` | `DateTimeField(auto_now_add)` | Tự động | |
+
+- Mỗi dòng là **ảnh chụp cả hai khoản** tại ngày áp dụng: đổi một khoản thì form điền sẵn khoản kia từ mức hiện tại **[Nội bộ]**. Mức hiện tại = dòng có `effective_date` lớn nhất không quá hôm nay; cùng ngày thì dòng `id` lớn hơn.
+- Không sửa, không xóa: `save()` từ chối khi đã có `pk`, `delete()` báo lỗi, QuerySet chặn `update()`/`delete()`; migration tạo trigger PostgreSQL chặn `UPDATE` (như `AuditPersonalValue`). **Chỉ xóa** trong `apps.workers.retention.anonymize` (câu 41, mục 4.7).
+- Thêm dòng qua `apps.employment.services.add_salary(...)`: chỉ Admin và Quản lý nhân sự (kiểm tra ở máy chủ); ghi `AuditLog` `CREATE` với `worker`, giá trị lương ở `AuditPersonalValue` (`salary_history[pk].monthly_salary`, `.client_unit_price`, `.reason`).
+- Mọi vai trò xem được (câu 42); xem **không** ghi nhật ký. Không có cột lương trong file xuất Excel và không nhập lương từ Excel ở v1.1.
+- Đơn giá gắn với công nhân và ngày áp dụng, **không** có khóa ngoại tới `WorkAssignment`; công ty tương ứng suy ra từ đợt làm việc có hiệu lực tại ngày đó. **[Nội bộ, cần xác nhận]**
+- `__str__` = `"Lương <mã hồ sơ> từ dd/mm/yyyy"` (không chứa số tiền).
+
 ## 4. Quy tắc nghiệp vụ và nơi kiểm tra
 
 Mọi quy tắc kiểm tra ở máy chủ (service/form), không chỉ ở giao diện. Mỗi quy tắc có test riêng ở phase tương ứng.
@@ -531,7 +586,7 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Bị từ chối | Không ai | Không ai | Không ai | Không ai |
 | Lưu trữ | Không ai (chỉ xem) | Không ai | Không ai | Không ai |
 
-Đổi trạng thái xác minh tài liệu chỉ QL, Admin (câu 34). Bị từ chối chỉ xem (câu 35). Bảng này chỉ khóa phần được duyệt; tab Tuyển dụng và Quá trình làm việc vẫn thao tác được ở mọi trạng thái trừ Bị từ chối và Lưu trữ (câu 36).
+Đổi trạng thái xác minh tài liệu chỉ QL, Admin (câu 34). Bị từ chối chỉ xem (câu 35). Bảng này chỉ khóa phần được duyệt; tab Tuyển dụng và Quá trình làm việc vẫn thao tác được ở mọi trạng thái trừ Bị từ chối và Lưu trữ (câu 36); điều này áp dụng cả cho đợt làm việc và lương (v1.1), lương chỉ A, Q thêm (câu 42).
 
 ### 4.5 Kiểm tra dữ liệu
 | Quy tắc | Nơi kiểm tra | Mức |
@@ -563,7 +618,12 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Khóa tạm do sai mật khẩu, tự đăng xuất, buộc đổi mật khẩu | `apps.accounts` (backend + middleware) |
 | Admin khóa / mở khóa (câu 28): khóa đặt `is_active = False` **và hủy mọi phiên đăng nhập đang có của người đó** (để phiên cũ không sống lại khi mở khóa); mở khóa đặt `is_active = True`, `locked_until = None`, `failed_login_count = 0` | `apps.accounts.services.lock_user`, `unlock_user` |
 | Bảo vệ quyền quản trị (câu 29): Admin không tự khóa, không tự đổi vai trò; không ai khóa hoặc hạ vai trò Admin cuối cùng đang hoạt động (`role = ADMIN`, `is_active = True`). Test cho từng trường hợp | `apps.accounts.services` |
-| Viewer không thấy trường nhạy cảm, kể cả mức lương mong muốn (câu 13) | context của view chi tiết, danh sách, Tuyển dụng, mảnh HTMX, xuất Excel |
+| Viewer không thấy trường nhạy cảm, kể cả mức lương mong muốn (câu 13). **Ngoại lệ v1.1 (câu 42):** lương tháng và đơn giá tháng (`SalaryHistory`) mọi vai trò đều xem được; chỉ A, Q thêm | context của view chi tiết, danh sách, Tuyển dụng, mảnh HTMX, xuất Excel |
+| Đợt làm việc (câu 40): một công ty tại một lúc, không chồng lấn, `end_date >= start_date`, công nhân có mã NV và chưa Đã nghỉ việc; nghỉ việc thì đóng đợt đang mở | `apps.employment.services` |
+| Lương (câu 41, 42): chỉ thêm dòng mới, số nguyên VNĐ > 0, bắt buộc lý do, chỉ A, Q; mã hóa; ghi nhật ký (giá trị ở `AuditPersonalValue`) | `apps.employment.services.add_salary` |
+| Đợt làm việc sắp đủ 12 tháng (câu 43): trong danh sách việc cần làm ở Dashboard, dùng `expiry_warning_days` và `assignment_limit_months`; bộ lọc `?dot_sap_du_han=1` | `apps.workers.indicators` |
+| Báo cáo số công nhân đang làm theo công ty khách (câu 45): đếm đợt hiện tại theo `client_company`; bộ lọc danh sách `?cong_ty_khach=<id>` (theo đợt hiện tại) | `apps.reports`, `apps.workers.listing` |
+| Hạn lưu trữ công nhân đã nghỉ (câu 44): mốc là `Employment.resign_date`, **không** dùng `WorkAssignment.end_date`. **Test:** công nhân có đợt kết thúc từ lâu nhưng chưa nghỉ việc thì `retention_info` không đổi; đổi `end_date` của đợt không làm đổi hạn lưu trữ | `apps.workers.retention.retention_info` |
 | Nhập Excel (câu 27): mã NV cũ khớp `^[A-Za-z0-9-]{1,20}$`, không trùng (CSDL và trong cùng file); chỉ Admin/QL được nhập phần làm việc; danh mục khớp tên; đẩy `CodeSequence` chỉ khi mã khớp định dạng đang cấu hình (xem `CodeSequence`) | `apps.reports.importer` |
 | Sinh mã (câu 6, 27): kiểm tra mã chưa tồn tại trước khi cấp, tồn tại thì tăng tiếp | `apps.core.codes.next_code` |
 | Hợp đồng hiển thị tệp hiện hành (câu 32): đi theo `replaced_by` tới bản `is_current` | `Contract.current_document` |
@@ -580,6 +640,8 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | `DataConsent` | Tệp biên bản (qua `WorkerDocument`) | Có/không, ngày, hình thức |
 | `Application`, `Education`, `Certificate`, `WorkExperience` | Các trường thuộc `PERSONAL_FIELDS` (mục 3.2): `expected_salary`, `interview_notes`, `reject_reason`, tên trường/công ty/chứng chỉ, mô tả, ghi chú | Vị trí, nguồn, ngày, trạng thái, trình độ (phục vụ thống kê) |
 | `Employment`, `EmploymentHistory`, `Contract` | Tệp hợp đồng, `resign_note`, `note` | Bộ phận, chức danh, ngày, trạng thái, số hợp đồng |
+| `WorkAssignment` (v1.1) | `note` | Công ty khách hàng, vị trí, ngày bắt đầu/kết thúc (thống kê, không kèm tên) |
+| `SalaryHistory` (v1.1) | **Xóa mọi dòng của hồ sơ** (lương tháng, đơn giá, lý do, ngày áp dụng, người sửa): ngoại lệ có kiểm soát của bảng chỉ thêm, chỉ trong `anonymize()`; cần thêm vào ngoại lệ "không xóa cứng" của `CLAUDE.md` | — |
 | `AuditPersonalValue` | **Xóa mọi dòng của hồ sơ** (câu 30) | — |
 | `AuditLog` | Không đổi; thêm một dòng `ANONYMIZE` (`object_repr` = mã hồ sơ, `note` = số biên bản) | Toàn bộ dòng cũ: ai, khi nào, hành động, tên trường thay đổi |
 | `StatusChange`, `LoginHistory` | Giữ nguyên | Toàn bộ |

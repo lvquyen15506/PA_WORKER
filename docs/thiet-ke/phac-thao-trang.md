@@ -100,8 +100,10 @@ Thông báo lỗi đúng chữ ở `trang.md` mục 5.1 (sai mật khẩu, bị 
 | Biểu đồ: giới tính, 5 nhóm tuổi| Biểu đồ: theo trạng thái xác   |
 | + "Chưa có ngày sinh", trình độ| minh                           |
 +-------------------------------+-------------------------------+
-Việc cần làm: 3 khối  [_table] nhỏ + [_status_badge]
+Việc cần làm: 4 khối  [_table] nhỏ + [_status_badge]
   Chờ duyệt {A,Q} | Cần bổ sung | CCCD sắp hết hạn
+  Đợt làm việc sắp đủ 12 tháng   (v1.1; hàng thứ hai, khối cuối; không thêm thẻ số liệu)
+     cột: Mã NV | Công ty khách | Ngày bắt đầu | Đủ 12 tháng ngày [_status_badge: Sắp hết hạn]
   (trống -> [_empty_state] một câu, không nút)
 ```
 
@@ -111,7 +113,7 @@ Mỗi biểu đồ có tiêu đề nói kết quả và đơn vị. Khối "Ch�
 
 ```
 [_page_header] Hồ sơ công nhân     [ Xuất Excel ]{A,Q,H}  [*Thêm hồ sơ*]{A,Q,H}
-[_filter_bar] (Phòng ban)(Bộ phận)(Chức danh)(Trình độ)
+[_filter_bar] (Phòng ban)(Bộ phận)(Chức danh)(Trình độ)(Công ty khách)   <- v1.1, theo đợt đang diễn ra
               (TT hồ sơ)(TT làm việc)(Thiếu giấy tờ)(Hoàn thiện)
               (Tiếp nhận từ)(đến)         [ Lọc ] [ Xóa lọc ]
 [_table]
@@ -128,6 +130,8 @@ Mỗi biểu đồ có tiêu đề nói kết quả và đơn vị. Khối "Ch�
 - Tiêu đề hai cột trạng thái viết tắt "TT hồ sơ" và "TT làm việc" để 12 cột vừa khung ở 1366 px (đã đo: đủ chỗ, không cuộn ngang).
 - Bộ lọc thêm "Trạng thái tuyển dụng" (xét lần ứng tuyển gần nhất), "Hoàn thiện", khoảng ngày tiếp nhận; tham số URL tiếng Việt không dấu trùng với liên kết thẻ Dashboard.
 - Bộ lọc được giữ trong phiên, **trừ chữ tìm kiếm** (có thể là số CCCD, không lưu vào phiên); "Xóa lọc" là `?reset=1`.
+
+**v1.1:** thêm ô lọc "Công ty khách" (danh sách công ty và địa điểm, `_form_field` dạng chọn trong `_filter_bar`) và tham số `?dot_sap_du_han=1` từ Dashboard. **Không thêm cột** vào bảng (12 cột đã vừa khung 1366 px); công ty khách hiện ở tab Quá trình làm việc. Nếu khách muốn thấy cột "Công ty khách" ở danh sách thì phải bỏ hoặc gộp một cột (chờ quyết định).
 
 Ô tìm nhanh ở thanh trên gửi tới `?q=`. Viewer: không tìm theo CCCD, không có nút Xuất Excel, Thêm hồ sơ, Sửa.
 
@@ -209,7 +213,7 @@ Biểu đồ Chart.js (1 hoặc 2 tùy loại, có tiêu đề kết quả + đ�
 ([_empty_state] khi không có dữ liệu trong khoảng đã chọn)
 ```
 
-Viewer xem được, không có nút Xuất Excel và In. Danh mục loại báo cáo chốt ở Phase 7.
+Viewer xem được, không có nút Xuất Excel và In. Danh mục loại báo cáo chốt ở Phase 7. v1.1: có loại "Công nhân đang làm theo công ty khách hàng": biểu đồ cột (người) + `_table` Công ty | Địa điểm | Số công nhân đang làm; mỗi số liên kết tới `/ho-so/?cong_ty_khach=<id>`.
 
 ### 2.10 Nhật ký thao tác `/nhat-ky/` {A,Q}
 
@@ -247,8 +251,10 @@ Trạng thái: Đang hoạt động / Bị khóa (Admin khóa) / Khóa tạm đ�
 [_page_header] Cài đặt
 [_tabs]  Danh mục | Sinh mã | Ngưỡng và thời hạn | OCR và QR | Chờ hủy | Biên bản hủy
 Tab Danh mục: danh sách loại (phòng ban, bộ phận, tổ, chức danh, ca, nguồn ứng tuyển,
-              trình độ, nhóm tài liệu, loại tài liệu)  -> mỗi loại 1 [_table]
+              trình độ, nhóm tài liệu, loại tài liệu, công ty khách hàng)  -> mỗi loại 1 [_table]
   Tên | Mã | Trạng thái [_status_badge: Đang dùng / Ngừng] | Thao tác <bi-pencil> [ Ngừng ]/[ Dùng lại ]
+  Công ty khách hàng (v1.1): Tên | Địa điểm | Trạng thái | Thao tác (không có cột Mã; mỗi địa điểm một dòng)
+     form thêm/sửa: [_form_section] [_form_field] Tên công ty *, Địa điểm (tỉnh/thành) *
   [ Thêm ] ở đầu bảng      (không có nút xóa)
 Tab Sinh mã / Ngưỡng / OCR và QR: [_form_section] + [_form_field]   [ Hủy ] [*Lưu cài đặt*]
   (OCR và QR: bật API ngoài -> [_alert] cảnh báo ảnh được gửi ra ngoài)
@@ -344,10 +350,20 @@ Xóa dòng con qua `[_confirm_modal]` (dòng con là ngoại lệ được xóa,
 ```
 [_form_section] Hiện tại (xem): Phòng ban, Bộ phận, Chức danh, Ca, Ngày vào làm, TT làm việc [_status_badge]
                                   [ Ghi nhận thay đổi ]{A,Q,H}
+[_form_section] Đợt làm việc hiện tại (v1.1, xem): Công ty khách | Địa điểm | Vị trí | Từ ngày | Đến ngày (trống = đang mở)
+                [_status_badge: Sắp hết hạn] khi sắp đủ 12 tháng              [ Thêm đợt làm việc ]{A,Q,H}
+[_table] Lịch sử đợt làm việc (v1.1): Công ty khách | Địa điểm | Vị trí | Từ ngày | Đến ngày | Ghi chú | <bi-pencil>{A,Q,H}
+         (đợt mới nhất trước; không có nút xóa; [_empty_state] nếu chưa có đợt nào)
+[_form_section] Lương hiện tại (v1.1, xem, mọi vai trò): Lương tháng | Đơn giá tháng (tính cho công ty khách) | Áp dụng từ
+                                                       [ Ghi nhận thay đổi lương ]{A,Q}
+[_table] Lịch sử lương (v1.1): Ngày áp dụng | Lương tháng | Đơn giá tháng | Lý do | Người sửa | Ngày ghi
+         (mọi vai trò xem; chỉ thêm dòng, không có nút sửa/xóa; cột số căn phải, ô trống "—")
 [_table] Lịch sử điều chuyển: Ngày hiệu lực | Thay đổi (từ → đến) | Số quyết định | Lý do
 [_table] Hợp đồng: Loại | Số HĐ | Từ ngày | Đến ngày [_status_badge: Sắp hết hạn nếu có] | Tệp (bản hiện hành) <bi-download>{A,Q,H} | <pencil>
          [ Thêm hợp đồng ]{A,Q,H}
 ```
+
+**Form v1.1 ở tab này** (cùng khuôn `[_form_section]` + `[_form_field]`, `[ Hủy ] [*Lưu*]`): *Thêm/sửa đợt làm việc* gồm Công ty khách * (chọn, hiện "tên – địa điểm"), Vị trí * (chọn từ Chức danh), Ngày bắt đầu *, Ngày kết thúc, Ghi chú; *Ghi nhận thay đổi lương* gồm Lương tháng *, Đơn giá tháng, Ngày áp dụng *, Lý do * (gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ"). Lỗi chồng lấn ngày hoặc đang có đợt mở hiện bằng `_alert`/lỗi dưới ô. Chỉ dùng component đã duyệt ở `/ui-kit/`: `_form_section`, `_form_field`, `_table`, `_status_badge` (nhãn "Sắp hết hạn" sẵn có), `_alert`, `_empty_state`; không thêm component hay nhãn mới.
 
 **Tab 4 – Tài liệu (`tai-lieu`)**
 
