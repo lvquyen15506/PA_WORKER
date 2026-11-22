@@ -11,7 +11,9 @@ def test_ten_ngau_nhien_giu_duoi_va_thu_muc():
     st = PrivateStorage()
     name = st.save("intake/abc/cccd-that-cua-toi.JPG", ContentFile(b"x"))
     assert re.fullmatch(r"intake/abc/[0-9a-f]{32}\.jpg", name.replace("\\", "/"))
-    assert "cccd" not in name
+    assert (
+        "cccd-that-cua-toi" not in name
+    )  # tên gốc không lọt vào tên lưu (hex ngẫu nhiên có thể tình cờ chứa "cccd")
     assert st.exists(name)
 
 

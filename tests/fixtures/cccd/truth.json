@@ -1,0 +1,651 @@
+{
+ "watermark": "MẪU – KHÔNG CÓ GIÁ TRỊ",
+ "cards": [
+  {
+   "id": "01",
+   "doc_type": "CCCD_2021",
+   "quality": "good",
+   "files": {
+    "front": "01-cccd_2021-truoc.png",
+    "back": "01-cccd_2021-sau.png"
+   },
+   "values": {
+    "id_number": "999000000001",
+    "old_id_number": null,
+    "full_name": "VŨ VĂN DỰNG",
+    "date_of_birth": "2001-11-28",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Phường Demo 1, Tỉnh Demo",
+    "permanent_address": "Số 1 Đường Mẫu, Quận Kiểm Tra 1",
+    "birth_registration_place": "Quận Kiểm Tra 1, Tỉnh Demo",
+    "issue_date": "2021-04-20",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2036-04-20"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "front"
+  },
+  {
+   "id": "02",
+   "doc_type": "CCCD_2021",
+   "quality": "good",
+   "files": {
+    "front": "02-cccd_2021-truoc.png",
+    "back": "02-cccd_2021-sau.png"
+   },
+   "values": {
+    "id_number": "999000000002",
+    "old_id_number": null,
+    "full_name": "PHẠM THỊ MẪU",
+    "date_of_birth": "2004-02-04",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Xã Thử Nghiệm 2, Tỉnh Demo",
+    "permanent_address": "Số 2 Đường Mẫu, Phường Demo 2",
+    "birth_registration_place": "Phường Demo 2, Tỉnh Demo",
+    "issue_date": "2023-02-15",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2033-02-15"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "front"
+  },
+  {
+   "id": "03",
+   "doc_type": "CCCD_2021",
+   "quality": "good",
+   "files": {
+    "front": "03-cccd_2021-truoc.png",
+    "back": "03-cccd_2021-sau.png"
+   },
+   "values": {
+    "id_number": "999000000003",
+    "old_id_number": null,
+    "full_name": "VŨ THỊ NGHIỆM",
+    "date_of_birth": "1997-12-17",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Huyện Giả Lập 3, Tỉnh Demo",
+    "permanent_address": "Số 3 Đường Mẫu, Quận Kiểm Tra 3",
+    "birth_registration_place": "Phường Demo 3, Tỉnh Demo",
+    "issue_date": "2021-12-11",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2031-12-11"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "front"
+  },
+  {
+   "id": "04",
+   "doc_type": "CCCD_2021",
+   "quality": "good",
+   "files": {
+    "front": "04-cccd_2021-truoc.png",
+    "back": "04-cccd_2021-sau.png"
+   },
+   "values": {
+    "id_number": "999000000004",
+    "old_id_number": null,
+    "full_name": "NGÔ VĂN DEMO",
+    "date_of_birth": "1985-12-12",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Quận Kiểm Tra 4, Tỉnh Demo",
+    "permanent_address": "Số 4 Đường Mẫu, Phường Demo 4",
+    "birth_registration_place": "Phường Demo 4, Tỉnh Demo",
+    "issue_date": "2023-08-14",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2033-08-14"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "front"
+  },
+  {
+   "id": "05",
+   "doc_type": "CCCD_2021",
+   "quality": "good",
+   "files": {
+    "front": "05-cccd_2021-truoc.png",
+    "back": "05-cccd_2021-sau.png"
+   },
+   "values": {
+    "id_number": "999000000005",
+    "old_id_number": null,
+    "full_name": "ĐẶNG VĂN DỰNG",
+    "date_of_birth": "2004-08-13",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Phường Demo 5, Tỉnh Demo",
+    "permanent_address": "Số 5 Đường Mẫu, Quận Kiểm Tra 5",
+    "birth_registration_place": "Quận Kiểm Tra 5, Tỉnh Demo",
+    "issue_date": "2025-05-28",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2040-05-28"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "front"
+  },
+  {
+   "id": "06",
+   "doc_type": "CCCD_2021",
+   "quality": "low_res",
+   "files": {
+    "front": "06-cccd_2021-truoc.png",
+    "back": "06-cccd_2021-sau.png"
+   },
+   "values": {
+    "id_number": "999000000006",
+    "old_id_number": "999927262",
+    "full_name": "NGÔ VĂN KIỂM",
+    "date_of_birth": "1989-01-23",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Xã Thử Nghiệm 6, Tỉnh Demo",
+    "permanent_address": "Số 6 Đường Mẫu, Phường Demo 6",
+    "birth_registration_place": "Thôn Mẫu 6, Tỉnh Demo",
+    "issue_date": "2025-11-04",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2040-11-04"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [
+    "id_number",
+    "old_id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "front"
+  },
+  {
+   "id": "07",
+   "doc_type": "CAN_CUOC_2024",
+   "quality": "good",
+   "files": {
+    "front": "07-can_cuoc_2024-truoc.png",
+    "back": "07-can_cuoc_2024-sau.png"
+   },
+   "values": {
+    "id_number": "999000000007",
+    "old_id_number": "999308673",
+    "full_name": "BÙI THỊ DỰNG",
+    "date_of_birth": "1993-09-13",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Huyện Giả Lập 7, Tỉnh Demo",
+    "permanent_address": "Số 7 Đường Mẫu, Phường Demo 7",
+    "birth_registration_place": "Thôn Mẫu 7, Tỉnh Demo",
+    "issue_date": "2023-09-26",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2038-09-26"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "permanent_address",
+    "birth_registration_place",
+    "issue_date",
+    "expiry_date"
+   ],
+   "qr_fields": [
+    "id_number",
+    "old_id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "back"
+  },
+  {
+   "id": "08",
+   "doc_type": "CAN_CUOC_2024",
+   "quality": "good",
+   "files": {
+    "front": "08-can_cuoc_2024-truoc.png",
+    "back": "08-can_cuoc_2024-sau.png"
+   },
+   "values": {
+    "id_number": "999000000008",
+    "old_id_number": null,
+    "full_name": "LÊ VĂN MÔ",
+    "date_of_birth": "1999-09-16",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Phường Demo 8, Tỉnh Demo",
+    "permanent_address": "Số 8 Đường Mẫu, Phường Demo 8",
+    "birth_registration_place": "Phường Demo 8, Tỉnh Demo",
+    "issue_date": "2023-04-09",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2038-04-09"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "permanent_address",
+    "birth_registration_place",
+    "issue_date",
+    "expiry_date"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "back"
+  },
+  {
+   "id": "09",
+   "doc_type": "CAN_CUOC_2024",
+   "quality": "good",
+   "files": {
+    "front": "09-can_cuoc_2024-truoc.png",
+    "back": "09-can_cuoc_2024-sau.png"
+   },
+   "values": {
+    "id_number": "999000000009",
+    "old_id_number": null,
+    "full_name": "HOÀNG VĂN NGHIỆM",
+    "date_of_birth": "1999-02-15",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Phường Demo 9, Tỉnh Demo",
+    "permanent_address": "Số 9 Đường Mẫu, Phường Demo 9",
+    "birth_registration_place": "Thôn Mẫu 9, Tỉnh Demo",
+    "issue_date": "2025-05-15",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2035-05-15"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "permanent_address",
+    "birth_registration_place",
+    "issue_date",
+    "expiry_date"
+   ],
+   "qr_fields": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "back"
+  },
+  {
+   "id": "10",
+   "doc_type": "CAN_CUOC_2024",
+   "quality": "good",
+   "files": {
+    "front": "10-can_cuoc_2024-truoc.png",
+    "back": "10-can_cuoc_2024-sau.png"
+   },
+   "values": {
+    "id_number": "999000000010",
+    "old_id_number": "999608845",
+    "full_name": "BÙI THỊ NGHIỆM",
+    "date_of_birth": "1988-04-24",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Quận Kiểm Tra 10, Tỉnh Demo",
+    "permanent_address": "Số 10 Đường Mẫu, Thôn Mẫu 10",
+    "birth_registration_place": "Thôn Mẫu 10, Tỉnh Demo",
+    "issue_date": "2024-03-15",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2034-03-15"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "permanent_address",
+    "birth_registration_place",
+    "issue_date",
+    "expiry_date"
+   ],
+   "qr_fields": [
+    "id_number",
+    "old_id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "back"
+  },
+  {
+   "id": "11",
+   "doc_type": "CAN_CUOC_2024",
+   "quality": "good",
+   "files": {
+    "front": "11-can_cuoc_2024-truoc.png",
+    "back": "11-can_cuoc_2024-sau.png"
+   },
+   "values": {
+    "id_number": "999000000011",
+    "old_id_number": "999696864",
+    "full_name": "PHẠM VĂN THỬ",
+    "date_of_birth": "2004-01-25",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Quận Kiểm Tra 11, Tỉnh Demo",
+    "permanent_address": "Số 11 Đường Mẫu, Xã Thử Nghiệm 11",
+    "birth_registration_place": "Quận Kiểm Tra 11, Tỉnh Demo",
+    "issue_date": "2025-05-22",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2040-05-22"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "permanent_address",
+    "birth_registration_place",
+    "issue_date",
+    "expiry_date"
+   ],
+   "qr_fields": [
+    "id_number",
+    "old_id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "permanent_address",
+    "issue_date"
+   ],
+   "has_qr": true,
+   "qr_side": "back"
+  },
+  {
+   "id": "12",
+   "doc_type": "CCCD_2016",
+   "quality": "good",
+   "files": {
+    "front": "12-cccd_2016-truoc.png",
+    "back": "12-cccd_2016-sau.png"
+   },
+   "values": {
+    "id_number": "999000000012",
+    "old_id_number": "999167899",
+    "full_name": "LÊ THỊ DỰNG",
+    "date_of_birth": "1992-08-19",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Xã Thử Nghiệm 12, Tỉnh Demo",
+    "permanent_address": "Số 12 Đường Mẫu, Thôn Mẫu 12",
+    "birth_registration_place": "Quận Kiểm Tra 12, Tỉnh Demo",
+    "issue_date": "2022-10-23",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2037-10-23"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [],
+   "has_qr": false,
+   "qr_side": null
+  },
+  {
+   "id": "13",
+   "doc_type": "CCCD_2016",
+   "quality": "good",
+   "files": {
+    "front": "13-cccd_2016-truoc.png",
+    "back": "13-cccd_2016-sau.png"
+   },
+   "values": {
+    "id_number": "999000000013",
+    "old_id_number": null,
+    "full_name": "ĐỖ THỊ LẬP",
+    "date_of_birth": "1997-03-17",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Thôn Mẫu 13, Tỉnh Demo",
+    "permanent_address": "Số 13 Đường Mẫu, Phường Demo 13",
+    "birth_registration_place": "Huyện Giả Lập 13, Tỉnh Demo",
+    "issue_date": "2022-07-01",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2032-07-01"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [],
+   "has_qr": false,
+   "qr_side": null
+  },
+  {
+   "id": "14",
+   "doc_type": "CCCD_2016",
+   "quality": "dark",
+   "files": {
+    "front": "14-cccd_2016-truoc.png",
+    "back": "14-cccd_2016-sau.png"
+   },
+   "values": {
+    "id_number": "999000000014",
+    "old_id_number": null,
+    "full_name": "NGUYỄN THỊ MẪU",
+    "date_of_birth": "2001-08-11",
+    "gender": "FEMALE",
+    "nationality": "Việt Nam",
+    "hometown": "Quận Kiểm Tra 14, Tỉnh Demo",
+    "permanent_address": "Số 14 Đường Mẫu, Phường Demo 14",
+    "birth_registration_place": "Quận Kiểm Tra 14, Tỉnh Demo",
+    "issue_date": "2023-08-11",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2033-08-11"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [],
+   "has_qr": false,
+   "qr_side": null
+  },
+  {
+   "id": "15",
+   "doc_type": "CCCD_2016",
+   "quality": "blur",
+   "files": {
+    "front": "15-cccd_2016-truoc.png",
+    "back": "15-cccd_2016-sau.png"
+   },
+   "values": {
+    "id_number": "999000000015",
+    "old_id_number": null,
+    "full_name": "LÊ VĂN MÔ",
+    "date_of_birth": "2001-04-14",
+    "gender": "MALE",
+    "nationality": "Việt Nam",
+    "hometown": "Thôn Mẫu 15, Tỉnh Demo",
+    "permanent_address": "Số 15 Đường Mẫu, Thôn Mẫu 15",
+    "birth_registration_place": "Xã Thử Nghiệm 15, Tỉnh Demo",
+    "issue_date": "2025-06-15",
+    "issue_place": "Cục Mẫu Thử Nghiệm",
+    "expiry_date": "2035-06-15"
+   },
+   "printed": [
+    "id_number",
+    "full_name",
+    "date_of_birth",
+    "gender",
+    "nationality",
+    "hometown",
+    "permanent_address",
+    "expiry_date",
+    "issue_date",
+    "issue_place"
+   ],
+   "qr_fields": [],
+   "has_qr": false,
+   "qr_side": null
+  }
+ ]
+}
