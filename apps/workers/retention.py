@@ -136,7 +136,13 @@ def expired_entries(today=None):
         verification_status=VerificationStatus.ARCHIVED, anonymized_at__isnull=True
     )
     for worker in archived:
-        info = retention_info(worker, setting)
+        try:
+            info = retention_info(worker, setting)
+        except RetentionError:
+            # Một hồ sơ hỏng (Lưu trữ nhưng không có lịch sử chuyển, ví dụ do sửa dữ liệu tay) không
+            # được làm hỏng cả danh sách; ghi lỗi để người vận hành xử lý.
+            logger.error("Hồ sơ %s Lưu trữ nhưng không tính được hạn lưu trữ", worker.worker_code)
+            continue
         if info.expires_on < today:
             entries.append((worker, info))
     entries.sort(key=lambda entry: (entry[1].expires_on, entry[0].pk))
@@ -215,8 +221,9 @@ def _wipe(worker, now):
         Q(worker=worker) | Q(consents__worker=worker) | Q(contracts__worker=worker)
     ).distinct()
     names = [d.stored_file.name for d in documents if d.stored_file]
+    # note là chữ người dùng tự gõ nên có thể chứa tên: xóa cùng tên tệp gốc.
     WorkerDocument.objects.filter(pk__in=[d.pk for d in documents]).update(
-        stored_file=None, original_name=""
+        stored_file=None, original_name="", note=""
     )
     # Giá trị trước/sau của trường cá nhân trong nhật ký (câu 30). Dòng nhật ký vẫn giữ.
     AuditPersonalValue.objects.filter(worker=worker).delete()

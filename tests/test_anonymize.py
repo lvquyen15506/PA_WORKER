@@ -86,7 +86,9 @@ def rich_worker(archive=True):
     emp.resign_date, emp.resign_reason, emp.resign_note = D(2026, 1, 1), "SELF", MARK
     emp.save()
 
-    v1 = make_document(worker, "CCCD_FRONT", content=b"%PDF-v1", name=f"{MARK}1.pdf")
+    v1 = make_document(
+        worker, "CCCD_FRONT", content=b"%PDF-v1", name=f"{MARK}1.pdf", note=f"Ghi chú {MARK}"
+    )
     v2 = make_document(worker, "CCCD_FRONT", content=b"%PDF-v2", name=f"{MARK}2.pdf", replaces=v1)
     WorkerDocument.objects.filter(pk=v1.pk).update(is_current=False)
     v3 = make_document(worker, "CCCD_FRONT", content=b"%PDF-v3", name=f"{MARK}3.pdf", replaces=v2)
@@ -209,7 +211,7 @@ def test_tai_lieu_moi_phien_ban_bi_xoa_tep_va_ten_goc(django_capture_on_commit_c
     after = WorkerDocument.objects.filter(worker=worker)
     assert after.count() == 5  # giữ dòng: loại, phiên bản, ngày, người tải
     for doc in after:
-        assert not doc.stored_file and doc.original_name == ""
+        assert not doc.stored_file and doc.original_name == "" and doc.note == ""
         assert doc.document_type_id and doc.version and doc.uploaded_by_id
 
 

@@ -125,7 +125,8 @@ def worker_list(request):
         # Giữ bộ lọc khi quay lại trang. Không lưu chữ tìm kiếm (có thể là số CCCD) vào phiên.
         saved = params.copy()
         saved.pop("q", None)
-        request.session[SESSION_KEY] = saved.urlencode()
+        if saved:  # chỉ tìm nhanh (?q=) thì giữ nguyên bộ lọc đã lưu
+            request.session[SESSION_KEY] = saved.urlencode()
     elif request.session.get(SESSION_KEY):
         params = QueryDict(request.session[SESSION_KEY])
     form = WorkerFilterForm(params)
@@ -256,7 +257,8 @@ def worker_create(request):
 @require_POST
 def check_duplicate(request):
     """Mảnh HTMX khi rời ô họ tên / SĐT / ngày sinh / số CCCD: báo trùng, không ghi gì."""
-    instance = Worker.objects.filter(pk=request.GET.get("sua") or 0).first()
+    editing = request.GET.get("sua", "")
+    instance = Worker.objects.filter(pk=int(editing)).first() if editing.isdigit() else None
     form = WorkerForm(request.POST, instance=instance)
     form.is_valid()
     errors = [
@@ -445,7 +447,7 @@ def _modals(worker, bound):
             prefix="archive", required=worker.verification_status == VerificationStatus.VERIFIED
         ),
         "anonymize": bound.get("anonymize") or AnonymizeForm(prefix="anon", worker=worker),
-        "document": VerifyForm(prefix="docv"),
+        "document": VerifyForm(),  # không tiền tố: view xác minh đọc đúng tên trường status, note
     }
 
 

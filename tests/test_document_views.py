@@ -227,6 +227,42 @@ def test_ql_admin_doi_trang_thai_xac_minh(role):
     assert doc.verification_status == "MATCHED"
 
 
+def test_hop_thoai_xac_minh_tren_trang_gui_dung_ten_truong_ma_view_doc():
+    """Hợp đồng giữa giao diện và máy chủ: lấy tên ô thật trong HTML của hộp thoại rồi gửi đúng
+    các tên đó (trước đây hộp thoại dùng tiền tố còn view đọc không tiền tố nên luôn báo lỗi)."""
+    import re
+
+    worker = make_worker_in_status(VS.DRAFT)
+    doc = doc_of(worker)
+    client = login_client(make_user("HR_MANAGER"))
+    page = client.get(f"/ho-so/{worker.pk}/?tab=tai-lieu").content.decode()
+    modal = page.split('id="doc-verify-modal"')[1].split("</form>")[0]
+    status_name = re.search(r'<select name="([^"]+)"', modal).group(1)
+    note_name = re.search(r'<textarea name="([^"]+)"', modal).group(1)
+    assert f"/tai-lieu/{doc.pk}/xac-minh/" in page  # nút Xác minh trong bảng trỏ đúng URL
+    response = client.post(
+        f"/tai-lieu/{doc.pk}/xac-minh/", {status_name: "MATCHED", note_name: "Đã đối chiếu"}
+    )
+    assert response.status_code == 302
+    assert [str(m) for m in response.wsgi_request._messages] == [
+        "Đã cập nhật trạng thái xác minh tài liệu."
+    ]
+    doc.refresh_from_db()
+    assert (doc.verification_status, doc.note) == ("MATCHED", "Đã đối chiếu")
+
+
+def test_xem_va_tai_tep_mat_tren_dia_la_404_va_khong_ghi_nhat_ky():
+    import os
+
+    worker = make_worker_in_status(VS.DRAFT)
+    doc = doc_of(worker)
+    os.remove(doc.stored_file.path)  # dòng còn, tệp mất (khôi phục thiếu thư mục tệp)
+    client = login_client(make_user("HR_STAFF"))
+    assert client.get(f"/tai-lieu/{doc.pk}/xem/").status_code == 404
+    assert client.get(f"/tai-lieu/{doc.pk}/tai-xuong/").status_code == 404
+    assert not AuditLog.objects.filter(action__in=["VIEW_FILE", "DOWNLOAD_FILE"]).exists()
+
+
 @pytest.mark.parametrize("role", ["HR_STAFF", "VIEWER"])
 def test_hr_va_viewer_khong_doi_duoc_trang_thai_xac_minh(role):
     doc = doc_of(make_worker_in_status(VS.DRAFT))

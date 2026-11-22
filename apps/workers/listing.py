@@ -114,11 +114,12 @@ def _search_q(text, user):
     digits = re.sub(r"\D", "", text)
     if len(digits) == 12 and digits == re.sub(r"[\s.-]", "", text) and role_code(user) in ALL_STAFF:
         return Q(identity__id_number_hash=compute_id_hash(digits))
-    condition = (
-        Q(worker_code__icontains=text)
-        | Q(employee_code__icontains=text)
-        | Q(name_search__contains=compute_name_search(text))
-    )
+    if not re.search(r"\w", text):
+        return Q(pk__in=[])  # chỉ có dấu câu ("-", "..."): không khớp gì thay vì khớp mọi hồ sơ
+    condition = Q(worker_code__icontains=text) | Q(employee_code__icontains=text)
+    name = compute_name_search(text)
+    if name:
+        condition |= Q(name_search__contains=name)
     if digits:
         condition |= Q(phone__contains=digits)
     return condition

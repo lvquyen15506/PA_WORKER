@@ -9,7 +9,7 @@ import re
 import unicodedata
 from urllib.parse import quote
 
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 
 from .validators import FORMATS, INLINE_KINDS
 
@@ -66,10 +66,11 @@ def file_response(document, *, inline):
     ext = FORMATS[kind][1] if kind else ""
     if inline and kind not in INLINE_KINDS:
         raise ValueError("Định dạng này chỉ cho tải xuống.")
-    response = FileResponse(
-        document.stored_file.open("rb"),
-        content_type=document.mime_type or "application/octet-stream",
-    )
+    try:
+        stored = document.stored_file.open("rb")
+    except FileNotFoundError as exc:  # dòng còn nhưng tệp mất (khôi phục thiếu thư mục tệp)
+        raise Http404 from exc
+    response = FileResponse(stored, content_type=document.mime_type or "application/octet-stream")
     response["Content-Disposition"] = safe_content_disposition(
         "inline" if inline else "attachment", document.original_name, ext
     )

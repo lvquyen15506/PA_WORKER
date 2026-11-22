@@ -109,16 +109,18 @@ def view_file(request, pk):
     document = _stored(_document_or_404(pk))
     if _kind_of(document) not in INLINE_KINDS:
         return redirect("document_download", pk=document.pk)
+    response = file_response(document, inline=True)  # 404 nếu tệp không còn trên đĩa
     log(AuditAction.VIEW_FILE, user=request.user, obj=document, request=request)
-    return file_response(document, inline=True)
+    return response
 
 
 @role_required(*STAFF)
 @require_GET
 def download_file(request, pk):
     document = _stored(_document_or_404(pk))
+    response = file_response(document, inline=False)  # 404 nếu tệp không còn trên đĩa
     log(AuditAction.DOWNLOAD_FILE, user=request.user, obj=document, request=request)
-    return file_response(document, inline=False)
+    return response
 
 
 @role_required(*STAFF)

@@ -576,7 +576,7 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | `IdentityDocument` | Mọi trường giá trị, kể cả `id_number_hash` | Dòng khung |
 | `EmergencyContact` | `full_name`, `relationship`, `phone` | Dòng khung |
 | `IdentityFieldSource` | Không có giá trị cá nhân, giữ nguyên | Nguồn, độ tin cậy, người xác nhận |
-| `WorkerDocument` | Tệp trên đĩa, `original_name` | Loại, ngày, người tải |
+| `WorkerDocument` | Tệp trên đĩa của **mọi phiên bản**, `original_name`, `note` (chữ người dùng tự gõ, có thể chứa tên; bổ sung ở Phase 4 sau rà soát) | Loại, ngày, người tải, phiên bản |
 | `DataConsent` | Tệp biên bản (qua `WorkerDocument`) | Có/không, ngày, hình thức |
 | `Application`, `Education`, `Certificate`, `WorkExperience` | Các trường thuộc `PERSONAL_FIELDS` (mục 3.2): `expected_salary`, `interview_notes`, `reject_reason`, tên trường/công ty/chứng chỉ, mô tả, ghi chú | Vị trí, nguồn, ngày, trạng thái, trình độ (phục vụ thống kê) |
 | `Employment`, `EmploymentHistory`, `Contract` | Tệp hợp đồng, `resign_note`, `note` | Bộ phận, chức danh, ngày, trạng thái, số hợp đồng |

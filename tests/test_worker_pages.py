@@ -252,6 +252,13 @@ def test_kiem_tra_trung_bao_loi_dinh_dang_khi_o_co_noi_dung():
     assert "Số CCCD" not in body(client.post("/ho-so/kiem-tra-trung/", {"id_number": ""}))
 
 
+@pytest.mark.parametrize("sua", ["abc", "-1", "1.5", "", "99999999999999999999"])
+def test_kiem_tra_trung_tham_so_sua_la_khong_gay_loi_500(sua):
+    client = login_client(make_user("HR_STAFF"))
+    response = client.post(f"/ho-so/kiem-tra-trung/?sua={sua}", {"phone": "0911999777"})
+    assert response.status_code == 200
+
+
 def test_kiem_tra_trung_chi_nhan_post():
     assert login_client(make_user("HR_STAFF")).get("/ho-so/kiem-tra-trung/").status_code == 405
 

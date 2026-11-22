@@ -231,6 +231,21 @@ def test_danh_sach_cho_huy_bo_ho_so_da_an_danh_va_chua_luu_tru():
     assert [w.pk for w, _ in expired_entries(D(2026, 11, 22))] == [old.pk]
 
 
+def test_mot_ho_so_luu_tru_hong_khong_lam_hong_ca_danh_sach_cho_huy(caplog):
+    from django.db import connection
+
+    good = archived_with_expiry(D(2026, 1, 5))
+    broken = archived_with_expiry(D(2026, 1, 6))
+    # Dữ liệu hỏng: Lưu trữ nhưng không có lịch sử chuyển (xóa bằng SQL thô vì ORM chặn).
+    with connection.cursor() as cur:
+        cur.execute("DELETE FROM workers_statuschange WHERE worker_id = %s", [broken.pk])
+    with caplog.at_level("ERROR"):
+        entries = expired_entries(D(2026, 11, 22))
+    assert [w.pk for w, _ in entries] == [good.pk]
+    assert broken.worker_code in caplog.text  # ghi lỗi để người vận hành xử lý
+    assert list(expired_queryset(D(2026, 11, 22))) == [good]
+
+
 def test_cho_huy_khong_phai_trang_thai_ho_so_van_la_luu_tru():
     worker = archived_with_expiry(D(2026, 1, 5))
     assert expired_entries(D(2026, 11, 22))

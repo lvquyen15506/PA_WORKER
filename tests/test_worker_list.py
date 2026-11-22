@@ -334,6 +334,23 @@ def test_giu_bo_loc_khi_quay_lai_trang_va_xoa_loc():
     assert "worker_list_query" not in client.session
 
 
+def test_chi_tim_nhanh_khong_xoa_bo_loc_da_luu():
+    named("Giữ Bộ Lọc Nháp")
+    client = login_client(make_user("HR_STAFF"))
+    client.get("/ho-so/?trang_thai_ho_so=DRAFT")
+    client.get("/ho-so/?q=Giu+Bo+Loc")  # chỉ có chữ tìm kiếm
+    assert "trang_thai_ho_so=DRAFT" in client.session["worker_list_query"]
+    back = client.get("/ho-so/").content.decode()
+    assert re.search(r'value="DRAFT"\s+selected', back)  # bộ lọc trước đó vẫn còn
+
+
+@pytest.mark.parametrize("query", ["-", "--", "...", " / ", "()"])
+def test_tim_chi_co_dau_cau_khong_khop_moi_ho_so(query):
+    named("Có Người Trong Bảng")
+    content = page(query=f"?q={query}")
+    assert "Không có hồ sơ phù hợp." in content and "Có Người Trong Bảng" not in content
+
+
 def test_chu_tim_kiem_khong_luu_vao_phien():
     named("Ai Đó")
     client = login_client(make_user("HR_STAFF"))
