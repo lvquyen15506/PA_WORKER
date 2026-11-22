@@ -245,8 +245,19 @@ def test_personal_fields_dung_ten_logic_va_anh_xa():
             "id_number": "id_number_enc",
             "old_id_number": "old_id_number_enc",
             "permanent_address": "permanent_address_enc",
-        }
+        },
+        # v1.1 (models.md 3.2): hai khoản lương mã hóa.
+        "employment.SalaryHistory": {
+            "monthly_salary": "monthly_salary_enc",
+            "client_unit_price": "client_unit_price_enc",
+        },
     }
+    assert PERSONAL_FIELDS["employment.SalaryHistory"] == {
+        "monthly_salary",
+        "client_unit_price",
+        "reason",
+    }
+    assert PERSONAL_FIELDS["employment.WorkAssignment"] == {"note"}
     assert all(not n.endswith("_enc") for names in PERSONAL_FIELDS.values() for n in names)
 
 

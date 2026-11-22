@@ -7,8 +7,15 @@ import pytest
 from django.apps import apps
 
 from apps.audit.personal_fields import PERSONAL_FIELDS, attr_name
-from apps.core.models import ApplicationSource, Department, EducationLevel, Position, Section
-from apps.employment.models import Contract, Employment
+from apps.core.models import (
+    ApplicationSource,
+    ClientCompany,
+    Department,
+    EducationLevel,
+    Position,
+    Section,
+)
+from apps.employment.models import Contract, Employment, SalaryHistory, WorkAssignment
 from apps.recruitment.models import Application, Certificate, Education, WorkExperience
 from apps.workers.models import EmergencyContact, IdentityDocument
 from tests.factories import fake_id, make_user, make_worker
@@ -112,6 +119,25 @@ def _build():
         signed_date=datetime.date(2026, 1, 1),
         effective_date=datetime.date(2026, 1, 1),
         note="ZQX-ghi-chú-hợp-đồng",
+        created_by=user,
+    )
+    # v1.1: đợt làm việc và lương.
+    assignment = WorkAssignment.objects.create(
+        worker=worker,
+        client_company=ClientCompany.objects.create(name="Công ty Mẫu", location="Tỉnh Mẫu"),
+        position=pos,
+        start_date=datetime.date(2026, 2, 1),
+        note="ZQX-ghi-chú-đợt",
+        created_by=user,
+    )
+    objs["employment.WorkAssignment"] = assignment
+    objs["employment.SalaryHistory"] = SalaryHistory.objects.create(
+        assignment=assignment,
+        worker=worker,
+        monthly_salary_enc="7654321",
+        client_unit_price_enc="9876543",
+        effective_date=datetime.date(2026, 2, 1),
+        reason="ZQX-lý-do-lương",
         created_by=user,
     )
     return objs

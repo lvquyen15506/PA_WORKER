@@ -34,7 +34,8 @@ def test_nhom_tai_lieu_bat_buoc():
 
 
 def test_loai_tai_lieu_va_system_code():
-    assert DocumentType.objects.count() == 11
+    # 11 loại của v1.0 + "Bản cam kết" (v1.1, câu 45; migration core 0004).
+    assert DocumentType.objects.count() == 12
     codes = dict(DocumentType.objects.exclude(system_code=None).values_list("system_code", "name"))
     assert codes == {
         "CCCD_FRONT": "CCCD mặt trước",

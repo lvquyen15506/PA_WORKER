@@ -106,6 +106,28 @@ class EducationLevel(models.Model):
         return self.name
 
 
+class ClientCompany(models.Model):
+    """Công ty khách hàng (v1.1, câu 39): chỉ tên + địa điểm; mỗi địa điểm một dòng.
+
+    Ngoài unique (name, location) ở CSDL, service Cài đặt còn chặn trùng khi so không phân biệt
+    hoa thường và khoảng trắng thừa (apps.core.settings_services, câu 48)."""
+
+    name = models.CharField("Tên công ty", max_length=150)
+    location = models.CharField("Địa điểm (tỉnh/thành)", max_length=100)
+    is_active = models.BooleanField("Đang sử dụng", default=True)
+
+    class Meta:
+        ordering = ["name", "location"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "location"], name="uniq_clientcompany_name_location"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.name} – {self.location}"
+
+
 class RequiredDocumentGroup(models.Model):
     name = models.CharField("Nhóm tài liệu bắt buộc", max_length=100, unique=True)
     sort_order = models.PositiveSmallIntegerField("Thứ tự", default=0)
@@ -162,6 +184,12 @@ class SystemSetting(models.Model):
     )
     expiry_warning_days = models.PositiveSmallIntegerField(
         "Cảnh báo sắp hết hạn (ngày)", default=30
+    )
+    # v1.1, câu 43: số tháng của một chuỗi đợt làm việc để cảnh báo "sắp đủ 12 tháng".
+    assignment_limit_months = models.PositiveSmallIntegerField(
+        "Thời hạn đợt làm việc để cảnh báo (tháng)",
+        default=12,
+        validators=[MinValueValidator(1), MaxValueValidator(60)],
     )
     ocr_confidence_threshold = models.PositiveSmallIntegerField(
         "Ngưỡng tin cậy OCR (%)", default=80

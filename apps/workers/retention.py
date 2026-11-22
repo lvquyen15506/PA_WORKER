@@ -29,7 +29,7 @@ from apps.core.dates import add_months, add_years
 from apps.core.models import SystemSetting
 from apps.core.storage import private_storage
 from apps.documents.models import WorkerDocument
-from apps.employment.models import Contract, Employment
+from apps.employment.models import Contract, Employment, SalaryHistory, WorkAssignment
 from apps.recruitment.models import Application, Certificate, Education, WorkExperience
 
 from .models import (
@@ -215,6 +215,10 @@ def _wipe(worker, now):
     )
     Employment.objects.filter(worker=worker).update(resign_note="")
     Contract.objects.filter(worker=worker).update(note="")
+    # v1.1: giữ công ty khách, vị trí, ngày của đợt (thống kê); xóa ghi chú. Lịch sử lương bị xóa
+    # toàn bộ: ngoại lệ có kiểm soát của bảng chỉ thêm, CHỈ ở đây (CLAUDE.md, models.md 4.7).
+    WorkAssignment.objects.filter(worker=worker).update(note="")
+    SalaryHistory.objects.filter(worker=worker).delete()
 
     # Tài liệu: MỌI phiên bản (kể cả bản đã bị thay thế), biên bản đồng ý và tệp hợp đồng.
     documents = WorkerDocument.objects.filter(

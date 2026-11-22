@@ -5,10 +5,14 @@ import re
 
 from apps.core.choices import (
     ConsentMethod,
+    ContractType,
     DocumentVerificationStatus,
     Gender,
     IdDocType,
+    RecruitmentStatus,
+    ResignReason,
     VerificationStatus,
+    WorkStatus,
 )
 
 DOCUMENT_TYPE = "documents.WorkerDocument"
@@ -45,6 +49,30 @@ _BASE_LABELS = {
     "interview_notes": "Ghi chú phỏng vấn",
     "reject_reason": "Lý do không đạt",
     "resign_note": "Ghi chú nghỉ việc",
+    # Phase 6: tuyển dụng, làm việc, v1.1
+    "status": "Trạng thái",
+    "applied_date": "Ngày ứng tuyển",
+    "available_date": "Ngày có thể nhận việc",
+    "interview_at": "Hẹn phỏng vấn",
+    "result_date": "Ngày có kết quả",
+    "section": "Bộ phận",
+    "team": "Tổ",
+    "position": "Vị trí",
+    "shift": "Ca làm việc",
+    "manager": "Người quản lý trực tiếp",
+    "work_status": "Trạng thái làm việc",
+    "resign_date": "Ngày nghỉ việc",
+    "resign_reason": "Lý do nghỉ việc",
+    "contract_no": "Số hợp đồng",
+    "contract_type": "Loại hợp đồng",
+    "signed_date": "Ngày ký",
+    "effective_date": "Ngày hiệu lực",
+    "client_company": "Công ty khách",
+    "start_date": "Ngày bắt đầu",
+    "end_date": "Ngày kết thúc",
+    "monthly_salary": "Lương tháng",
+    "client_unit_price": "Đơn giá tháng",
+    "reason": "Lý do",
 }
 _PREFIXES = {
     "identity": "Giấy tờ",
@@ -55,6 +83,8 @@ _PREFIXES = {
     "certificates": "Chứng chỉ",
     "work_experiences": "Kinh nghiệm",
     "contracts": "Hợp đồng",
+    "work_assignments": "Đợt làm việc",
+    "salary_history": "Lương",
 }
 _COLLECTION = re.compile(r"(\w+)\[\d+\]\.(\w+)")
 
@@ -87,6 +117,10 @@ def value_label(field_name, object_type, value):
         "gender": Gender,
         "id_doc_type": IdDocType,
         "method": ConsentMethod,
+        "status": RecruitmentStatus,  # chỉ Application có trường "status" trong nhật ký
+        "work_status": WorkStatus,
+        "resign_reason": ResignReason,
+        "contract_type": ContractType,
     }.get(base)
     if choices is not None:
         try:

@@ -61,6 +61,10 @@ EXPECTED_TABLES = {
     "employment_employment",
     "employment_employmenthistory",
     "employment_contract",
+    # v1.1 (phiếu thay đổi đã ký 23/11/2026, câu 39–41): 3 bảng mới.
+    "core_clientcompany",
+    "employment_workassignment",
+    "employment_salaryhistory",
 }
 
 # erd.md mục 5 "Mã hóa và băm".
@@ -72,6 +76,8 @@ EXPECTED_ENCRYPTED = {
     ("audit", "auditpersonalvalue", "old_value_enc"),
     ("audit", "auditpersonalvalue", "new_value_enc"),
     ("core", "systemsetting", "key_check_enc"),
+    ("employment", "salaryhistory", "monthly_salary_enc"),
+    ("employment", "salaryhistory", "client_unit_price_enc"),
 }
 EXPECTED_HASH = {
     ("workers", "identitydocument", "id_number_hash"),
@@ -97,9 +103,10 @@ def _project_models():
     ]
 
 
-def test_dung_34_model_dung_ten_bang():
+def test_dung_37_model_dung_ten_bang():
+    # 34 model của v1.0 + 3 model của v1.1 (models.md mục 1). Đổi kỳ vọng vì thiết kế đã đổi.
     assert {m._meta.db_table for m in _project_models()} == EXPECTED_TABLES
-    assert len(_project_models()) == 34
+    assert len(_project_models()) == 37
 
 
 def test_cot_ma_hoa_va_bam_khop_erd():

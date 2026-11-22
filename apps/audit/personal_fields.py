@@ -44,6 +44,9 @@ PERSONAL_FIELDS = {
     "recruitment.WorkExperience": {"company_name", "job_title", "description"},
     "employment.Employment": {"resign_note"},
     "employment.Contract": {"note"},
+    # v1.1 (câu 41): giá trị lương không bao giờ vào AuditLog.changes.
+    "employment.WorkAssignment": {"note"},
+    "employment.SalaryHistory": {"monthly_salary", "client_unit_price", "reason"},
 }
 
 
@@ -53,6 +56,10 @@ LOGICAL_TO_ATTR = {
         "id_number": "id_number_enc",
         "old_id_number": "old_id_number_enc",
         "permanent_address": "permanent_address_enc",
+    },
+    "employment.SalaryHistory": {
+        "monthly_salary": "monthly_salary_enc",
+        "client_unit_price": "client_unit_price_enc",
     },
 }
 
@@ -68,6 +75,8 @@ COLLECTION_PREFIX = {
     "recruitment.Certificate": "certificates",
     "recruitment.WorkExperience": "work_experiences",
     "employment.Contract": "contracts",
+    "employment.WorkAssignment": "work_assignments",
+    "employment.SalaryHistory": "salary_history",
 }
 
 

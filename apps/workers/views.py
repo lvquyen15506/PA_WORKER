@@ -148,7 +148,7 @@ def worker_list(request):
                 "date_of_birth": worker.date_of_birth,
                 "gender": _label(Gender, worker.gender),
                 "phone": worker.phone,
-                "section": employment.section.name if employment else None,
+                "section": employment.section.name if employment and employment.section else None,
                 "position": employment.position.name if employment else None,
                 "start_date": employment.start_date if employment else None,
                 "status": worker.verification_status,
@@ -603,8 +603,8 @@ def _employment_tab(request, worker, employment, identity, staff, role):
     items = None
     if employment is not None:
         items = [
-            ("Phòng ban", employment.section.department.name),
-            ("Bộ phận", employment.section.name),
+            ("Phòng ban", employment.department.name if employment.section_id else None),
+            ("Bộ phận", employment.section.name if employment.section_id else None),
             ("Tổ", employment.team.name if employment.team else None),
             ("Chức danh", employment.position.name),
             ("Ca làm việc", employment.shift.name if employment.shift else None),
