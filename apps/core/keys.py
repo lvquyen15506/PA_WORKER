@@ -81,6 +81,25 @@ def key_check_hash():
     return hmac_hash(KEY_CHECK_TEXT)
 
 
+def check_against_database():
+    """Đối chiếu hai khóa với giá trị kiểm tra trong Settings (chạy sau migrate).
+
+    Lần khởi động đầu (cả hai cột còn rỗng): ghi giá trị kiểm tra, không sửa về sau.
+    Trả "created" khi vừa ghi, "ok" khi khớp. Sai thì ném KeyConfigError.
+    Đọc key_check_enc tự giải mã (EncryptedTextField); sai khóa thì giải mã báo lỗi ngay.
+    """
+    from .models import SystemSetting
+
+    setting = SystemSetting.objects.get(pk=1)  # sai FIELD_ENCRYPTION_KEY: ném KeyConfigError ở đây
+    if setting.key_check_enc is None and setting.key_check_hash is None:
+        setting.key_check_enc = KEY_CHECK_TEXT
+        setting.key_check_hash = key_check_hash()
+        setting.save(update_fields=["key_check_enc", "key_check_hash"])
+        return "created"
+    verify_key_check(setting.key_check_enc, setting.key_check_hash)
+    return "ok"
+
+
 def verify_key_check(decrypted_text, stored_hash):
     """So khớp giá trị đã lưu với hai khóa hiện tại. Hai khóa được kiểm tra độc lập.
 
