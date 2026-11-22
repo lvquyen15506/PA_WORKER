@@ -295,5 +295,11 @@ flowchart TB
 | `cryptography` | Thư viện Python | Fernet: mã hóa trường nhạy cảm | Django không có mã hóa đối xứng sẵn; thư viện chuẩn, chạy offline |
 | `whitenoise` | Thư viện Python | Phục vụ `static/` khi `DEBUG = False` | Gunicorn không phục vụ tệp tĩnh; tránh thêm container Nginx |
 | `antiword` | Gói hệ thống (apt) | Trích văn bản CV định dạng `.doc` (Word 97–2003) | Mục V yêu cầu nhận DOC; python-docx chỉ đọc `.docx` |
+| `opencv-python-headless` 5.1.0.95 | Thư viện Python | Kiểm tra ảnh (độ nét, độ sáng), tiền xử lý, xoay (Phase 5) | Bản headless, không cần giao diện; cần gói apt `libglib2.0-0` |
+| `pyzbar` 0.1.9 | Thư viện Python | Đọc mã QR của CCCD | Dùng gói apt `libzbar0` |
+| `pytesseract` 0.3.13 | Thư viện Python | Gọi Tesseract `vie`, lấy độ tin cậy từng từ, có timeout | |
+| `Pillow` 13.0.0 | Thư viện Python | Mở ảnh, xoay theo EXIF, xóa EXIF, giới hạn điểm ảnh | |
+| `pdfplumber` 0.11.11, `python-docx` 1.2.0 | Thư viện Python | Trích văn bản CV PDF, DOCX | |
+| `segno` 1.6.6, `fpdf2` 2.9.0 | Thư viện Python | Chỉ dùng để sinh ảnh CCCD giả và CV giả cho test, demo | Phông `fonts-dejavu-core` (apt) cho chữ tiếng Việt |
 
 Đã ghi vào danh sách công nghệ trong CLAUDE.md. Các thành phần khác đã có trong kế hoạch: Django 5.2, Gunicorn, psycopg, OpenCV, pyzbar, Tesseract `vie`, pdfplumber, python-docx, openpyxl, pytest, pytest-django, ruff, Faker (Phase 2, `seed_demo`).

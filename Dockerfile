@@ -5,9 +5,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PRIVATE_MEDIA_ROOT=/app/private_media
 
 # Tesseract (tiếng Việt), zbar (đọc QR), antiword (đọc .doc) dùng từ Phase 5.
+# fonts-dejavu-core: phông có dấu tiếng Việt cho ảnh/CV giả; libglib2.0-0: OpenCV cần.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        tesseract-ocr tesseract-ocr-vie libzbar0 antiword \
+        tesseract-ocr tesseract-ocr-vie libzbar0 antiword fonts-dejavu-core libglib2.0-0 \
     && apt-get clean
 
 WORKDIR /app

@@ -4,6 +4,14 @@ gunicorn==27.0.1
 whitenoise==6.12.0
 cryptography==50.0.2
 Faker==40.63.0
+opencv-python-headless==5.1.0.95
+pyzbar==0.1.9
+pytesseract==0.3.13
+Pillow==13.0.0
+pdfplumber==0.11.11
+python-docx==1.2.0
+segno==1.6.6
+fpdf2==2.9.0
 pytest==9.2.0
 pytest-django==4.14.0
 ruff==0.17.6
