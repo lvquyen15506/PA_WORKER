@@ -16,7 +16,7 @@
 | Phase | Trạng thái | Ngày xong | Ghi chú |
 | --- | --- | --- | --- |
 | 0. Khởi động | Xong | 21/11/2026 | Cài skill webapp-testing + Playwright (Python 3.12 64-bit); thêm vòng lặp tự kiểm thử vào CLAUDE.md; tóm tắt yêu cầu, chốt 24 câu hỏi vào `docs/lam-ro-yeu-cau.md` |
-| 1. Thiết kế | Đang làm | | Xong 3/7 file, đã rà và đồng bộ với `lam-ro-yeu-cau.md` câu 1–37: `docs/thiet-ke/erd.md` (34 bảng, 5 sơ đồ Mermaid đã kiểm tra cú pháp bằng parser của mermaid 11.4.1), `models.md` (34 model, TextChoices, quy tắc nghiệp vụ), `trang.md` (URL, quyền, component, ánh xạ 17 kịch bản nghiệm thu). CLAUDE.md cập nhật theo thiết kế. Không có code nên chưa chạy pytest/ruff/chụp màn hình |
+| 1. Thiết kế | Xong | 22/11/2026 | 6 file trong `docs/thiet-ke/`: `erd.md` (34 bảng), `models.md` (34 model, TextChoices, quy tắc nghiệp vụ), `trang.md` (URL, quyền, component), `kien-truc.md`, `excel-mau.md`, `mau-dong-y.md`; `docs/lam-ro-yeu-cau.md` câu 1–38; CLAUDE.md cập nhật. Sơ đồ Mermaid đã kiểm tra cú pháp. `phac-thao-trang.md` dời sang đầu Phase 3. Không có code nên chưa chạy pytest/ruff |
 | 2. Nền tảng + Docker | Chưa làm | | |
 | 3. Bộ giao diện mẫu | Chưa làm | | |
 | 4. Hồ sơ + tài liệu | Chưa làm | | |
@@ -27,7 +27,7 @@
 
 ## Việc còn tồn
 
-- Phase 1 còn 4 file chưa viết: `docs/thiet-ke/kien-truc.md` (gồm mục cất giữ khóa mã hóa, câu 31), `phac-thao-trang.md`, `mau-dong-y.md`, `excel-mau.md`. CLAUDE.md đã tham chiếu `kien-truc.md` như thiết kế đã duyệt, nên phải viết và duyệt file này trước Phase 2.
-- Gửi khách hàng mục E của `docs/lam-ro-yeu-cau.md` để xác nhận các câu [Sửa]/[Nội bộ] (ưu tiên: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi).
-- Khách hàng (và pháp chế) duyệt `docs/thiet-ke/mau-dong-y.md` (sau khi viết).
+- Khách hàng xác nhận mục E của `docs/lam-ro-yeu-cau.md` (5 điểm ưu tiên cao: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi, duyệt hồ sơ nhập Excel, ẩn danh hóa theo yêu cầu).
+- Pháp chế doanh nghiệp duyệt `docs/thiet-ke/mau-dong-y.md` (5 câu hỏi ở cuối file).
 - Cấu trúc QR CCCD là giả định (câu 20), cần kiểm chứng bằng thẻ thật tại chỗ khách khi triển khai.
+- Viết `docs/thiet-ke/phac-thao-trang.md` ở đầu Phase 3.
