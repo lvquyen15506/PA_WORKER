@@ -281,3 +281,5 @@ Các điểm khác:
 - Câu 31: khóa mã hóa không nằm trong file sao lưu, phải cất riêng; chưa hỗ trợ đổi khóa.
 - Câu 32: hợp đồng hiển thị bản tài liệu hiện hành.
 - Câu 33–37: "Ứng viên từ chối" lưu 12 tháng; chỉ QL/Admin xác minh tài liệu; Bị từ chối chỉ xem; Chờ duyệt chỉ khóa phần được duyệt; giới tính Nam/Nữ.
+- Câu 9 (làm rõ ở Phase 4) [Nội bộ]: chặn Lưu trữ khi trạng thái làm việc là Thử việc hoặc Đang làm việc áp dụng cho **mọi** đường chuyển sang Lưu trữ (thủ công từ Nháp, Cần bổ sung, Bị từ chối, Đã xác minh, và tự động), không chỉ từ Đã xác minh.
+- Câu 5/9 (làm rõ ở Phase 4) [Nội bộ]: sửa hồ sơ đang Đã xác minh phải giữ đủ các trường bắt buộc khi gửi duyệt (không cho xóa trắng ngày sinh, giới tính, nơi ở, loại giấy tờ, số CCCD...).
