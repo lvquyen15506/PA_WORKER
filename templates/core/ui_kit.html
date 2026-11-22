@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static pa_tags %}
+{% block title %}Bộ giao diện mẫu{% endblock %}
+{% block content %}
+<span id="dau-trang"></span>
+{% include "components/_page_header.html" with title="Bộ giao diện mẫu" breadcrumbs=None actions=header_actions %}
+
+<nav class="pa-toc" aria-label="Mục lục">
+  <a href="#dau-trang-mau">Đầu trang</a><a href="#the-so-lieu">Thẻ số liệu</a><a href="#thanh-loc">Thanh lọc</a>
+  <a href="#bang">Bảng</a><a href="#phan-trang">Phân trang</a><a href="#form">Form</a>
+  <a href="#nhan-trang-thai">Nhãn trạng thái</a><a href="#hop-xac-nhan">Hộp xác nhận</a>
+  <a href="#trong">Trạng thái rỗng</a><a href="#thong-bao">Thông báo</a><a href="#tab">Tab</a>
+  <a href="#nhan-nguon">Nhãn nguồn</a><a href="#bieu-do">Biểu đồ</a><a href="#token">Token</a>
+</nav>
+
+<section class="pa-section" id="dau-trang-mau">
+  <h2 class="pa-section__title">1. Đầu trang và nút</h2>
+  <p class="pa-small pa-muted">Đầu trang của chính trang này có đủ bốn kiểu nút (chỉ để minh họa; trang thật chỉ có một nút chính): chính, phụ, nguy hiểm, vô hiệu. Dưới đây là nút trong các trạng thái.</p>
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button class="btn btn-primary" type="button">Lưu hồ sơ</button>
+    <button class="btn btn-outline-secondary" type="button">Xuất Excel</button>
+    <button class="btn btn-outline-danger" type="button">Từ chối</button>
+    <button class="btn btn-primary" type="button" disabled>Lưu hồ sơ (khóa)</button>
+    <button class="btn btn-outline-secondary" type="button" disabled>Hủy (khóa)</button>
+  </div>
+  {% include "components/_page_header.html" with title="Chi tiết hồ sơ" breadcrumbs=header_breadcrumbs %}
+</section>
+
+<section class="pa-section" id="the-so-lieu">
+  <h2 class="pa-section__title">2. Thẻ số liệu</h2>
+  <div class="row g-3">
+    <div class="col-sm-6 col-lg-3">{% include "components/_stat_card.html" with label="Tổng số hồ sơ" value=512 sub="Không tính Lưu trữ" url="#the-so-lieu" %}</div>
+    <div class="col-sm-6 col-lg-3">{% include "components/_stat_card.html" with label="Chờ duyệt" value=7 sub="Cần duyệt hôm nay" url="#the-so-lieu" %}</div>
+    <div class="col-sm-6 col-lg-3">{% include "components/_stat_card.html" with label="Thiếu giấy tờ" value=0 sub="Không có hồ sơ" url="#the-so-lieu" %}</div>
+    <div class="col-sm-6 col-lg-3">{% include "components/_stat_card.html" with label="Hợp đồng sắp hết hạn" value=12 sub="Trong 30 ngày" url="#the-so-lieu" %}</div>
+  </div>
+  <p class="pa-small pa-muted mt-3">Thẻ không số liệu (lựa chọn ở trang Thêm hồ sơ): chỉ có nhãn và dòng phụ.</p>
+  <div class="row g-3">
+    <div class="col-md-4">{% include "components/_stat_card.html" with label="Nhập tay" sub="Điền thông tin từng trường." url="#the-so-lieu" %}</div>
+    <div class="col-md-4">{% include "components/_stat_card.html" with label="Từ CCCD và CV" sub="Đọc ảnh, đối chiếu rồi lưu." url="#the-so-lieu" %}</div>
+    <div class="col-md-4">{% include "components/_stat_card.html" with label="Từ file Excel" sub="Nhập nhiều hồ sơ một lần." url="#the-so-lieu" %}</div>
+  </div>
+</section>
+
+<section class="pa-section" id="thanh-loc">
+  <h2 class="pa-section__title">3. Thanh lọc</h2>
+  {% include "components/_filter_bar.html" with form=filter_form reset_url="#thanh-loc" %}
+</section>
+
+<section class="pa-section" id="bang">
+  <h2 class="pa-section__title">4. Bảng (10 dòng, nhãn đủ màu) và trạng thái rỗng</h2>
+  {% include "components/_table.html" with columns=columns rows=rows modal_id="modal-row" %}
+  <p class="pa-small pa-muted mt-3">Bảng không có dòng nào:</p>
+  {% include "components/_table.html" with columns=columns rows=none_rows empty_text="Không có hồ sơ phù hợp với bộ lọc." empty_action_label="Xóa lọc" empty_action_url="#bang" %}
+</section>
+
+<section class="pa-section" id="phan-trang">
+  <h2 class="pa-section__title">5. Phân trang</h2>
+  <p class="pa-small pa-muted">Trang giữa:</p>{% include "components/_pagination.html" with page=page_middle %}
+  <p class="pa-small pa-muted mt-4">Trang đầu (nút Trước bị khóa):</p>{% include "components/_pagination.html" with page=page_first %}
+  <p class="pa-small pa-muted mt-4">Trang cuối (nút Sau bị khóa):</p>{% include "components/_pagination.html" with page=page_last %}
+</section>
+
+<section class="pa-section" id="form">
+  <h2 class="pa-section__title">6. Form 2 cột</h2>
+  <p class="pa-small pa-muted">Bình thường: trường bắt buộc, có gợi ý, trường bị khóa.</p>
+  {% include "components/_form_section.html" with title="Thông tin cá nhân" fields=form_normal.visible_fields %}
+  <p class="pa-small pa-muted">Có lỗi kiểm tra:</p>
+  {% include "components/_alert.html" with kind="danger" text="Có 3 trường chưa hợp lệ. Hãy sửa các trường báo đỏ rồi lưu lại." %}
+  {% include "components/_form_section.html" with title="Thông tin cá nhân (có lỗi)" fields=form_errors.visible_fields %}
+  <p class="pa-small pa-muted">Chế độ xem (ô trống hiện "—"):</p>
+  {% include "components/_form_section.html" with title="Thông tin cơ bản" items=view_items %}
+  <div class="pa-form-actions">
+    <button class="btn btn-outline-secondary" type="button">Hủy</button>
+    <button class="btn btn-primary" type="button">Lưu hồ sơ</button>
+  </div>
+</section>
+
+<section class="pa-section" id="nhan-trang-thai">
+  <h2 class="pa-section__title">7. Nhãn trạng thái</h2>
+  <div class="pa-form-section">
+    {% for g in status_groups %}
+    <h3 class="pa-card-title">{{ g.title }}</h3>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      {% for v in g.values %}{% include "components/_status_badge.html" with value=v %}{% endfor %}
+    </div>
+    {% endfor %}
+    <h3 class="pa-card-title">Chữ thay thế (giữ màu)</h3>
+    <div>{% include "components/_status_badge.html" with value="account_temp_locked" label="Khóa tạm đến 14:05" %}</div>
+  </div>
+</section>
+
+<section class="pa-section" id="hop-xac-nhan">
+  <h2 class="pa-section__title">8. Hộp xác nhận</h2>
+  <div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modal-simple">Mở hộp đơn giản</button>
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modal-form">Mở hộp có trường form</button>
+  </div>
+  {% include "components/_confirm_modal.html" with id="modal-simple" title="Lưu trữ hồ sơ" message="Hồ sơ HS-DEMO-0001 sẽ chuyển sang Lưu trữ." action="#" confirm_label="Lưu trữ hồ sơ" danger=True %}
+  {% include "core/_ui_kit_modal_reason.html" with id="modal-form" title="Ẩn danh hóa hồ sơ HS-DEMO-0001" message="Thông tin cá nhân của hồ sơ sẽ bị xóa." action="#" confirm_label="Ẩn danh hóa" danger=True %}
+  {% include "components/_confirm_modal.html" with id="modal-row" title="Xác nhận" message="" action="" confirm_label="Xác nhận" danger=True %}
+</section>
+
+<section class="pa-section" id="trong">
+  <h2 class="pa-section__title">9. Trạng thái rỗng</h2>
+  <div class="pa-form-section">{% include "components/_empty_state.html" with text="Chưa có tài liệu nào cho hồ sơ này." action_label="Tải tài liệu lên" action_url="#trong" %}</div>
+  <div class="pa-form-section">{% include "components/_empty_state.html" with text="Không có hồ sơ nào chờ duyệt." %}</div>
+</section>
+
+<section class="pa-section" id="thong-bao">
+  <h2 class="pa-section__title">10. Thông báo</h2>
+  {% include "components/_alert.html" with kind="success" text="Đã lưu hồ sơ ở trạng thái Nháp." %}
+  {% include "components/_alert.html" with kind="danger" text="Số CCCD phải gồm 12 chữ số." %}
+  {% include "components/_alert.html" with kind="warning" text="Số điện thoại này đã có ở hồ sơ khác." %}
+  {% include "components/_alert.html" with kind="info" text="Kết quả nhận diện chưa được lưu. Hãy kiểm tra từng trường." %}
+  <p class="pa-small pa-muted">Thông báo tự ẩn sau 5 giây (chỉ thông báo sau thao tác, như dòng dưới):</p>
+  <div id="demo-autohide">{% include "components/_alert.html" with kind="success" text="Thông báo này sẽ tự ẩn sau 5 giây." auto_hide=True %}</div>
+</section>
+
+<section class="pa-section" id="tab">
+  <h2 class="pa-section__title">11. Tab</h2>
+  {% include "components/_tabs.html" with tabs=tabs %}
+</section>
+
+<section class="pa-section" id="nhan-nguon">
+  <h2 class="pa-section__title">12. Nhãn nguồn và trường độ tin cậy thấp</h2>
+  <div class="d-flex gap-2 mb-3">
+    {% include "components/_source_tag.html" with source="QR" %}
+    {% include "components/_source_tag.html" with source="OCR" %}
+    {% include "components/_source_tag.html" with source="MANUAL" %}
+  </div>
+  {% include "components/_form_section.html" with title="Đối chiếu" fields=form_intake.visible_fields meta=intake_meta %}
+  <button class="btn btn-primary" type="button" data-pa-gate disabled>Lưu hồ sơ</button>
+  <span class="pa-small pa-muted">Nút Lưu bị khóa đến khi trường tô vàng được tích "Đã kiểm tra".</span>
+</section>
+
+<section class="pa-section" id="bieu-do">
+  <h2 class="pa-section__title">13. Biểu đồ cột</h2>
+  <div class="pa-form-section">
+    <h3 class="pa-card-title">Hồ sơ mới tăng đều, đạt 42 hồ sơ trong tháng 11</h3>
+    <div class="pa-chart"><canvas data-pa-chart="chart-demo" aria-label="Biểu đồ cột số hồ sơ mới theo tháng, đơn vị hồ sơ" role="img"></canvas></div>
+    {{ chart|json_script:"chart-demo" }}
+  </div>
+</section>
+
+<section class="pa-section" id="token">
+  <h2 class="pa-section__title">14. Màu, chữ, khoảng cách</h2>
+  <div class="pa-form-section">
+    <div class="d-flex flex-wrap gap-3 mb-3 align-items-center pa-small">
+      {% for n in token_names %}<span><span class="pa-swatch pa-swatch--{{ n }}"></span> {{ n }}</span>{% endfor %}
+    </div>
+    <p class="mb-1">Chữ thân 14px, màu chữ chính.</p>
+    <p class="pa-small pa-muted mb-3">Chữ phụ 13px, màu muted.</p>
+    <div class="d-flex gap-3 align-items-center pa-small">
+      {% for s in spacings %}<span><span class="pa-spacing pa-spacing--{{ s }}"></span> {{ s }}px</span>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script src="{% static 'js/pa-charts.js' %}"></script>
+{% endblock %}

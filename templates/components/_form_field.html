@@ -1,0 +1,22 @@
+{% comment %}Một trường form. Tham số: field (BoundField); source (QR | OCR | MANUAL, tùy chọn: hiện nhãn nguồn);
+   low_confidence (tùy chọn: nền vàng + ô tích "Đã kiểm tra"). Nhãn ở trên, dấu * nếu bắt buộc, lỗi ngay dưới ô.{% endcomment %}
+{% load pa_tags %}
+<div class="{% if low_confidence %}pa-field--low{% endif %}">
+  {% if field.field.widget.input_type == "checkbox" %}
+  <div class="form-check">
+    {{ field|pa_widget }}
+    <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="pa-required">*</span>{% endif %}</label>
+  </div>
+  {% else %}
+  <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="pa-required">*</span>{% endif %}{% if source %} {% include "components/_source_tag.html" with source=source %}{% endif %}</label>
+  {{ field|pa_widget }}
+  {% endif %}
+  {% if field.help_text %}<div class="pa-form-hint">{{ field.help_text }}</div>{% endif %}
+  {% for e in field.errors %}<div class="pa-form-error">{{ e }}</div>{% endfor %}
+  {% if low_confidence %}
+  <div class="form-check mt-2">
+    <input class="form-check-input" type="checkbox" id="{{ field.id_for_label }}_checked" name="{{ field.html_name }}__checked" data-pa-checked>
+    <label class="form-check-label" for="{{ field.id_for_label }}_checked">Đã kiểm tra</label>
+  </div>
+  {% endif %}
+</div>

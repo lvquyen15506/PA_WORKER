@@ -1,7 +1,8 @@
-{% extends "base_tam.html" %}
-{% block title %}Trang chủ{% endblock %}
+{% extends "base.html" %}
+{% block title %}Tổng quan{% endblock %}
 {% block content %}
-<h1 class="h4 mb-3">Xin chào, {{ request.user.full_name }}</h1>
-<p>Vai trò: <strong>{{ request.user.role.name }}</strong>.</p>
-<p class="text-muted">Đây là trang tạm của Phase 2. Các chức năng quản lý hồ sơ được xây dựng ở các phase sau.</p>
+{% include "components/_page_header.html" with title="Tổng quan" %}
+<div class="pa-form-section">
+  {% include "components/_empty_state.html" with text="Trang tổng quan (thẻ số liệu và biểu đồ) được xây dựng ở Phase 7." %}
+</div>
 {% endblock %}

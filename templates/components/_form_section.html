@@ -1,0 +1,26 @@
+{% comment %}Nhóm trường, lưới 2 cột. Tham số: title (tùy chọn);
+   fields (danh sách BoundField) — chế độ nhập; meta (tùy chọn: dict tên trường -> dict source, low_confidence);
+   single (tùy chọn: mỗi trường một hàng, cho form hẹp như đổi mật khẩu);
+   items (danh sách (nhãn, giá trị)) — chế độ xem, ô trống hiện "—".{% endcomment %}
+{% load pa_tags %}
+<section class="pa-form-section">
+  {% if title %}<h2 class="pa-card-title">{{ title }}</h2>{% endif %}
+  <div class="row g-3">
+    {% if items %}
+      {% for label, value in items %}
+      <div class="col-md-6">
+        <div class="pa-view-label">{{ label }}</div>
+        <p class="pa-view-value">{{ value|default_if_none:"—"|default:"—" }}</p>
+      </div>
+      {% endfor %}
+    {% else %}
+      {% for f in fields %}
+      {% with m=meta|get_item:f.name %}
+      <div class="{% if single or f|is_wide %}col-12{% else %}col-md-6{% endif %}">
+        {% include "components/_form_field.html" with field=f source=m.source low_confidence=m.low_confidence %}
+      </div>
+      {% endwith %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>

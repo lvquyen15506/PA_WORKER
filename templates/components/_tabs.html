@@ -1,0 +1,6 @@
+{# Tab dạng liên kết (tải lại trang). Tham số: tabs (danh sách dict: label, url, active). #}
+<ul class="nav nav-tabs pa-tabs" role="tablist">
+  {% for t in tabs %}
+  <li class="nav-item"><a class="nav-link{% if t.active %} active{% endif %}" href="{{ t.url }}"{% if t.active %} aria-current="page"{% endif %}>{{ t.label }}</a></li>
+  {% endfor %}
+</ul>

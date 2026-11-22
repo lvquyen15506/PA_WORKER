@@ -1,0 +1,8 @@
+{% extends "components/_confirm_modal.html" %}
+{% comment %}Ví dụ hộp xác nhận có trường form qua block body (mẫu cho "Ẩn danh hóa theo yêu cầu", "Trả lại", "Từ chối").{% endcomment %}
+{% block body %}
+<p class="pa-small pa-muted">Thao tác này không hoàn tác được.</p>
+{% for f in reason_form %}
+<div class="mb-3">{% include "components/_form_field.html" with field=f %}</div>
+{% endfor %}
+{% endblock %}

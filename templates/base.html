@@ -1,0 +1,73 @@
+{% load static %}<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PA Worker{% endblock %} – PA Worker</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pa.css' %}">
+</head>
+<body>
+{% block shell %}
+<div class="pa-shell">
+  <aside class="pa-sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="paSidebar" aria-label="Menu chính">
+    <a class="pa-sidebar__brand" href="{% url 'home' %}">PA Worker</a>
+    <form class="pa-sidebar__search d-lg-none" method="get" action="/ho-so/" role="search">
+      <div class="pa-search">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input class="form-control" type="search" name="q" placeholder="Tìm hồ sơ" aria-label="Tìm hồ sơ">
+      </div>
+    </form>
+    <nav>
+      <ul class="pa-nav">
+        {% for item in pa_menu %}
+        <li><a class="pa-nav__link{% if item.active %} is-active{% endif %}" href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}><i class="bi {{ item.icon }}" aria-hidden="true"></i><span>{{ item.label }}</span></a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="pa-main">
+    <header class="pa-topbar">
+      <button class="btn btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#paSidebar" aria-controls="paSidebar">Menu</button>
+      <form class="pa-topbar__search d-none d-lg-block" method="get" action="/ho-so/" role="search">
+        <div class="pa-search">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input class="form-control" type="search" name="q" placeholder="Tìm theo mã, họ tên, số điện thoại" aria-label="Tìm nhanh hồ sơ">
+        </div>
+      </form>
+      <div class="dropdown ms-auto">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          {{ request.user.full_name }}<span class="d-none d-sm-inline pa-muted"> · {{ request.user.role.name }}</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="{% url 'change_password' %}">Đổi mật khẩu</a></li>
+          <li>
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+              <button class="dropdown-item" type="submit">Đăng xuất</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="pa-content">
+      {% for message in messages %}
+        {% include "components/_alert.html" with kind=message.tags text=message auto_hide=True %}
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="pa-footer">
+      PA Worker v1.0 · Phát triển bởi QQIT · <a href="{% url 'about' %}">Giới thiệu</a>
+    </footer>
+  </div>
+</div>
+{% endblock %}
+<script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+<script src="{% static 'js/pa.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

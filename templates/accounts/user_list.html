@@ -1,41 +1,9 @@
-{% extends "base_tam.html" %}
+{% extends "base.html" %}
 {% block title %}Tài khoản{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h4 m-0">Tài khoản</h1>
-  <a class="btn btn-primary" href="{% url 'user_create' %}">Thêm tài khoản</a>
-</div>
-<div class="table-responsive card"><table class="table table-hover align-middle mb-0">
-  <thead class="table-light"><tr>
-    <th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th><th>Đăng nhập lần cuối</th><th class="text-end">Thao tác</th>
-  </tr></thead>
-  <tbody>
-  {% for row in rows %}
-  <tr>
-    <td class="text-nowrap">{{ row.user.username }}</td>
-    <td>{{ row.user.full_name }}</td>
-    <td>{{ row.user.role.name }}</td>
-    <td class="text-nowrap">
-      {% if row.status.0 == "ok" %}<span class="badge text-bg-success">{{ row.status.1 }}</span>
-      {% elif row.status.0 == "temp" %}<span class="badge text-bg-warning">{{ row.status.1 }}</span>
-      {% else %}<span class="badge text-bg-secondary">{{ row.status.1 }}</span>{% endif %}
-    </td>
-    <td>{{ row.user.last_login|date:"d/m/Y H:i"|default:"—" }}</td>
-    <td class="text-end text-nowrap">
-      <a class="btn btn-sm btn-outline-secondary" href="{% url 'user_edit' row.user.pk %}">Sửa</a>
-      {% if row.status.0 != "ok" %}
-      <form class="d-inline" method="post" action="{% url 'user_unlock' row.user.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Mở khóa</button></form>
-      {% endif %}
-      {% if row.status.0 != "admin" and not row.is_self %}
-      <form class="d-inline" method="post" action="{% url 'user_lock' row.user.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" type="submit">Khóa</button></form>
-      {% endif %}
-      <form class="d-inline" method="post" action="{% url 'user_reset_password' row.user.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-secondary" type="submit">Đặt lại mật khẩu</button></form>
-    </td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="6" class="text-center text-muted py-4">Chưa có tài khoản.</td></tr>
-  {% endfor %}
-  </tbody>
-</table></div>
-{% include "accounts/_pager.html" %}
+{% include "components/_page_header.html" with title="Quản lý tài khoản" actions=header_actions %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% include "components/_table.html" with columns=columns rows=rows modal_id="account-confirm" empty_text="Chưa có tài khoản." %}
+{% include "components/_pagination.html" with page=page %}
+{% include "components/_confirm_modal.html" with id="account-confirm" title="Xác nhận" message="" action="" confirm_label="Xác nhận" danger=True %}
 {% endblock %}

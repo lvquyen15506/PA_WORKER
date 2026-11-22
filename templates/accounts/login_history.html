@@ -1,35 +1,9 @@
-{% extends "base_tam.html" %}
+{% extends "base.html" %}
 {% block title %}Lịch sử đăng nhập{% endblock %}
 {% block content %}
-<h1 class="h4 mb-3">Lịch sử đăng nhập</h1>
-<form method="get" class="row g-2 mb-3 align-items-end">
-  {% for field in form %}
-  <div class="col-sm-6 col-lg-3">
-    <label class="form-label small" for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
-    {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-  </div>
-  {% endfor %}
-  <div class="col-12">
-    <button class="btn btn-primary" type="submit">Lọc</button>
-    <a class="btn btn-outline-secondary" href="{% url 'login_history' %}">Xóa lọc</a>
-  </div>
-</form>
-<div class="table-responsive card"><table class="table table-hover mb-0">
-  <thead class="table-light"><tr><th>Thời điểm</th><th>Tên đăng nhập</th><th>Địa chỉ IP</th><th>Kết quả</th><th>Lý do</th></tr></thead>
-  <tbody>
-  {% for h in page %}
-  <tr>
-    <td class="text-nowrap">{{ h.created_at|date:"d/m/Y H:i:s" }}</td>
-    <td>{{ h.username_attempted }}</td>
-    <td>{{ h.ip_address }}</td>
-    <td>{% if h.success %}<span class="badge text-bg-success">Thành công</span>{% else %}<span class="badge text-bg-danger">Thất bại</span>{% endif %}</td>
-    <td>{{ h.failure_reason|default:"—" }}</td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="5" class="text-center text-muted py-4">Không có lượt đăng nhập nào.</td></tr>
-  {% endfor %}
-  </tbody>
-</table></div>
-{% include "accounts/_pager.html" %}
+{% include "components/_page_header.html" with title="Quản lý tài khoản" %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% include "components/_filter_bar.html" with form=form reset_url=request.path %}
+{% include "components/_table.html" with columns=columns rows=rows empty_text="Không có lượt đăng nhập nào." %}
+{% include "components/_pagination.html" with page=page query=query %}
 {% endblock %}

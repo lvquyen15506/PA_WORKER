@@ -1,0 +1,2 @@
+{# Nhãn trạng thái. Tham số: value (mã trạng thái, chỉ số tự tính hoặc nhãn hiển thị), label (tùy chọn, thay chữ). #}
+{% load pa_tags %}{% if label %}{{ value|status_badge:label }}{% else %}{{ value|status_badge }}{% endif %}

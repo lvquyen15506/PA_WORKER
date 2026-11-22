@@ -1,0 +1,63 @@
+{% comment %}Bảng danh sách. Tham số:
+   columns: danh sách dict {key, label, kind = text | num | date | datetime | badge | actions, nowrap}
+   rows: danh sách dict; giá trị lấy theo columns[].key. Ô badge: mã trạng thái, hoặc dict {value, label}.
+         Ô actions: row.actions = danh sách dict
+           {kind: "link", icon, tooltip, url, disabled}  hoặc
+           {kind: "menu", label, items: [{label, url | post_url, title, message, danger, disabled}]}
+         (mục có post_url mở hộp xác nhận modal_id; hộp do trang include _confirm_modal với id đó)
+   modal_id: id hộp xác nhận (khi có mục post_url)
+   empty_text, empty_action_label, empty_action_url: nội dung khi rows rỗng.{% endcomment %}
+{% load pa_tags %}
+<div class="pa-table-wrap">
+{% if rows %}
+  <table class="table table-hover pa-table">
+    <thead>
+      <tr>
+        {% for col in columns %}
+        <th scope="col" class="{% if col.kind == 'num' %}is-num{% elif col.kind == 'actions' %}is-actions{% endif %}">{{ col.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for col in columns %}
+        {% with cell=row|get_item:col.key %}
+        <td class="{% if col.kind == 'num' %}is-num{% elif col.kind == 'actions' %}is-actions{% endif %}{% if col.nowrap or col.kind == 'badge' or col.kind == 'date' or col.kind == 'datetime' %} is-nowrap{% endif %}">
+          {% if col.kind == "badge" %}
+            {% if cell.value %}{% include "components/_status_badge.html" with value=cell.value label=cell.label %}{% else %}{% include "components/_status_badge.html" with value=cell label="" %}{% endif %}
+          {% elif col.kind == "date" %}{{ cell|date:"d/m/Y"|default:"—" }}
+          {% elif col.kind == "datetime" %}{{ cell|date:"d/m/Y H:i"|default:"—" }}
+          {% elif col.kind == "actions" %}
+            {% for a in row.actions %}
+              {% if a.kind == "menu" %}
+              <div class="dropdown d-inline-block">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">{{ a.label }}</button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  {% for it in a.items %}
+                  <li>
+                    {% if it.disabled %}<span class="dropdown-item disabled">{{ it.label }}</span>
+                    {% elif it.post_url %}<button class="dropdown-item{% if it.danger %} is-danger{% endif %}" type="button" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}" data-pa-action="{{ it.post_url }}" data-pa-title="{{ it.title|default:it.label }}" data-pa-message="{{ it.message }}">{{ it.label }}</button>
+                    {% else %}<a class="dropdown-item" href="{{ it.url }}">{{ it.label }}</a>{% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% elif a.disabled %}
+              <span class="d-inline-block" data-bs-toggle="tooltip" title="{{ a.tooltip }}"><button class="btn btn-sm btn-outline-secondary pa-icon-btn" type="button" disabled aria-label="{{ a.tooltip }}"><i class="bi {{ a.icon }}" aria-hidden="true"></i></button></span>
+              {% else %}
+              <a class="btn btn-sm btn-outline-secondary pa-icon-btn" href="{{ a.url }}" data-bs-toggle="tooltip" title="{{ a.tooltip }}" aria-label="{{ a.tooltip }}"><i class="bi {{ a.icon }}" aria-hidden="true"></i></a>
+              {% endif %}
+            {% endfor %}
+          {% else %}{{ cell|default_if_none:"—"|default:"—" }}{% endif %}
+        </td>
+        {% endwith %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  {% include "components/_empty_state.html" with text=empty_text action_label=empty_action_label action_url=empty_action_url %}
+{% endif %}
+</div>

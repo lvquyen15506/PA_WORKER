@@ -1,0 +1,12 @@
+{# Thanh lọc phía trên bảng. Tham số: form (form GET, mọi trường không bắt buộc), reset_url (địa chỉ "Xóa lọc"). #}
+<form class="pa-filter" method="get" novalidate>
+  <div class="row g-3 align-items-end">
+    {% for f in form %}
+    <div class="col-sm-6 col-lg-3">{% include "components/_form_field.html" with field=f %}</div>
+    {% endfor %}
+    <div class="col-12 d-flex flex-wrap gap-2">
+      <button class="btn btn-outline-secondary" type="submit">Lọc</button>
+      <a class="btn btn-outline-secondary" href="{{ reset_url }}">Xóa lọc</a>
+    </div>
+  </div>
+</form>

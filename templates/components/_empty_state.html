@@ -1,0 +1,5 @@
+{# Danh sách trống. Tham số: text, action_label + action_url (tùy chọn, một nút duy nhất). #}
+<div class="pa-empty">
+  <p>{{ text }}</p>
+  {% if action_label and action_url %}<a class="btn btn-outline-secondary" href="{{ action_url }}">{{ action_label }}</a>{% endif %}
+</div>

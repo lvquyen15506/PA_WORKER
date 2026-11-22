@@ -1,0 +1,30 @@
+{% comment %}Đầu trang. Tham số: title; breadcrumbs (danh sách (nhãn, url hoặc None)); actions (danh sách dict:
+   label, kind = primary | secondary | danger, url (liên kết) hoặc post_url (gửi POST có CSRF),
+   modal (id hộp thoại để mở), disabled, tooltip).{% endcomment %}
+<div class="pa-page-header">
+  <div>
+    {% if breadcrumbs %}
+    <ol class="pa-breadcrumb" aria-label="Đường dẫn">
+      {% for label, url in breadcrumbs %}<li>{% if url %}<a href="{{ url }}">{{ label }}</a>{% else %}{{ label }}{% endif %}</li>{% endfor %}
+    </ol>
+    {% endif %}
+    <h1 class="pa-page-header__title">{{ title }}</h1>
+  </div>
+  {% if actions %}
+  <div class="pa-page-header__actions">
+    {% for a in actions %}
+      {% if a.post_url %}
+      <form method="post" action="{{ a.post_url }}">{% csrf_token %}
+        <button class="btn btn-{% if a.kind == 'primary' %}primary{% elif a.kind == 'danger' %}outline-danger{% else %}outline-secondary{% endif %}" type="submit"{% if a.disabled %} disabled{% endif %}>{{ a.label }}</button>
+      </form>
+      {% elif a.modal %}
+      <button class="btn btn-{% if a.kind == 'primary' %}primary{% elif a.kind == 'danger' %}outline-danger{% else %}outline-secondary{% endif %}" type="button" data-bs-toggle="modal" data-bs-target="#{{ a.modal }}"{% if a.disabled %} disabled{% endif %}>{{ a.label }}</button>
+      {% elif a.disabled %}
+      <span class="d-inline-block"{% if a.tooltip %} title="{{ a.tooltip }}"{% endif %}><button class="btn btn-{% if a.kind == 'primary' %}primary{% elif a.kind == 'danger' %}outline-danger{% else %}outline-secondary{% endif %}" type="button" disabled>{{ a.label }}</button></span>
+      {% else %}
+      <a class="btn btn-{% if a.kind == 'primary' %}primary{% elif a.kind == 'danger' %}outline-danger{% else %}outline-secondary{% endif %}" href="{{ a.url }}">{{ a.label }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

@@ -1,24 +1,17 @@
-{% extends "base_tam.html" %}
+{% extends "base.html" %}
 {% block title %}{% if creating %}Thêm tài khoản{% else %}Sửa tài khoản{% endif %}{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-6 col-lg-5">
-  <h1 class="h4 mb-3">{% if creating %}Thêm tài khoản{% else %}Sửa tài khoản {{ target.username }}{% endif %}</h1>
-  {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-  <form method="post" novalidate class="card card-body">
-    {% csrf_token %}
-    {% for field in form %}
-    <div class="mb-3">
-      <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }} <span class="text-danger">*</span></label>
-      {{ field }}
-      {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-      {% for e in field.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-    </div>
-    {% endfor %}
-    {% if creating %}<p class="small text-muted">Hệ thống tạo mật khẩu tạm và chỉ hiện một lần sau khi lưu.</p>{% endif %}
-    <div class="text-end">
+{% include "components/_page_header.html" with title=page_title breadcrumbs=crumbs %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-lg-6">
+    {% include "components/_form_section.html" with fields=form.visible_fields single=True %}
+    {% if creating %}<p class="pa-small pa-muted">Hệ thống tạo mật khẩu tạm và chỉ hiện một lần sau khi lưu.</p>{% endif %}
+    <div class="pa-form-actions">
       <a class="btn btn-outline-secondary" href="{% url 'user_list' %}">Hủy</a>
       <button class="btn btn-primary" type="submit">Lưu tài khoản</button>
     </div>
-  </form>
-</div></div>
+  </div></div>
+</form>
 {% endblock %}

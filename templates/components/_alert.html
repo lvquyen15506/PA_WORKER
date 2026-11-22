@@ -1,0 +1,2 @@
+{# Thông báo. Tham số: kind (success|danger|error|warning|info), text, auto_hide (tự ẩn sau 5 giây). #}
+<div class="alert alert-{% if kind == 'error' %}danger{% elif kind == 'debug' or not kind %}info{% else %}{{ kind }}{% endif %}" role="{% if kind == 'danger' or kind == 'error' %}alert{% else %}status{% endif %}"{% if auto_hide %} data-pa-autohide{% endif %}>{{ text }}</div>

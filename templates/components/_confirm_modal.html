@@ -1,0 +1,29 @@
+{% comment %}Hộp xác nhận thao tác không hoàn tác được. Chỉ là giao diện: nút xác nhận gửi form POST có CSRF,
+   máy chủ kiểm tra lại mọi trường (lý do bắt buộc, mã hồ sơ gõ lại…).
+   Tham số: id, title, message, action (địa chỉ POST; có thể để trống nếu nút mở hộp truyền data-pa-action),
+   confirm_label (động từ cụ thể), danger (nút xác nhận đỏ),
+   fields (tùy chọn: danh sách BoundField, vẽ bằng _form_field).
+   Cần nội dung riêng: tạo template con extends components/_confirm_modal.html và ghi đè block body.{% endcomment %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}-title" aria-hidden="true" data-pa-confirm>
+  <div class="modal-dialog">
+    <form class="modal-content" method="post" action="{{ action }}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h2 class="modal-title" id="{{ id }}-title" data-pa-title>{{ title }}</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <p data-pa-message>{{ message }}</p>
+        {% block body %}
+        {% for f in fields %}
+        <div class="mb-3">{% include "components/_form_field.html" with field=f %}</div>
+        {% endfor %}
+        {% endblock %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn {% if danger %}btn-danger{% else %}btn-primary{% endif %}" data-pa-submit>{{ confirm_label }}</button>
+      </div>
+    </form>
+  </div>
+</div>

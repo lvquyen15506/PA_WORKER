@@ -1,0 +1,6 @@
+{# Thẻ số liệu, cả thẻ là liên kết. Tham số: label, value (tùy chọn; không có thì thẻ chỉ có nhãn + dòng phụ), sub, url. #}
+<a class="pa-stat{% if value is None or value == "" %} pa-stat--plain{% endif %}" href="{{ url }}">
+  <div class="pa-stat__label">{{ label }}</div>
+  {% if value is not None and value != "" %}<div class="pa-stat__value">{{ value }}</div>{% endif %}
+  {% if sub %}<div class="pa-stat__sub">{{ sub }}</div>{% endif %}
+</a>

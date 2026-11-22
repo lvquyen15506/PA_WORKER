@@ -1,28 +1,24 @@
-{% extends "base_tam.html" %}
+{% extends "base.html" %}
 {% block title %}Đăng nhập{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-5 col-lg-4">
-    <h1 class="h4 mb-3 text-center">PA Worker</h1>
+{% block shell %}
+<main class="pa-auth">
+  <div class="pa-auth__box">
+    <div class="pa-auth__brand">
+      <strong>PA Worker</strong>
+      <span class="pa-muted">Phần mềm quản lý hồ sơ công nhân</span>
+    </div>
     <div class="card"><div class="card-body">
-      <h2 class="h5 mb-3">Đăng nhập</h2>
-      {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+      <h1 class="pa-card-title">Đăng nhập</h1>
+      {% if error %}{% include "components/_alert.html" with kind="danger" text=error %}{% endif %}
       <form method="post" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.username.id_for_label }}">{{ form.username.label }} <span class="text-danger">*</span></label>
-          <input class="form-control" type="text" name="username" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default:'' }}" autocomplete="username" autofocus required>
-          {% for e in form.username.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-        </div>
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.password.id_for_label }}">{{ form.password.label }} <span class="text-danger">*</span></label>
-          <input class="form-control" type="password" name="password" id="{{ form.password.id_for_label }}" autocomplete="current-password" required>
-          {% for e in form.password.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
-        </div>
+        <div class="mb-3">{% include "components/_form_field.html" with field=form.username %}</div>
+        <div class="mb-3">{% include "components/_form_field.html" with field=form.password %}</div>
         <button class="btn btn-primary w-100" type="submit">Đăng nhập</button>
       </form>
     </div></div>
   </div>
-</div>
+  <footer class="pa-footer">PA Worker v1.0 · Phát triển bởi QQIT</footer>
+</main>
 {% endblock %}
