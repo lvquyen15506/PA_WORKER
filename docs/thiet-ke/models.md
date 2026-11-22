@@ -208,7 +208,7 @@ Danh mục chung: mọi danh mục có `is_active = BooleanField(default=True)`.
 | `Shift` | `name CharField(50)`, `time_range CharField(20, blank)` | `name` unique |
 | `ApplicationSource` | `name CharField(100)` | `name` unique |
 | `EducationLevel` | `name CharField(100)`, `rank PositiveSmallIntegerField` | `name`, `rank` unique; số lớn = cao hơn (câu 14) |
-| `ClientCompany` (v1.1) | `name CharField(150)`, `location CharField(100)` (tỉnh/thành, văn bản tự nhập) | unique (`name`, `location`); mỗi địa điểm một dòng (câu 39). Công ty đã có đợt làm việc thì chỉ ngừng sử dụng, không xóa. `__str__` = `"<name> – <location>"` |
+| `ClientCompany` (v1.1) | `name CharField(150)`, `location CharField(100)` (tỉnh/thành, văn bản tự nhập) | unique (`name`, `location`); mỗi địa điểm một dòng (câu 39). Service chặn thêm trùng tên + địa điểm khi so `casefold()` + gộp khoảng trắng (giữ dấu); tên chỉ trùng khi bỏ dấu (`compute_name_search`) thì **cảnh báo** "Có thể trùng với: <tên – địa điểm>", không chặn (câu 48). Công ty đã có đợt làm việc thì chỉ ngừng sử dụng, không xóa. `__str__` = `"<name> – <location>"` |
 | `RequiredDocumentGroup` | `name CharField(100)`, `sort_order` | `name` unique |
 | `DocumentType` | `name CharField(100)`, `system_code CharField(30, null)`, `required_group FK(RequiredDocumentGroup, null)`, `sort_order` | `name` unique; `system_code` unique khi khác rỗng |
 
@@ -462,7 +462,7 @@ Vòng đời (khớp `erd.md` mục 6):
 | `resign_note` | `TextField(blank)` | Không | |
 | `created_at`, `updated_at` | `DateTimeField` | Tự động | |
 
-Không sửa trực tiếp `section`, `team`, `position`, `shift`, `work_status`: mọi thay đổi đi qua `apps.employment.services.change_employment(...)`, hàm này cập nhật `Employment` và **thêm** một dòng `EmploymentHistory` (không ghi đè).
+Không sửa trực tiếp `section`, `team`, `position`, `shift`, `manager`, `work_status`: mọi thay đổi đi qua `apps.employment.services.change_employment(...)`, hàm này cập nhật `Employment` và **thêm** một dòng `EmploymentHistory` (không ghi đè).
 
 **`EmploymentHistory`** – chỉ thêm.
 
@@ -477,6 +477,7 @@ Không sửa trực tiếp `section`, `team`, `position`, `shift`, `work_status`
 | `from_team`, `to_team` | `FK(Team, null)` | Tự động |
 | `from_position`, `to_position` | `FK(Position, null)` | Tự động |
 | `from_shift`, `to_shift` | `FK(Shift, null)` | Tự động |
+| `from_manager`, `to_manager` | `FK(Worker, null)` | Tự động. Thêm ở Phase 6 (câu 48): đổi người quản lý trực tiếp cũng qua `change_employment` và có dòng lịch sử |
 | `from_work_status`, `to_work_status` | `CharField(20, choices=WorkStatus, blank)` | Tự động |
 | `created_by` | `FK(User, null)` | Tự động (rỗng = Hệ thống) |
 | `created_at` | `DateTimeField(auto_now_add)` | Tự động |
@@ -518,7 +519,7 @@ Không sửa trực tiếp `section`, `team`, `position`, `shift`, `work_status`
 - Mọi thay đổi đi qua `apps.employment.services.add_assignment(...)`, `update_assignment(...)`; ghi `AuditLog` `CREATE`/`UPDATE` với `worker`. Thêm đợt mới khi đang có đợt mở: bắt buộc nhập ngày kết thúc cho đợt cũ ở cùng thao tác (đóng đợt cũ rồi mở đợt mới), hoặc báo lỗi tiếng Việt **[Nội bộ]**.
 - Khi `change_employment` đổi sang Đã nghỉ việc: đợt đang mở tự có `end_date = resign_date` (ghi nhật ký `UPDATE`, người thực hiện là người đổi trạng thái) **[Nội bộ]**.
 - Không có nút xóa; nhập nhầm thì sửa (giá trị cũ ghi nhật ký). **Không** thêm `TextChoices`: "Đang diễn ra" suy ra từ ngày.
-- Đợt hiện tại: `start_date <= hôm nay` và (`end_date` rỗng hoặc `end_date >= hôm nay`). Đợt "sắp đủ 12 tháng" (câu 43, 48): xét **chuỗi** các đợt liền nhau cùng `client_company` (đợt sau có `start_date` không quá 1 ngày sau `end_date` đợt trước); nếu đợt hiện tại thuộc một chuỗi có `ngày đủ hạn = add_months(start_date của đợt đầu chuỗi, assignment_limit_months)` trong vòng `expiry_warning_days` ngày tới (hoặc đã qua), và `end_date` của đợt hiện tại rỗng hoặc sau `ngày đủ hạn`, thì cảnh báo **[Giả định]**; tính ở `apps.workers.indicators`, dùng `apps/core/dates.add_months`.
+- Đợt hiện tại: `start_date <= hôm nay` và (`end_date` rỗng hoặc `end_date >= hôm nay`). Đợt "sắp đủ 12 tháng" (câu 43, 48): xét **chuỗi** các đợt liền nhau có cùng **tên** công ty khách, **bỏ qua địa điểm** (tên so bằng `normalize_client_name`: `casefold()` + gộp khoảng trắng, giữ dấu; đợt sau có `start_date` không quá 1 ngày sau `end_date` đợt trước); nếu đợt hiện tại thuộc một chuỗi có `ngày đủ hạn = add_months(start_date của đợt đầu chuỗi, assignment_limit_months)` trong vòng `expiry_warning_days` ngày tới (hoặc đã qua), và `end_date` của đợt hiện tại rỗng hoặc sau `ngày đủ hạn`, thì cảnh báo **[Giả định]**; tính ở `apps.workers.indicators`, dùng `apps/core/dates.add_months`.
 - `__str__` = `"Đợt làm việc <id> của <mã hồ sơ>"` (không họ tên, không lương).
 
 **`SalaryHistory`** – lịch sử lương tháng và đơn giá tháng tính cho công ty khách (câu 41, 42). **Chỉ thêm**.
@@ -623,7 +624,7 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | Viewer không thấy trường nhạy cảm: số CCCD đầy đủ, CMND cũ, địa chỉ thường trú, quê quán, ảnh CCCD (câu 13). **Thay đổi v1.1 (câu 42, 48):** lương tháng, đơn giá tháng (`SalaryHistory`) và mức lương mong muốn mọi vai trò đều xem được; chỉ A, Q thêm lương. Test kỳ vọng "Viewer không thấy mức lương mong muốn" phải đổi ở Phase 6 | context của view chi tiết, danh sách, Tuyển dụng, mảnh HTMX, xuất Excel |
 | Đợt làm việc (câu 40): một công ty tại một lúc, không chồng lấn, `end_date >= start_date`, công nhân có mã NV và chưa Đã nghỉ việc; nghỉ việc thì đóng đợt đang mở; sửa ngày không làm dòng lương của đợt nằm ngoài khoảng | `apps.employment.services` |
 | Lương (câu 41, 42): chỉ thêm dòng mới, số nguyên VNĐ > 0, bắt buộc lý do, chỉ A, Q; mã hóa; ghi nhật ký (giá trị ở `AuditPersonalValue`) | `apps.employment.services.add_salary` |
-| Đợt làm việc sắp đủ 12 tháng (câu 43, 48): trong danh sách việc cần làm ở Dashboard, dùng `expiry_warning_days` và `assignment_limit_months`; **cộng dồn chuỗi đợt liền nhau cùng công ty** (đợt sau bắt đầu không quá 1 ngày sau khi đợt trước kết thúc), tính từ `start_date` của đợt đầu chuỗi **[Giả định]**; bộ lọc `?dot_sap_du_han=1` | `apps.workers.indicators` |
+| Đợt làm việc sắp đủ 12 tháng (câu 43, 48): trong danh sách việc cần làm ở Dashboard, dùng `expiry_warning_days` và `assignment_limit_months`; **cộng dồn chuỗi đợt liền nhau cùng tên công ty khách, bỏ qua địa điểm** (tên so không phân biệt hoa thường, gộp khoảng trắng, giữ dấu; đợt sau bắt đầu không quá 1 ngày sau khi đợt trước kết thúc), tính từ `start_date` của đợt đầu chuỗi **[Giả định]**; bộ lọc `?dot_sap_du_han=1` | `apps.workers.indicators` |
 | Báo cáo số công nhân đang làm theo công ty khách (câu 45): đếm đợt hiện tại theo `client_company`; bộ lọc danh sách `?cong_ty_khach=<id>` (theo đợt hiện tại) | `apps.reports`, `apps.workers.listing` |
 | Hạn lưu trữ công nhân đã nghỉ (câu 44): mốc là `Employment.resign_date`, **không** dùng `WorkAssignment.end_date`. **Test:** công nhân có đợt kết thúc từ lâu nhưng chưa nghỉ việc thì `retention_info` không đổi; đổi `end_date` của đợt không làm đổi hạn lưu trữ | `apps.workers.retention.retention_info` |
 | Nhập Excel v1.1 (câu 48): phần B có thêm "Công ty khách" (khớp tên + địa điểm trong `ClientCompany` đang dùng) và "Ngày bắt đầu đợt" (bắt buộc nếu có công ty khách); dòng hợp lệ tạo thêm một `WorkAssignment` (vị trí = chức danh B5); Bộ phận (B3) không bắt buộc; **không nhập lương** | `apps.reports.importer` |

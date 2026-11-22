@@ -387,6 +387,8 @@ erDiagram
         bigint to_position_id FK
         bigint from_shift_id FK
         bigint to_shift_id FK
+        bigint from_manager_id FK "Workers; thêm ở Phase 6 (câu 48)"
+        bigint to_manager_id FK "Workers"
         varchar from_work_status "WorkStatus"
         varchar to_work_status "WorkStatus"
         bigint created_by_id FK "rỗng khi Hệ thống"
@@ -581,7 +583,7 @@ Mục VI liệt kê 24 bảng và nhắc tới 2 bảng danh mục qua khóa ngo
 
 **Một cột tính sẵn:** `Workers.name_search` (họ tên bỏ dấu, chữ thường) lặp lại thông tin của `full_name`. Lý do: tìm không dấu phải chạy được trên cả PostgreSQL lẫn SQLite (bản dự phòng không Docker) và dưới 2 giây với 500 hồ sơ. Giá trị luôn được tính lại khi lưu, không cho sửa tay.
 
-**Không lưu riêng, chỉ tính:** đợt làm việc hiện tại (đợt có `start_date` ≤ hôm nay và `end_date` rỗng hoặc ≥ hôm nay), mức lương và đơn giá hiện tại của đợt (dòng `SalaryHistory` của đợt có `effective_date` lớn nhất không quá hôm nay), đợt sắp đủ 12 tháng (chuỗi đợt liền nhau cùng công ty, đợt sau bắt đầu không quá 1 ngày sau khi đợt trước kết thúc; `start_date` của đợt đầu chuỗi + `assignment_limit_months` nằm trong `expiry_warning_days` ngày tới; **không có trạng thái đợt làm việc**, không tạo bộ trạng thái thứ năm), ảnh chân dung (là `WorkerDocuments` có loại `PORTRAIT`, câu 4), phòng ban (từ bộ phận), thiếu giấy tờ / hoàn thiện / sắp hết hạn, ngày chuyển Lưu trữ và người gửi duyệt (từ `StatusChanges`), hạn lưu trữ (theo 6 căn cứ ở câu 2: từ `Employments.resign_date`, `Applications.result_date`, hoặc ngày chuyển Lưu trữ trong `StatusChanges`; hồ sơ Lưu trữ luôn tính được).
+**Không lưu riêng, chỉ tính:** đợt làm việc hiện tại (đợt có `start_date` ≤ hôm nay và `end_date` rỗng hoặc ≥ hôm nay), mức lương và đơn giá hiện tại của đợt (dòng `SalaryHistory` của đợt có `effective_date` lớn nhất không quá hôm nay), đợt sắp đủ 12 tháng (chuỗi đợt liền nhau cùng **tên** công ty khách, bỏ qua địa điểm, tên so không phân biệt hoa thường và khoảng trắng thừa, giữ dấu; đợt sau bắt đầu không quá 1 ngày sau khi đợt trước kết thúc; `start_date` của đợt đầu chuỗi + `assignment_limit_months` nằm trong `expiry_warning_days` ngày tới; **không có trạng thái đợt làm việc**, không tạo bộ trạng thái thứ năm), ảnh chân dung (là `WorkerDocuments` có loại `PORTRAIT`, câu 4), phòng ban (từ bộ phận), thiếu giấy tờ / hoàn thiện / sắp hết hạn, ngày chuyển Lưu trữ và người gửi duyệt (từ `StatusChanges`), hạn lưu trữ (theo 6 căn cứ ở câu 2: từ `Employments.resign_date`, `Applications.result_date`, hoặc ngày chuyển Lưu trữ trong `StatusChanges`; hồ sơ Lưu trữ luôn tính được).
 
 ## 5. Ràng buộc
 

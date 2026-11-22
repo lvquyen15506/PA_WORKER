@@ -316,7 +316,8 @@ Nguồn: phiếu thay đổi v1.1 đã ký (`docs/yeu-cau-thay-doi-v1.1.pdf`). C
 - Đợt làm việc **sắp đủ 12 tháng** kể từ ngày bắt đầu được cảnh báo ở Dashboard, trong **danh sách việc cần làm**.
 - Dùng **chung ngưỡng số ngày `expiry_warning_days`** với CCCD và hợp đồng sắp hết hạn (câu 17).
 - **[Nội bộ]** Không thêm thẻ số liệu mới (9 thẻ ở mục VII giữ nguyên), theo cách đã làm với CCCD sắp hết hạn. Đợt đã quá 12 tháng mà chưa kết thúc vẫn hiện trong danh sách cho đến khi có ngày kết thúc. Con số 12 tháng cấu hình được (`assignment_limit_months`, mặc định 12).
-- **[Giả định, đã đồng ý 23/11/2026]** **Cộng dồn các đợt liền nhau cùng công ty khách**: đợt sau bắt đầu không quá 1 ngày sau ngày kết thúc đợt trước thì thuộc cùng một chuỗi; 12 tháng tính từ ngày bắt đầu của đợt đầu chuỗi. Doanh nghiệp tự đối chiếu với quy định hiện hành; phần mềm chỉ cảnh báo, không chặn. "Cùng công ty" là cùng một dòng danh mục (cùng tên và địa điểm).
+- **[Giả định, đã đồng ý 23/11/2026]** **Cộng dồn các đợt liền nhau cùng công ty khách**: đợt sau bắt đầu không quá 1 ngày sau ngày kết thúc đợt trước thì thuộc cùng một chuỗi; 12 tháng tính từ ngày bắt đầu của đợt đầu chuỗi. Doanh nghiệp tự đối chiếu với quy định hiện hành; phần mềm chỉ cảnh báo, không chặn.
+- **[Nội bộ, chốt 23/11/2026 khi lập kế hoạch Phase 6]** "Cùng công ty" so theo **TÊN** công ty khách, **bỏ qua địa điểm**: so khớp không phân biệt hoa thường, gộp khoảng trắng thừa, **giữ dấu tiếng Việt** ("Công ty An" khác "Cong ty An"). Lý do: giới hạn cho thuê lại gắn với bên thuê lại, không gắn với nhà máy. Hai đợt liền nhau ở hai địa điểm của cùng một công ty vẫn cộng dồn.
 
 ### 44. Hạn lưu trữ công nhân đã nghỉ
 - **Giữ 10 năm như v1.0** (`resigned_retention_years = 10`). Mốc tính là **ngày chấm dứt hợp đồng lao động cuối cùng với bên cung ứng** (`Employment.resign_date`); **không** tính từ ngày kết thúc một đợt làm việc.
@@ -342,7 +343,10 @@ Do người phụ trách dự án chốt khi rà thiết kế, **chưa xác nh�
 2. **Mức lương mong muốn mở cho Viewer** (bỏ ẩn ở câu 13), nhất quán với câu 42. Test kỳ vọng Viewer không thấy cột này sẽ đổi ở Phase 6.
 3. **Lương gắn với đợt làm việc** (câu 41): `SalaryHistory` có khóa ngoại bắt buộc tới `WorkAssignment`; xem `models.md` 3.9.
 4. **Quyền đợt làm việc:** A, Q, H thêm/sửa; V chỉ xem (câu 40).
-5. **Cảnh báo 12 tháng cộng dồn** các đợt liền nhau cùng công ty (câu 43).
+5. **Cảnh báo 12 tháng cộng dồn** các đợt liền nhau cùng **tên** công ty khách, bỏ qua địa điểm (câu 43).
+8. **Người quản lý trực tiếp** đổi sau khi tiếp nhận đi qua `change_employment` và có dòng `EmploymentHistory` (thêm cột `from_manager`, `to_manager`), như điều chuyển (chốt khi lập kế hoạch Phase 6).
+9. **Danh mục công ty khách:** chặn lưu khi trùng tên + địa điểm (không phân biệt hoa thường, gộp khoảng trắng, giữ dấu); nếu tên chỉ trùng khi bỏ dấu thì **cảnh báo** "Có thể trùng với: <tên – địa điểm>", không chặn.
+10. **Kịch bản nghiệm thu 10** ở Phase 6 kiểm qua nhãn "Sắp hết hạn" và `/ho-so/?hop_dong_sap_het_han=1`; Phase 7 chạy lại khi có thẻ Dashboard.
 6. **Nhập Excel:** file mẫu phần B thêm cột "Công ty khách" (khớp tên + địa điểm trong danh mục) và "Ngày bắt đầu đợt" (bắt buộc nếu có công ty khách); nhập thì tạo `WorkAssignment`. **Không** nhập lương (`excel-mau.md`).
 7. **Ngoại lệ xóa cứng:** `SalaryHistory` chỉ bị xóa trong `anonymize()`; đã thêm vào `CLAUDE.md`.
 
