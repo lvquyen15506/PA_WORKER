@@ -1,5 +1,6 @@
 """Trang chung: giới thiệu, bộ giao diện mẫu /ui-kit/ (trang chủ là Dashboard ở apps.reports)."""
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
@@ -14,7 +15,7 @@ def about(request):
     items = [
         ("Tên phần mềm", "PA Worker – quản lý hồ sơ công nhân"),
         ("Đơn vị phát triển", "QQIT"),
-        ("Phiên bản", "1.0"),
+        ("Phiên bản", settings.APP_VERSION),
         ("Năm phát hành", "2026"),
     ]
     return render(request, "about.html", {"about_items": items})

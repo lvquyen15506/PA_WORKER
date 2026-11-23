@@ -113,7 +113,8 @@ def test_menu_muc_dang_chon_la_khop_dai_nhat():
 def test_khung_trang_co_sidebar_thanh_tren_chan_trang():
     body = login(make_user("HR_STAFF")).get("/").content.decode()
     assert "pa-sidebar" in body and "pa-topbar" in body
-    assert "PA Worker v1.0 · Phát triển bởi QQIT" in body
+    # Phase 8: phiên bản lấy từ settings.APP_VERSION (bàn giao v1.1.0), không viết cứng "1.0".
+    assert "PA Worker v1.1.0 · Phát triển bởi QQIT" in body
     assert "Đổi mật khẩu" in body and "Đăng xuất" in body
     assert "pa-page-header" in body
     assert "Nhật ký thao tác" not in body  # H không có mục này

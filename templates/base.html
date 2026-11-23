@@ -1,4 +1,4 @@
-{% load static %}<!doctype html>
+{% load static pa_tags %}<!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8">
@@ -60,7 +60,7 @@
     </main>
 
     <footer class="pa-footer">
-      PA Worker v1.0 · Phát triển bởi QQIT · <a href="{% url 'about' %}">Giới thiệu</a>
+      PA Worker v{% app_version %} · Phát triển bởi QQIT · <a href="{% url 'about' %}">Giới thiệu</a>
     </footer>
   </div>
 </div>

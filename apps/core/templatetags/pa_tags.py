@@ -1,11 +1,19 @@
 """Template tag/filter dùng chung cho giao diện (skill pa-ui)."""
 
 from django import template
+from django.conf import settings
 from django.utils.html import format_html
 
 from apps.core import badges
 
 register = template.Library()
+
+
+@register.simple_tag
+def app_version():
+    """Phiên bản phần mềm (một nguồn: settings.APP_VERSION). Dùng được cả ở trang lỗi 500
+    (không có context processor)."""
+    return settings.APP_VERSION
 
 
 @register.filter

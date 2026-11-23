@@ -34,7 +34,14 @@ def _env_list(name, default):
     return [item.strip() for item in _env(name, default).split(",") if item.strip()]
 
 
+APP_VERSION = "1.1.0"
+
 DEBUG = _env("DEBUG", "0") == "1"
+# Bản Demo (dữ liệu giả lập, nghiệm thu, trình diễn) hay bản Thật (dữ liệu của doanh nghiệp).
+# Chỉ bản Demo được chạy seed_demo (docs/lam-ro-yeu-cau.md câu 49).
+DEMO_MODE = _env("DEMO_MODE", "0") == "1"
+# Chỉ bật khi đã có reverse proxy cấp HTTPS phía trước (docs/ra-soat-bao-mat.md mục 10).
+HTTPS = _env("HTTPS", "0") == "1"
 
 SECRET_KEY = _env("SECRET_KEY")
 if not SECRET_KEY:
@@ -78,6 +85,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.core.middleware.RequestSizeLimitMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -153,6 +161,8 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # Tệp tải lên: ngoài thư mục public, không có MEDIA_URL (chỉ tải qua view kiểm tra quyền).
 PRIVATE_MEDIA_ROOT = Path(_env("PRIVATE_MEDIA_ROOT", str(BASE_DIR / "private_media")))
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+# Tổng một request: 3 tệp 10 MB (ảnh mặt trước, mặt sau, CV) + phần dư cho trường form.
+MAX_REQUEST_BYTES = 35 * 1024 * 1024
 
 # Nhận diện CCCD/CV (Phase 5). Gunicorn timeout 120 giây nên toàn bộ một lượt nhận diện chỉ được
 # dùng tối đa 90 giây (mỗi giai đoạn lấy phần còn lại); hết thì trường chưa đọc để trống, tô vàng.
@@ -179,3 +189,42 @@ LOGIN_LOCK_MINUTES = 15
 
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+# CSRF_COOKIE_HTTPONLY giữ False: static/js/pa.js đọc cookie csrftoken để gửi kèm request htmx.
+
+# HTTPS (tắt mặc định): bản bàn giao chạy HTTP trong mạng nội bộ. Bật HTTPS=1 khi đặt reverse
+# proxy (Caddy/Nginx) cấp HTTPS phía trước; proxy phải gửi X-Forwarded-Proto.
+if HTTPS:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_HSTS_SECONDS = 31_536_000
+    CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS]
+    # Chuyển hướng HTTP -> HTTPS do reverse proxy làm. Bật ở Django thì healthcheck nội bộ
+    # (http://localhost:8000) bị chuyển hướng và container bị coi là hỏng.
+    # HSTS cho tên miền con và danh sách preload chỉ dành cho tên miền công khai; máy chủ trong
+    # LAN truy cập bằng IP hoặc tên máy nội bộ, không có tên miền con.
+    SILENCED_SYSTEM_CHECKS = ["security.W008", "security.W005", "security.W021"]
+
+# Log ra stdout của container (docker compose logs). Che dãy số dài (apps/core/log_format.py);
+# Gunicorn không bật access log vì URL có thể chứa chữ tìm kiếm (?q=).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "pa": {
+            "()": "apps.core.log_format.RedactingFormatter",
+            "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
+        },
+    },
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "pa"}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {
+        "django": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        # runserver (bản SQLite) ghi dòng request kèm chuỗi truy vấn: chỉ ghi khi có lỗi.
+        "django.server": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+        "apps": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+}

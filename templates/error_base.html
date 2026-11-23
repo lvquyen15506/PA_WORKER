@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load pa_tags %}
+{% comment %}Khung trang lỗi 400, 404, 413, 500: dùng khung tối giản như trang đăng nhập, không cần
+request hay CSDL (trang 500 được vẽ không có context processor). Không có chi tiết gỡ lỗi.{% endcomment %}
+{% block shell %}
+<main class="pa-auth">
+  <div class="pa-auth__box">
+    <div class="pa-auth__brand">
+      <strong>PA Worker</strong>
+      <span class="pa-muted">Phần mềm quản lý hồ sơ công nhân</span>
+    </div>
+    <div class="card"><div class="card-body">
+      <h1 class="pa-card-title">{% block error_title %}{% endblock %}</h1>
+      <p>{% block error_text %}{% endblock %}</p>
+      <a class="btn btn-primary" href="/">Về trang tổng quan</a>
+    </div></div>
+  </div>
+  <footer class="pa-footer">PA Worker v{% app_version %} · Phát triển bởi QQIT</footer>
+</main>
+{% endblock %}

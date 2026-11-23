@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load pa_tags %}
 {% block title %}Đăng nhập{% endblock %}
 {% block shell %}
 <main class="pa-auth">
@@ -19,6 +20,6 @@
       </form>
     </div></div>
   </div>
-  <footer class="pa-footer">PA Worker v1.0 · Phát triển bởi QQIT</footer>
+  <footer class="pa-footer">PA Worker v{% app_version %} · Phát triển bởi QQIT</footer>
 </main>
 {% endblock %}
