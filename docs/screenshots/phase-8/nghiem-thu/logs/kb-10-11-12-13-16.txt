@@ -37,7 +37,7 @@
 ĐẠT  KB11 (admin): thẻ Hợp đồng sắp hết hạn = số dòng danh sách đích
 ĐẠT  KB12: tìm “nguyen van an” (không dấu) ra hồ sơ “Nguyễn Văn An”
 ĐẠT  KB12: tìm kiếm dưới 2 giây (0.61s)
-ĐẠT  KB13: mở danh sách đang lọc dưới 2 giây (0.61s)
+ĐẠT  KB13: mở danh sách đang lọc dưới 2 giây (0.62s)
 ĐẠT  KB13: số dòng file Excel bằng số dòng trên màn hình
 ĐẠT  KB13: nội dung 3 dòng đầu khớp màn hình (cùng thứ tự)
 ĐẠT  KB13: HR nhận số CCCD đã che

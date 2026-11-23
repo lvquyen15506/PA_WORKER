@@ -5,7 +5,7 @@
    "ma": "cai-dat",
    "ten": "Kịch bản 1 (phần cài đặt): máy mới chỉ có Docker Desktop, PA Worker.bat bản Demo",
    "dat": true,
-   "giay": 116,
+   "giay": 117,
    "khong_cache": true,
    "so_tai_khoan_mau": 4
   },
@@ -15,7 +15,7 @@
    "dat": true,
    "so_buoc_dat": 52,
    "tong_buoc": 52,
-   "giay": 31
+   "giay": 32
   },
   {
    "ma": "kb-2-5-6-7-14",
@@ -23,7 +23,7 @@
    "dat": true,
    "so_buoc_dat": 40,
    "tong_buoc": 40,
-   "giay": 48
+   "giay": 49
   },
   {
    "ma": "kb-3-4-5",
@@ -31,7 +31,7 @@
    "dat": true,
    "so_buoc_dat": 41,
    "tong_buoc": 41,
-   "giay": 57
+   "giay": 59
   },
   {
    "ma": "kb-8-9-10-v11",
@@ -47,7 +47,7 @@
    "dat": true,
    "so_buoc_dat": 105,
    "tong_buoc": 105,
-   "giay": 113
+   "giay": 115
   },
   {
    "ma": "kb-17",
@@ -55,7 +55,7 @@
    "dat": true,
    "so_buoc_dat": 25,
    "tong_buoc": 25,
-   "giay": 77
+   "giay": 78
   },
   {
    "ma": "kiem_thu_giao_dien_phase3",
@@ -63,7 +63,7 @@
    "dat": true,
    "so_buoc_dat": 81,
    "tong_buoc": 81,
-   "giay": 39
+   "giay": 38
   },
   {
    "ma": "kiem_thu_giao_dien_phase4",
@@ -79,7 +79,7 @@
    "dat": true,
    "so_buoc_dat": 88,
    "tong_buoc": 88,
-   "giay": 67
+   "giay": 68
   },
   {
    "ma": "kiem_thu_giao_dien_phase6",
@@ -87,7 +87,7 @@
    "dat": true,
    "so_buoc_dat": 149,
    "tong_buoc": 149,
-   "giay": 142
+   "giay": 143
   },
   {
    "ma": "kiem_thu_giao_dien_phase7",
@@ -95,7 +95,7 @@
    "dat": true,
    "so_buoc_dat": 173,
    "tong_buoc": 173,
-   "giay": 66
+   "giay": 65
   },
   {
    "ma": "kiem_thu_giao_dien_phase8",
@@ -103,7 +103,7 @@
    "dat": true,
    "so_buoc_dat": 21,
    "tong_buoc": 21,
-   "giay": 22
+   "giay": 21
   },
   {
    "ma": "ban-that",
@@ -111,7 +111,7 @@
    "dat": true,
    "so_buoc_dat": 8,
    "tong_buoc": 8,
-   "giay": 26,
+   "giay": 22,
    "chi_tiet": {
     "PA Worker.bat bản Thật chạy xong, tạo Admin quantri": true,
     "seed_demo bị chặn ở bản Thật": true,
@@ -124,6 +124,6 @@
    }
   }
  ],
- "tong_giay": 952,
+ "tong_giay": 955,
  "dat_het": true
 }
