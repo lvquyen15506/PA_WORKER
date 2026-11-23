@@ -1,13 +1,27 @@
-"""Dashboard `/` (trang.md 5.3): 9 thẻ số liệu bấm được, 4 khung biểu đồ, việc cần làm.
+"""Dashboard `/` và báo cáo `/bao-cao/` (trang.md 5.3, 5.9).
 
-Mọi vai trò đã đăng nhập xem được; khối "Chờ duyệt" chỉ hiện với Admin, Quản lý nhân sự.
+- Dashboard: mọi vai trò xem; khối "Chờ duyệt" chỉ hiện với Admin, Quản lý nhân sự.
+- Báo cáo: mọi vai trò xem; **xuất Excel và in chỉ Admin, Quản lý nhân sự, Nhân viên HR** (câu 18:
+  Viewer chỉ xem thống kê, in cũng là xuất). Mỗi lần xuất/in ghi nhật ký (không ghi họ tên).
 """
 
-from django.shortcuts import render
+from urllib.parse import urlencode
+
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_GET
 
 from apps.accounts.permissions import ALL_ROLES, role_required
+from apps.audit.services import log
+from apps.core import excel
+from apps.core.choices import AuditAction
+from apps.workers.rules import ALL_STAFF, role_code
 
-from . import stats
+from . import reports, stats
+from .forms import DepartmentFilterField, ReportFilterForm
+
+STAFF = tuple(ALL_STAFF)
 
 
 def _top(rows, label_index=0, value_index=1):
@@ -133,5 +147,105 @@ def dashboard(request):
             "cards": stats.cards(request.user),
             "charts": build_charts(),
             "todo": stats.todo_blocks(request.user),
+        },
+    )
+
+
+# --- Báo cáo ------------------------------------------------------------------------------------
+def _query(ctx):
+    """Tham số chuẩn hóa (đủ loại, khoảng ngày, phòng ban) dùng cho liên kết In và Xuất Excel."""
+    if ctx.department == stats.NO_SECTION:
+        department = DepartmentFilterField.NONE
+    else:
+        department = ctx.department.pk if ctx.department is not None else ""
+    return urlencode(
+        {
+            "loai": ctx.code,
+            "tu_ngay": ctx.start.strftime("%d/%m/%Y"),
+            "den_ngay": ctx.end.strftime("%d/%m/%Y"),
+            "phong_ban": department,
+        }
+    )
+
+
+def _report(request):
+    form = ReportFilterForm(request.GET)
+    form.is_valid()
+    ctx = form.context()
+    return form, ctx, reports.build_report(ctx)
+
+
+@role_required(*ALL_ROLES)
+@require_GET
+def report_page(request):
+    form, ctx, report = _report(request)
+    can_export = role_code(request.user) in ALL_STAFF
+    query = _query(ctx)
+    actions = (
+        [
+            {"label": "In", "kind": "secondary", "url": f"/bao-cao/in/?{query}"},
+            {"label": "Xuất Excel", "kind": "secondary", "url": f"/bao-cao/xuat-excel/?{query}"},
+        ]
+        if can_export
+        else []
+    )
+    chart_data = chart(
+        "chart-report",
+        report.headline,
+        f"Biểu đồ cột: {report.title}, đơn vị {report.unit}",
+        report.chart,
+    )
+    return render(
+        request,
+        "reports/report.html",
+        {
+            "form": form,
+            "report": report,
+            "chart": chart_data,
+            "header_actions": actions,
+        },
+    )
+
+
+def _log_report(request, event, report):
+    log(
+        event,
+        user=request.user,
+        object_type="report",
+        object_id=report.code,
+        object_repr=report.title,
+        note=f"{len(report.rows)} dòng; {report.filters}",
+        request=request,
+    )
+
+
+@role_required(*STAFF)
+@require_GET
+def report_export(request):
+    form, ctx, report = _report(request)
+    if form.errors:  # không xuất khi bộ lọc sai: quay lại trang để sửa
+        messages.error(request, "Bộ lọc báo cáo chưa hợp lệ. Hãy kiểm tra lại rồi xuất.")
+        return redirect(f"/bao-cao/?{request.GET.urlencode()}")
+    _log_report(request, AuditAction.EXPORT, report)
+    book = reports.workbook(report, request.user)
+    stamp = timezone.localdate().strftime("%Y%m%d")
+    return excel.xlsx_response(book, f"Bao-cao-{report.code}-{stamp}.xlsx")
+
+
+@role_required(*STAFF)
+@require_GET
+def report_print(request):
+    form, ctx, report = _report(request)
+    if form.errors:
+        messages.error(request, "Bộ lọc báo cáo chưa hợp lệ. Hãy kiểm tra lại rồi in.")
+        return redirect(f"/bao-cao/?{request.GET.urlencode()}")
+    _log_report(request, AuditAction.PRINT, report)
+    return render(
+        request,
+        "reports/report_print.html",
+        {
+            "report": report,
+            "printed_on": timezone.localdate(),
+            "printed_by": request.user.full_name or request.user.username,
         },
     )

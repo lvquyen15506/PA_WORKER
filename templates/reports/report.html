@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Thống kê báo cáo{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Thống kê báo cáo" actions=header_actions %}
+{% include "components/_filter_bar.html" with form=form reset_url="/bao-cao/" %}
+<h2 class="pa-section__title">{{ report.title }}</h2>
+<p class="pa-small pa-muted">{{ report.scope }}</p>
+{% if report.has_data %}
+  {% include "reports/_chart.html" with chart=chart %}
+  {% include "components/_table.html" with columns=report.columns rows=report.table_rows %}
+{% else %}
+  {% include "components/_empty_state.html" with text="Không có số liệu trong khoảng đã chọn." %}
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script src="{% static 'js/pa-charts.js' %}"></script>
+{% endblock %}

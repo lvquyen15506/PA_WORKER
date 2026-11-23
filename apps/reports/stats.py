@@ -358,45 +358,57 @@ def months_between(start, end):
 
 
 def last_12_months(today=None):
+    """(ngày đầu tháng cách đây 11 tháng, ngày cuối tháng hiện tại): đủ 12 tháng nguyên."""
     today = today or timezone.localdate()
-    return add_months(today.replace(day=1), -11), today
+    return add_months(today.replace(day=1), -11), month_bounds(today)[1]
+
+
+def _in_department(qs, department, prefix):
+    """Lọc theo phòng ban (hoặc NO_SECTION) trên đường dẫn `prefix` tới Employment."""
+    if department == NO_SECTION:
+        return qs.filter(**{f"{prefix}section__isnull": True})
+    if department is not None:
+        return qs.filter(**{f"{prefix}section__department": department})
+    return qs
 
 
 def _label(year_month):
     return f"{year_month[1]:02d}/{year_month[0]}"
 
 
-def hires_and_exits(start, end):
-    """[(tháng, vào làm, nghỉ việc)] theo ngày bắt đầu và ngày nghỉ việc (Đã nghỉ việc)."""
-    first = start.replace(day=1)
-    last = month_bounds(end)[1]
+def hires_and_exits(start, end, department=None):
+    """[(tháng, vào làm, nghỉ việc)] theo ngày bắt đầu và ngày nghỉ việc (Đã nghỉ việc), trong
+    khoảng ngày [start, end] (tháng ở hai đầu có thể chỉ tính một phần)."""
+    employments = _in_department(Employment.objects.all(), department, "")
     hires = Counter(
         (d.year, d.month)
-        for d in Employment.objects.filter(start_date__range=(first, last)).values_list(
+        for d in employments.filter(start_date__range=(start, end)).values_list(
             "start_date", flat=True
         )
     )
     exits = Counter(
         (d.year, d.month)
-        for d in Employment.objects.filter(
-            work_status=WorkStatus.RESIGNED, resign_date__range=(first, last)
+        for d in employments.filter(
+            work_status=WorkStatus.RESIGNED, resign_date__range=(start, end)
         ).values_list("resign_date", flat=True)
     )
     return [(_label(m), hires.get(m, 0), exits.get(m, 0)) for m in months_between(start, end)]
 
 
-def new_workers_by_month(start, end):
-    """[(tháng, số hồ sơ mới)] theo ngày tạo hồ sơ (giờ Việt Nam)."""
-    first = start.replace(day=1)
-    last = month_bounds(end)[1]
-    low = timezone.make_aware(datetime.datetime.combine(first, datetime.time.min))
+def new_workers_by_month(start, end, department=None):
+    """[(tháng, số hồ sơ mới)] theo ngày tạo hồ sơ (giờ Việt Nam) trong khoảng [start, end].
+    Có lọc phòng ban thì chỉ tính hồ sơ đã có thông tin làm việc ở phòng ban đó."""
+    low = timezone.make_aware(datetime.datetime.combine(start, datetime.time.min))
     high = timezone.make_aware(
-        datetime.datetime.combine(last + datetime.timedelta(days=1), datetime.time.min)
+        datetime.datetime.combine(end + datetime.timedelta(days=1), datetime.time.min)
     )
+    workers = Worker.objects.filter(created_at__gte=low, created_at__lt=high)
+    if department is not None:
+        workers = _in_department(
+            workers.filter(employment__isnull=False), department, "employment__"
+        )
     counts = Counter()
-    for stamp in Worker.objects.filter(created_at__gte=low, created_at__lt=high).values_list(
-        "created_at", flat=True
-    ):
+    for stamp in workers.values_list("created_at", flat=True):
         local = timezone.localtime(stamp)
         counts[(local.year, local.month)] += 1
     return [(_label(m), counts.get(m, 0)) for m in months_between(start, end)]

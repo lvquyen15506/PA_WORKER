@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ report.title }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title=report.title %}
+<div class="mb-3 d-print-none"><button class="btn btn-primary" type="button" onclick="window.print()">In báo cáo</button></div>
+<section class="pa-form-section">
+  <p class="mb-1">{{ report.scope }}</p>
+  <p class="pa-small pa-muted">Ngày lập: {{ printed_on|date:"d/m/Y" }} · Người lập: {{ printed_by }}</p>
+  {% if report.has_data %}
+    {% include "components/_table.html" with columns=report.columns rows=report.table_rows %}
+  {% else %}
+    {% include "components/_empty_state.html" with text="Không có số liệu trong khoảng đã chọn." %}
+  {% endif %}
+</section>
+{% endblock %}
