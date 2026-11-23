@@ -2,7 +2,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
 {% include "components/_page_header.html" with title=page_title actions=print_actions %}
-<div class="mb-3 d-print-none"><button class="btn btn-primary" type="button" onclick="window.print()">In văn bản</button></div>
+<div class="mb-3 d-print-none"><button class="btn btn-primary" type="button" data-pa-print>In văn bản</button></div>
 <section class="pa-form-section">
   <p><strong>[TÊN DOANH NGHIỆP]</strong></p>
   <h2 class="pa-card-title">VĂN BẢN ĐỒNG Ý XỬ LÝ DỮ LIỆU CÁ NHÂN</h2>

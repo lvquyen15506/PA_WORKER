@@ -86,6 +86,7 @@ AUTH_USER_MODEL = "accounts.User"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "apps.core.middleware.RequestSizeLimitMiddleware",
+    "apps.core.middleware.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

@@ -103,6 +103,20 @@
         putInto(btn.dataset.paTarget, btn.dataset.paInsertValue, "");
       });
     });
+
+    // Nút in của các trang in (thay onclick nội tuyến, để CSP chặn được mọi script nội tuyến)
+    document.querySelectorAll("[data-pa-print]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        window.print();
+      });
+    });
+
+    // Mở lại hộp xác nhận có lỗi sau khi máy chủ trả form (chi tiết hồ sơ)
+    var reopen = document.querySelector("[data-pa-open-modal]");
+    if (reopen) {
+      var modalEl = document.getElementById(reopen.dataset.paOpenModal);
+      if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
   });
 
   // HTMX gửi kèm CSRF token

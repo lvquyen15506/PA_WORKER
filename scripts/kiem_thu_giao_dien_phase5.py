@@ -44,11 +44,15 @@ def run_size(browser, size_name, size, cards):
     # ===== Admin: Cài đặt =====
     ctx, page = new_page(browser, size)
     login(page, "admin")
+    # Từ Phase 6, /cai-dat/ chuyển về tab đầu tiên là Danh mục (trang.md 5.2); tab OCR và QR
+    # mở bằng địa chỉ riêng.
     status = goto(page, "/cai-dat/")
     check(
-        f"[{s}] Admin: /cai-dat/ chuyển tới tab OCR và QR",
-        page.url.endswith("/cai-dat/ocr-qr/") and status == 200,
+        f"[{s}] Admin: /cai-dat/ chuyển tới tab đầu tiên (Danh mục)",
+        "/cai-dat/danh-muc/" in page.url and status == 200,
     )
+    status = goto(page, "/cai-dat/ocr-qr/")
+    check(f"[{s}] Admin: mở được tab OCR và QR", status == 200)
     check(
         f"[{s}] Admin: có tab OCR và QR và 2 khối cấu hình QR",
         page.locator("a.nav-link.active:has-text('OCR và QR')").count() == 1

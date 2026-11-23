@@ -27,5 +27,5 @@
 {% endif %}
 {% endblock %}
 {% block scripts %}
-{% if open_modal %}<script>document.addEventListener("DOMContentLoaded", function () { bootstrap.Modal.getOrCreateInstance(document.getElementById("{{ open_modal }}")).show(); });</script>{% endif %}
+{% if open_modal %}<span hidden data-pa-open-modal="{{ open_modal }}"></span>{% endif %}
 {% endblock %}

@@ -213,7 +213,8 @@ def test_thieu_ly_do_hien_lai_hop_thoai_voi_loi_duoi_o(action, prefix, modal, re
     page = text(response)
     assert response.status_code == 200 and status_of(worker) == VS.PENDING
     assert "Nhập lý do." in page
-    assert f'getElementById("{modal}")' in page  # hộp mở sẵn để thấy lỗi
+    # hộp mở sẵn để thấy lỗi (Phase 8: pa.js mở theo data-pa-open-modal, không còn script nội tuyến)
+    assert f'data-pa-open-modal="{modal}"' in page
     assert "Không ghi họ tên, chỉ dùng mã hồ sơ." in page  # gợi ý câu 30
 
 
@@ -392,7 +393,7 @@ def test_an_danh_thieu_hoac_sai_thong_tin_hien_loi_duoi_o_va_khong_an_danh(overr
     )
     page = text(response)
     assert response.status_code == 200 and message in page
-    assert 'getElementById("anonymize-modal")' in page
+    assert 'data-pa-open-modal="anonymize-modal"' in page
     assert Worker.objects.get(pk=worker.pk).anonymized_at is None
     assert not AnonymizationRecord.objects.exists()
 

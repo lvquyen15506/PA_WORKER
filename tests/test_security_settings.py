@@ -151,3 +151,54 @@ def test_cookie_va_header_mac_dinh():
     assert settings.X_FRAME_OPTIONS == "DENY"
     assert settings.SECURE_REFERRER_POLICY == "same-origin"
     assert "*" not in settings.ALLOWED_HOSTS
+
+
+# --- Mục 12: CSP cho mọi trang, không có script/style nội tuyến -----------------------------
+@pytest.mark.django_db
+def test_moi_trang_co_csp_khong_cho_script_noi_tuyen():
+    from apps.core.middleware import CONTENT_SECURITY_POLICY
+
+    for response in (
+        Client().get("/dang-nhap/"),
+        login(make_user("HR_STAFF")).get("/"),
+        Client().get("/khong-co-trang-nay/"),
+    ):
+        csp = response["Content-Security-Policy"]
+        assert csp == CONTENT_SECURITY_POLICY
+        assert "unsafe-inline" not in csp and "unsafe-eval" not in csp
+        assert "script-src 'self'" in csp and "frame-ancestors 'none'" in csp
+
+
+@pytest.mark.django_db
+def test_xem_tai_lieu_giu_csp_sandbox():
+    from tests.factories import make_document, make_worker
+
+    hr = make_user("HR_STAFF")
+    doc = make_document(make_worker(created_by=hr))
+    response = login(hr).get(f"/tai-lieu/{doc.pk}/xem/")
+    assert response.status_code == 200
+    assert response["Content-Security-Policy"] == "sandbox"
+
+
+def test_template_khong_co_script_va_su_kien_noi_tuyen():
+    import re
+
+    script_inline = re.compile(r"<script(?![^>]*\bsrc=)[^>]*>", re.I)
+    handler = re.compile(r"\son[a-z]+\s*=", re.I)
+    found = []
+    for path in (ROOT / "templates").rglob("*.html"):
+        text = path.read_text(encoding="utf-8")
+        for pattern in (script_inline, handler):
+            for m in pattern.finditer(text):
+                # json_script sinh thẻ <script type="application/json"> (dữ liệu, không chạy)
+                if "application/json" in m.group(0):
+                    continue
+                found.append(f"{path.relative_to(ROOT)}: {m.group(0)}")
+        if "javascript:" in text:
+            found.append(f"{path.relative_to(ROOT)}: javascript:")
+    assert found == []
+
+
+def test_htmx_tat_style_tu_chen_va_eval():
+    base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
+    assert '"includeIndicatorStyles": false' in base and '"allowEval": false' in base
