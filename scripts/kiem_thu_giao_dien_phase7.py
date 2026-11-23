@@ -42,7 +42,7 @@ def visit(page, size_name, role, path, expected, shot=None):
 
 
 def audit_detail_url(page):
-    goto(page, "/nhat-ky/?hanh_dong=IMPORT")
+    goto(page, "/nhat-ky/")
     link = page.locator("a[aria-label='Xem chi tiết']").first
     return link.get_attribute("href") if link.count() else None
 
