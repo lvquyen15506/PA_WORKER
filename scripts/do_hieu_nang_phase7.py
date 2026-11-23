@@ -106,7 +106,8 @@ def build_import_file(rows, with_work):
             "date_of_birth": "15/03/1995",
             "gender": "Nam",
             "id_doc_type": "CCCD gắn chip (mẫu 2021)",
-            "id_number": f"996{(stamp * 1000 + i) % 1000000000:09d}",
+            # Số CCCD giả luôn bắt đầu 999 (CLAUDE.md); dải 9997… riêng cho đo hiệu năng.
+            "id_number": f"9997{(stamp * 1000 + i) % 100000000:08d}",
             "issue_date": "20/06/2023",
             "contact_name": "Người Thân",
             "contact_relationship": "Anh",

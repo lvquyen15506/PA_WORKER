@@ -1,0 +1,90 @@
+ĐẠT  [1366x768] Admin: /cai-dat/ chuyển tới tab đầu tiên (Danh mục)
+ĐẠT  [1366x768] Admin: mở được tab OCR và QR
+ĐẠT  [1366x768] Admin: có tab OCR và QR và 2 khối cấu hình QR
+ĐẠT  [1366x768] Admin: không cuộn ngang
+ĐẠT  [1366x768] Admin: API OCR ngoài tắt, không có cảnh báo
+ĐẠT  [1366x768] Admin: cấu hình thiếu Số CCCD bị báo lỗi
+ĐẠT  [1366x768] Admin: có tóm tắt lỗi đầu trang
+ĐẠT  [1366x768] Admin: ngưỡng 0 bị báo lỗi
+ĐẠT  [1366x768] Admin: lưu thành công có thông báo
+ĐẠT  [1366x768] Admin: bật API ngoài hiện cảnh báo gửi ảnh ra ngoài
+ĐẠT  [1366x768] Admin: trả cài đặt về mặc định
+ĐẠT  [1366x768] quanly: /cai-dat/ bị 403
+ĐẠT  [1366x768] hr: /cai-dat/ bị 403
+ĐẠT  [1366x768] viewer: /cai-dat/ bị 403
+ĐẠT  [1366x768] viewer: /nhap-cccd/ bị 403
+ĐẠT  [1366x768] HR: thẻ 'Từ CCCD và CV' ở trang Thêm hồ sơ mở được
+ĐẠT  [1366x768] HR: trang tải ảnh mở được, có ô Loại giấy tờ
+ĐẠT  [1366x768] HR: không cuộn ngang ở trang tải ảnh
+ĐẠT  [1366x768] HR: không chọn tệp nào thì báo lỗi
+ĐẠT  [1366x768] HR: tệp PDF ở ô ảnh bị từ chối bằng tiếng Việt
+ĐẠT  [1366x768] HR: nhận diện xong chuyển tới màn hình đối chiếu
+ĐẠT  [1366x768] HR: có nhãn nguồn QR và OCR
+ĐẠT  [1366x768] HR: không có trường tô vàng
+ĐẠT  [1366x768] HR: nút Lưu hồ sơ bật
+ĐẠT  [1366x768] HR: số CCCD điền đúng từ QR
+ĐẠT  [1366x768] HR: có ảnh hai mặt, nút Phóng to và Xoay ảnh
+ĐẠT  [1366x768] HR: ảnh tải được (có kích thước)
+ĐẠT  [1366x768] HR: không cuộn ngang ở màn hình đối chiếu
+ĐẠT  [1366x768] HR: sửa ô họ tên thì nhãn nguồn thành Nhập tay
+ĐẠT  [1366x768] HR: lưu xong mở chi tiết hồ sơ Nháp
+ĐẠT  [1366x768] HR: thẻ ảnh mờ có trường tô vàng
+ĐẠT  [1366x768] HR: nút Lưu hồ sơ bị khóa
+ĐẠT  [1366x768] HR: hiện cảnh báo ảnh mờ
+ĐẠT  [1366x768] HR: tích thiếu một ô thì vẫn khóa
+ĐẠT  [1366x768] HR: tích đủ thì nút Lưu bật
+ĐẠT  [1366x768] HR: hủy phiên chuyển về Thêm hồ sơ có thông báo
+ĐẠT  [1366x768] HR: xoay ảnh đổi chiều ảnh
+ĐẠT  [1366x768] HR: xoay ảnh có thông báo
+ĐẠT  [1366x768] HR: CV hiện văn bản trích
+ĐẠT  [1366x768] HR: gợi ý SĐT và email từ CV
+ĐẠT  [1366x768] HR: gợi ý chưa tự điền vào hồ sơ
+ĐẠT  [1366x768] HR: chưa bôi đen thì hiện nhắc
+ĐẠT  [1366x768] HR: đoạn bôi đen vào ô Kỹ năng
+ĐẠT  [1366x768] HR: bấm gợi ý SĐT điền vào ô SĐT
+ĐẠT  [1366x768] HR: thiếu họ tên bị báo lỗi, phiên còn nguyên
+ĐẠT  [390x844] Admin: /cai-dat/ chuyển tới tab đầu tiên (Danh mục)
+ĐẠT  [390x844] Admin: mở được tab OCR và QR
+ĐẠT  [390x844] Admin: có tab OCR và QR và 2 khối cấu hình QR
+ĐẠT  [390x844] Admin: không cuộn ngang
+ĐẠT  [390x844] Admin: API OCR ngoài tắt, không có cảnh báo
+ĐẠT  [390x844] Admin: cấu hình thiếu Số CCCD bị báo lỗi
+ĐẠT  [390x844] Admin: có tóm tắt lỗi đầu trang
+ĐẠT  [390x844] Admin: ngưỡng 0 bị báo lỗi
+ĐẠT  [390x844] quanly: /cai-dat/ bị 403
+ĐẠT  [390x844] hr: /cai-dat/ bị 403
+ĐẠT  [390x844] viewer: /cai-dat/ bị 403
+ĐẠT  [390x844] viewer: /nhap-cccd/ bị 403
+ĐẠT  [390x844] HR: thẻ 'Từ CCCD và CV' ở trang Thêm hồ sơ mở được
+ĐẠT  [390x844] HR: trang tải ảnh mở được, có ô Loại giấy tờ
+ĐẠT  [390x844] HR: không cuộn ngang ở trang tải ảnh
+ĐẠT  [390x844] HR: không chọn tệp nào thì báo lỗi
+ĐẠT  [390x844] HR: tệp PDF ở ô ảnh bị từ chối bằng tiếng Việt
+ĐẠT  [390x844] HR: nhận diện xong chuyển tới màn hình đối chiếu
+ĐẠT  [390x844] HR: có nhãn nguồn QR và OCR
+ĐẠT  [390x844] HR: không có trường tô vàng
+ĐẠT  [390x844] HR: nút Lưu hồ sơ bật
+ĐẠT  [390x844] HR: số CCCD điền đúng từ QR
+ĐẠT  [390x844] HR: có ảnh hai mặt, nút Phóng to và Xoay ảnh
+ĐẠT  [390x844] HR: ảnh tải được (có kích thước)
+ĐẠT  [390x844] HR: không cuộn ngang ở màn hình đối chiếu
+ĐẠT  [390x844] HR: sửa ô họ tên thì nhãn nguồn thành Nhập tay
+ĐẠT  [390x844] HR: lưu xong mở chi tiết hồ sơ Nháp
+ĐẠT  [390x844] HR: thẻ ảnh mờ có trường tô vàng
+ĐẠT  [390x844] HR: nút Lưu hồ sơ bị khóa
+ĐẠT  [390x844] HR: hiện cảnh báo ảnh mờ
+ĐẠT  [390x844] HR: tích thiếu một ô thì vẫn khóa
+ĐẠT  [390x844] HR: tích đủ thì nút Lưu bật
+ĐẠT  [390x844] HR: hủy phiên chuyển về Thêm hồ sơ có thông báo
+ĐẠT  [390x844] HR: xoay ảnh đổi chiều ảnh
+ĐẠT  [390x844] HR: xoay ảnh có thông báo
+ĐẠT  [390x844] HR: CV hiện văn bản trích
+ĐẠT  [390x844] HR: gợi ý SĐT và email từ CV
+ĐẠT  [390x844] HR: gợi ý chưa tự điền vào hồ sơ
+ĐẠT  [390x844] HR: chưa bôi đen thì hiện nhắc
+ĐẠT  [390x844] HR: đoạn bôi đen vào ô Kỹ năng
+ĐẠT  [390x844] HR: bấm gợi ý SĐT điền vào ô SĐT
+ĐẠT  [390x844] HR: thiếu họ tên bị báo lỗi, phiên còn nguyên
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+
+Tổng: 88 bước, đạt 88, lỗi 0

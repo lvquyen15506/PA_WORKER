@@ -1,0 +1,37 @@
+ĐẠT  [chuẩn bị] HR lưu hồ sơ Nháp
+ĐẠT  [2] Viewer mở được hồ sơ
+ĐẠT  [2] Số CCCD bị che
+ĐẠT  [2] Không có trường nhạy cảm và nút Hiện số đầy đủ
+ĐẠT  [2] Gọi thẳng đường dẫn sửa bị từ chối (403)
+ĐẠT  [2] Gọi thẳng đường dẫn tải tệp bị từ chối (403)
+ĐẠT  [2] Gọi thẳng đường dẫn xem tệp bị từ chối (403)
+ĐẠT  [2] Viewer POST sửa/gửi duyệt bị 403
+Traceback (most recent call last):
+  File "D:\Workspace\PA_WORKER\scripts\nghiem_thu_phase4.py", line 212, in <module>
+    hr.wait_for_selector("#duplicate-check .alert", timeout=5000)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 21403, in wait_for_selector
+    self._sync(
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 124, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\page.py", line 464, in wait_for_selector
+    return await self._main_frame.wait_for_selector(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\frame.py", line 418, in wait_for_selector
+    result = await self._channel.waitForSelector(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 398, in _mapped
+    return mapper(await awaitable)
+                  ^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 387, in finish
+    raise e from None
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 352, in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\utils\zones.py", line 58, in run_async
+    return await func()
+           ^^^^^^^^^^^^
+playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("#duplicate-check .alert") to be visible
+

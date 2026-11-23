@@ -66,10 +66,21 @@ def scenario_3(browser, cards):
         tags = page.locator(".pa-source:has-text('QR')").count()
         if i == 0:
             pw.shot(OUT, page, S, "k3-doi-chieu-qr")
-        check(
-            f"K3 thẻ {c['id']} ({c['doc_type']}): có nhãn nguồn QR, không tô vàng",
-            tags >= len(c["qr_fields"]) - 1 and page.locator(".pa-field--low").count() == 0,
+        # Tiêu chí kịch bản 3 (mục X): trường CÓ TRONG QR điền đúng, không tô vàng. Trường không
+        # có trong QR (đọc bằng OCR, ví dụ nơi đăng ký khai sinh của Căn cước 2024) có thể tô vàng
+        # tùy chữ của thẻ giả sinh ngẫu nhiên; HR đối chiếu và tích Đã kiểm tra như thao tác thật.
+        low = page.evaluate(
+            "[...document.querySelectorAll('.pa-field--low input, .pa-field--low select')]"
+            ".map(e => e.name)"
         )
+        low_qr = [name for name in low if name in c["qr_fields"]]
+        check(
+            f"K3 thẻ {c['id']} ({c['doc_type']}): có nhãn nguồn QR, trường QR không tô vàng",
+            tags >= len(c["qr_fields"]) - 1 and not low_qr,
+            str(low_qr),
+        )
+        for box in page.locator("[data-pa-checked]").all():
+            box.check()
         page.fill("input[name=phone]", "0900000001")
         page.click("button[data-pa-gate]")
         page.wait_for_load_state("networkidle")

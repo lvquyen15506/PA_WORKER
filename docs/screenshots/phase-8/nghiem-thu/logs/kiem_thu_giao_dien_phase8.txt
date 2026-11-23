@@ -1,0 +1,23 @@
+ĐẠT  [1366x768] Đăng nhập: chân trang ghi v1.1.0
+ĐẠT  [1366x768] 404 chưa đăng nhập: tiếng Việt
+ĐẠT  [1366x768] 404: không cuộn ngang
+ĐẠT  [1366x768] 400 sai địa chỉ: hướng dẫn ALLOWED_HOSTS
+ĐẠT  [1366x768] Giới thiệu: phiên bản 1.1.0
+ĐẠT  [1366x768] Chân trang: v1.1.0
+ĐẠT  [1366x768] 404 đã đăng nhập: tiếng Việt
+ĐẠT  [1366x768] Nút In văn bản chạy dưới CSP
+ĐẠT  [1366x768] Nút In báo cáo chạy dưới CSP
+ĐẠT  [1366x768] Lỗi lý do trống: hộp xác nhận tự mở lại
+ĐẠT  [390x844] Đăng nhập: chân trang ghi v1.1.0
+ĐẠT  [390x844] 404 chưa đăng nhập: tiếng Việt
+ĐẠT  [390x844] 404: không cuộn ngang
+ĐẠT  [390x844] 400 sai địa chỉ: hướng dẫn ALLOWED_HOSTS
+ĐẠT  [390x844] Giới thiệu: phiên bản 1.1.0
+ĐẠT  [390x844] Chân trang: v1.1.0
+ĐẠT  [390x844] 404 đã đăng nhập: tiếng Việt
+ĐẠT  [390x844] Nút In văn bản chạy dưới CSP
+ĐẠT  [390x844] Nút In báo cáo chạy dưới CSP
+ĐẠT  [390x844] Lỗi lý do trống: hộp xác nhận tự mở lại
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+
+Tổng: 21 bước, đạt 21, lỗi 0

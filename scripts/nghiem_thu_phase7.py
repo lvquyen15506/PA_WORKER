@@ -260,7 +260,8 @@ def import_row(i, **over):
         "date_of_birth": "15/03/1995",
         "gender": "Nữ",
         "id_doc_type": "CCCD gắn chip (mẫu 2021)",
-        "id_number": f"995{RUN:04d}{i:05d}",
+        # Số CCCD giả luôn bắt đầu 999 (CLAUDE.md); dải 9998… không trùng seed_demo và thẻ giả.
+        "id_number": f"9998{RUN:04d}{i:04d}",
         "issue_date": "20/06/2023",
         "contact_name": "Người Thân",
         "contact_relationship": "Chị",

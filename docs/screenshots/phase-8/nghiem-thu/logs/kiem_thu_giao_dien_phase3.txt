@@ -1,0 +1,83 @@
+ĐẠT  [1366x768] đăng nhập: không có sidebar/thanh trên
+ĐẠT  [1366x768] đăng nhập: có 'PA Worker' và chân trang QQIT
+ĐẠT  [1366x768] đăng nhập: không cuộn ngang
+ĐẠT  [1366x768] đăng nhập sai: hiện thông báo chung
+ĐẠT  [1366x768] admin vào được trang chủ
+ĐẠT  [1366x768] /ui-kit/ mở được
+ĐẠT  [1366x768] /ui-kit/ không cuộn ngang cả trang
+ĐẠT  [1366x768] /ui-kit/ biểu đồ đã vẽ
+ĐẠT  [1366x768] font hệ thống (system-ui)
+ĐẠT  [1366x768] cỡ chữ thân 14px
+ĐẠT  [1366x768] hộp xác nhận: nút khóa khi chưa gõ mã
+ĐẠT  [1366x768] hộp xác nhận: nút bật khi gõ đúng mã
+ĐẠT  [1366x768] menu Thêm mở hộp xác nhận có nội dung
+ĐẠT  [1366x768] thông báo tự ẩn: đang hiện
+ĐẠT  [1366x768] thông báo tự ẩn: biến mất sau 5 giây
+ĐẠT  [1366x768] đối chiếu: nút Lưu khóa khi chưa tích
+ĐẠT  [1366x768] đối chiếu: nút Lưu bật khi đã tích
+ĐẠT  [1366x768] sidebar hiện ở màn hình rộng
+ĐẠT  [1366x768] sidebar rộng 240px
+ĐẠT  [1366x768] /tai-khoan/ không cuộn ngang cả trang
+ĐẠT  [1366x768] /tai-khoan/ có đầu trang
+ĐẠT  [1366x768] /tai-khoan/lich-su-dang-nhap/ không cuộn ngang cả trang
+ĐẠT  [1366x768] /tai-khoan/lich-su-dang-nhap/ có đầu trang
+ĐẠT  [1366x768] /tai-khoan/them/ không cuộn ngang cả trang
+ĐẠT  [1366x768] /tai-khoan/them/ có đầu trang
+ĐẠT  [1366x768] /doi-mat-khau/ không cuộn ngang cả trang
+ĐẠT  [1366x768] /doi-mat-khau/ có đầu trang
+ĐẠT  [1366x768] /gioi-thieu/ không cuộn ngang cả trang
+ĐẠT  [1366x768] /gioi-thieu/ có đầu trang
+ĐẠT  [1366x768] form thêm tài khoản bỏ trống: hiện lỗi dưới ô
+ĐẠT  [1366x768] tài khoản: hộp xác nhận nhận địa chỉ POST
+ĐẠT  [1366x768] quanly: menu có 7 mục
+ĐẠT  [1366x768] quanly: /tai-khoan/ trả 403
+ĐẠT  [1366x768] quanly: trang 403 dùng khung chung
+ĐẠT  [1366x768] hr: menu có 5 mục
+ĐẠT  [1366x768] hr: /ui-kit/ trả 403
+ĐẠT  [1366x768] hr: trang 403 dùng khung chung
+ĐẠT  [1366x768] viewer: menu có 4 mục
+ĐẠT  [1366x768] viewer: /ui-kit/ trả 403
+ĐẠT  [1366x768] viewer: trang 403 dùng khung chung
+ĐẠT  [390x844] đăng nhập: không có sidebar/thanh trên
+ĐẠT  [390x844] đăng nhập: có 'PA Worker' và chân trang QQIT
+ĐẠT  [390x844] đăng nhập: không cuộn ngang
+ĐẠT  [390x844] đăng nhập sai: hiện thông báo chung
+ĐẠT  [390x844] admin vào được trang chủ
+ĐẠT  [390x844] /ui-kit/ mở được
+ĐẠT  [390x844] /ui-kit/ không cuộn ngang cả trang
+ĐẠT  [390x844] /ui-kit/ biểu đồ đã vẽ
+ĐẠT  [390x844] font hệ thống (system-ui)
+ĐẠT  [390x844] cỡ chữ thân 14px
+ĐẠT  [390x844] hộp xác nhận: nút khóa khi chưa gõ mã
+ĐẠT  [390x844] hộp xác nhận: nút bật khi gõ đúng mã
+ĐẠT  [390x844] menu Thêm mở hộp xác nhận có nội dung
+ĐẠT  [390x844] thông báo tự ẩn: đang hiện
+ĐẠT  [390x844] thông báo tự ẩn: biến mất sau 5 giây
+ĐẠT  [390x844] đối chiếu: nút Lưu khóa khi chưa tích
+ĐẠT  [390x844] đối chiếu: nút Lưu bật khi đã tích
+ĐẠT  [390x844] sidebar ẩn ở màn hình hẹp
+ĐẠT  [390x844] nút Menu mở sidebar
+ĐẠT  [390x844] /tai-khoan/ không cuộn ngang cả trang
+ĐẠT  [390x844] /tai-khoan/ có đầu trang
+ĐẠT  [390x844] /tai-khoan/lich-su-dang-nhap/ không cuộn ngang cả trang
+ĐẠT  [390x844] /tai-khoan/lich-su-dang-nhap/ có đầu trang
+ĐẠT  [390x844] /tai-khoan/them/ không cuộn ngang cả trang
+ĐẠT  [390x844] /tai-khoan/them/ có đầu trang
+ĐẠT  [390x844] /doi-mat-khau/ không cuộn ngang cả trang
+ĐẠT  [390x844] /doi-mat-khau/ có đầu trang
+ĐẠT  [390x844] /gioi-thieu/ không cuộn ngang cả trang
+ĐẠT  [390x844] /gioi-thieu/ có đầu trang
+ĐẠT  [390x844] form thêm tài khoản bỏ trống: hiện lỗi dưới ô
+ĐẠT  [390x844] tài khoản: hộp xác nhận nhận địa chỉ POST
+ĐẠT  [390x844] quanly: menu có 7 mục
+ĐẠT  [390x844] quanly: /tai-khoan/ trả 403
+ĐẠT  [390x844] quanly: trang 403 dùng khung chung
+ĐẠT  [390x844] hr: menu có 5 mục
+ĐẠT  [390x844] hr: /ui-kit/ trả 403
+ĐẠT  [390x844] hr: trang 403 dùng khung chung
+ĐẠT  [390x844] viewer: menu có 4 mục
+ĐẠT  [390x844] viewer: /ui-kit/ trả 403
+ĐẠT  [390x844] viewer: trang 403 dùng khung chung
+ĐẠT  không có lỗi console ngoài 403 mong đợi
+
+81/81 bước đạt

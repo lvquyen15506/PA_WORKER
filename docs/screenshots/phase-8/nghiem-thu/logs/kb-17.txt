@@ -1,0 +1,29 @@
+ĐẠT  Chuẩn bị: sửa họ tên một hồ sơ có lương và tài liệu
+ĐẠT  Chuẩn bị: có dữ liệu và tệp
+ĐẠT  Sao luu.bat chạy thành công
+ĐẠT  File sao lưu có ngày giờ trong tên
+ĐẠT  Sao lưu nhắc cất khóa riêng
+   sao lưu pa-worker-20261124-020123.pawbk: 4.2 MB, 4 giây
+ĐẠT  File bị sửa 1 byte: bị từ chối
+ĐẠT  Khóa sai: phục hồi bị từ chối với thông báo tiếng Việt
+ĐẠT  Khóa sai: dữ liệu đang có giữ nguyên
+ĐẠT  docker compose down -v: xóa volume CSDL và tệp
+ĐẠT  Dựng lại: bản cài sạch không có hồ sơ, không có tệp
+ĐẠT  Phuc hoi.bat chạy thành công
+   phục hồi: 19 giây
+ĐẠT  Số dòng mọi bảng khớp trước khi sao lưu
+ĐẠT  Nhật ký: thêm đúng 1 dòng Phục hồi
+ĐẠT  Mọi tệp khớp sha256
+ĐẠT  Giải mã được số CCCD sau phục hồi
+ĐẠT  Giải mã được lương sau phục hồi
+ĐẠT  Họ tên đã sửa trước khi sao lưu còn nguyên
+ĐẠT  Giá trị trước/sau trong nhật ký còn nguyên
+ĐẠT  check_keys: khóa khớp dữ liệu phục hồi
+ĐẠT  Giao diện: hồ sơ hiện họ tên đã sửa
+ĐẠT  Giao diện: Hiện số đầy đủ đúng số CCCD
+ĐẠT  Giao diện: tab Quá trình làm việc mở được
+ĐẠT  Giao diện: xem được tài liệu sau phục hồi
+ĐẠT  Nhật ký thao tác có dòng Phục hồi
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+
+Tổng: 25 bước, đạt 25, lỗi 0

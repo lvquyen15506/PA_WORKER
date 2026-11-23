@@ -1,0 +1,41 @@
+ĐẠT  KB8: Đạt + Đã xác minh → Tiếp nhận sinh mã nhân viên đúng quy tắc CN-nnnnn
+ĐẠT  KB8: mã nhân viên bằng đúng mã kế tiếp theo cấu hình
+ĐẠT  KB8: trạng thái làm việc Chờ nhận việc
+ĐẠT  KB8: xuất hiện ở danh sách Chờ nhận việc
+ĐẠT  KB8: có đúng một dòng lịch sử Tiếp nhận vào làm
+ĐẠT  KB8: thao tác ghi nhật ký (cấp mã và tạo thông tin làm việc)
+ĐẠT  KB9: điều chuyển bộ phận thành công
+ĐẠT  KB9: thông tin hiện tại đổi sang bộ phận mới
+ĐẠT  KB9: lịch sử giữ dòng Tiếp nhận cũ và thêm dòng Điều chuyển mới
+ĐẠT  KB9: lịch sử có đúng 2 dòng (không ghi đè)
+ĐẠT  KB10: thêm hợp đồng hết hạn sau 20 ngày
+ĐẠT  KB10: tab hiện nhãn Sắp hết hạn
+ĐẠT  KB10: danh sách Hợp đồng sắp hết hạn (liên kết của thẻ) có hồ sơ
+ĐẠT  v1.1: Admin tạo công ty khách tại Bình Dương
+ĐẠT  v1.1: Admin tạo công ty khách tại Đồng Nai
+ĐẠT  v1.1: thêm trùng tên + địa điểm (khác hoa thường) bị chặn
+ĐẠT  v1.1: tạo đợt 1
+ĐẠT  v1.1: tạo đợt 2 liền nhau (cùng tên, khác địa điểm)
+ĐẠT  v1.1: thêm đợt thứ ba khi đang có đợt mở bị chặn
+ĐẠT  v1.1: Quản lý thêm lương 8700000
+ĐẠT  v1.1: Quản lý thêm lương 9400000
+ĐẠT  v1.1: tab hiện 2 dòng lịch sử lương, lương hiện tại 9.400.000
+ĐẠT  v1.1: cảnh báo sắp đủ 12 tháng tính từ đầu chuỗi (đợt 1), không phải đợt 2
+ĐẠT  v1.1: tab không cuộn ngang
+ĐẠT  v1.1: hr thấy lương và đơn giá
+ĐẠT  v1.1: hr không có nút ghi nhận lương
+ĐẠT  v1.1: hr gọi thẳng URL thêm lương bị 403
+ĐẠT  v1.1: hr thêm được đợt làm việc
+ĐẠT  v1.1: viewer thấy lương và đơn giá
+ĐẠT  v1.1: viewer không có nút ghi nhận lương
+ĐẠT  v1.1: viewer gọi thẳng URL thêm lương bị 403
+ĐẠT  v1.1: viewer không thêm được đợt làm việc
+ĐẠT  v1.1: lọc theo công ty khách đúng số người (1)
+ĐẠT  v1.1: cột Công ty khách hiện tên và địa điểm
+ĐẠT  v1.1: lọc đợt sắp đủ 12 tháng đúng số người (34) và có hồ sơ vừa tạo
+ĐẠT  v1.1: SQL thô không thấy số lương rõ (đã mã hóa)
+ĐẠT  v1.1: AuditLog.changes không chứa số lương
+ĐẠT  v1.1: giá trị lương nằm ở AuditPersonalValue (2 dòng)
+ĐẠT  Không có lỗi console ngoài 403/404/405 mong đợi
+
+39/39 bước đạt

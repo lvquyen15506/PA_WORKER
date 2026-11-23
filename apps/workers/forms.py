@@ -128,6 +128,10 @@ class WorkerForm(forms.Form):
                         "hx-target": "#duplicate-check",
                         "hx-swap": "innerHTML",
                         "hx-include": "closest form",
+                        # Rời ô SĐT rồi rời ô CCCD gửi hai request cùng ghi vào một khung: request
+                        # mới hủy request cũ còn chờ, để kết quả cũ (chưa có CCCD) không ghi đè
+                        # cảnh báo trùng CCCD khi hai phản hồi về sai thứ tự (Phase 8).
+                        "hx-sync": "closest form:replace",
                     }
                 )
 

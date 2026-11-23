@@ -1,0 +1,151 @@
+ĐẠT  [1366x768] Admin: /cai-dat/ mở tab Danh mục
+ĐẠT  [1366x768] Admin: đủ 4 tab Cài đặt
+ĐẠT  [1366x768] Admin: danh mục không cuộn ngang
+ĐẠT  [1366x768] Admin: chuyển sang danh mục công ty khách
+ĐẠT  [1366x768] Admin: bỏ trống tên công ty bị báo lỗi
+ĐẠT  [1366x768] Admin: thêm công ty khách thành công
+ĐẠT  [1366x768] Admin: bảng công ty khách có cột Địa điểm, không có cột Mã
+ĐẠT  [1366x768] Admin: trùng tên + địa điểm (khác hoa thường) bị chặn
+ĐẠT  [1366x768] Admin: tên chỉ trùng khi bỏ dấu thì lưu được và có cảnh báo
+ĐẠT  [1366x768] Admin: ngừng sử dụng công ty khách
+ĐẠT  [1366x768] Admin: dòng đã ngừng hiện nhãn Ngừng
+ĐẠT  [1366x768] Admin: có loại Bản cam kết
+ĐẠT  [1366x768] Admin: loại tài liệu hệ thống không ngừng được
+ĐẠT  [1366x768] Admin: trang sinh mã có mã kế tiếp
+ĐẠT  [1366x768] Admin: tiền tố có gạch ngang bị báo lỗi
+ĐẠT  [1366x768] Admin: trang ngưỡng có ô thời hạn đợt làm việc
+ĐẠT  [1366x768] Admin: trang ngưỡng không cuộn ngang
+ĐẠT  [1366x768] Admin: ngưỡng 0 bị báo lỗi
+ĐẠT  [1366x768] quanly: danh mục, sinh mã, ngưỡng đều 403
+ĐẠT  [1366x768] hr: danh mục, sinh mã, ngưỡng đều 403
+ĐẠT  [1366x768] viewer: danh mục, sinh mã, ngưỡng đều 403
+ĐẠT  [1366x768] HR: tab Tuyển dụng có 4 nút thêm
+ĐẠT  [1366x768] HR: tab Tuyển dụng không cuộn ngang
+ĐẠT  [1366x768] HR: Không đạt thiếu lý do bị báo lỗi
+ĐẠT  [1366x768] HR: thêm lần ứng tuyển thành công
+ĐẠT  [1366x768] HR: bảng hiện mức lương 8.500.000 đ và nhãn Không đạt
+ĐẠT  [1366x768] HR: năm kết thúc trước năm bắt đầu bị báo lỗi
+ĐẠT  [1366x768] HR: thêm học vấn thành công
+ĐẠT  [1366x768] HR: xóa dòng học vấn qua hộp xác nhận
+ĐẠT  [1366x768] Viewer: thấy mức lương mong muốn, không có nút thêm/sửa
+ĐẠT  [1366x768] Viewer: gọi thẳng URL thêm bị 403
+ĐẠT  [1366x768] Viewer: /tuyen-dung/ mở được, có cột Mức lương
+ĐẠT  [1366x768] Viewer: /tuyen-dung/ không cuộn ngang
+ĐẠT  [1366x768] Quản lý: lọc Không đạt thấy hồ sơ thử
+ĐẠT  [1366x768] Quản lý: lọc nhiều trạng thái không thấy hồ sơ Không đạt
+ĐẠT  [1366x768] HR: mở form Tiếp nhận vào làm
+ĐẠT  [1366x768] HR: ngày bắt đầu trước ngày tiếp nhận và mã quản lý sai bị báo lỗi
+ĐẠT  [1366x768] HR: ngày bắt đầu trước ngày tiếp nhận bị báo lỗi
+ĐẠT  [1366x768] HR: tiếp nhận thành công, có mã nhân viên
+ĐẠT  [1366x768] HR: trạng thái Chờ nhận việc
+ĐẠT  [1366x768] HR: tab Quá trình làm việc không cuộn ngang
+ĐẠT  [1366x768] HR: không còn nút Tiếp nhận vào làm cho lần đã tiếp nhận
+ĐẠT  [1366x768] HR: không đổi gì bị báo lỗi
+ĐẠT  [1366x768] HR: nghỉ việc thiếu ngày và lý do bị báo lỗi
+ĐẠT  [1366x768] HR: đổi trạng thái thành công
+ĐẠT  [1366x768] HR: lịch sử giữ dòng Tiếp nhận và thêm dòng Đổi trạng thái
+ĐẠT  [1366x768] HR: hợp đồng xác định thời hạn thiếu ngày hết hạn bị báo lỗi
+ĐẠT  [1366x768] HR: thêm hợp đồng thành công
+ĐẠT  [1366x768] HR: hợp đồng sắp hết hạn có nhãn Sắp hết hạn và nút tải tệp
+ĐẠT  [1366x768] HR: lọc hợp đồng sắp hết hạn thấy hồ sơ vừa thêm
+ĐẠT  [1366x768] Viewer: thấy lịch sử và hợp đồng, không có nút thao tác
+ĐẠT  [1366x768] Viewer: gọi thẳng các URL ghi nhận bị 403
+ĐẠT  [1366x768] Quản lý: tab có nút Thêm đợt làm việc
+ĐẠT  [1366x768] Quản lý: thiếu công ty, vị trí, ngày bắt đầu bị báo lỗi
+ĐẠT  [1366x768] Quản lý: thêm đợt 1 thành công
+ĐẠT  [1366x768] Quản lý: đợt chồng lấn ngày bị báo lỗi
+ĐẠT  [1366x768] Quản lý: thêm đợt 2 (cùng tên, khác địa điểm) thành công
+ĐẠT  [1366x768] Quản lý: cảnh báo sắp đủ 12 tháng tính từ đầu chuỗi và nhãn Sắp hết hạn
+ĐẠT  [1366x768] Quản lý: tab đợt/lương không cuộn ngang
+ĐẠT  [1366x768] Quản lý: thiếu lương, ngày, lý do bị báo lỗi
+ĐẠT  [1366x768] Quản lý: ngày áp dụng ngoài khoảng đợt bị báo lỗi
+ĐẠT  [1366x768] Quản lý: ghi nhận lương lần 1
+ĐẠT  [1366x768] Quản lý: form lương điền sẵn khoản cũ
+ĐẠT  [1366x768] Quản lý: ghi nhận lương lần 2
+ĐẠT  [1366x768] Quản lý: lịch sử lương có 2 dòng, lương hiện tại 9.200.000
+ĐẠT  [1366x768] HR: thấy lương, không có nút Ghi nhận thay đổi lương, có nút Thêm đợt làm việc
+ĐẠT  [1366x768] HR: gọi thẳng URL ghi nhận lương bị 403
+ĐẠT  [1366x768] Viewer: thấy lương và đơn giá, không có nút, không thấy ghi chú/lý do
+ĐẠT  [1366x768] Viewer: gọi thẳng URL lương và thêm đợt bị 403
+ĐẠT  [1366x768] HR: danh sách có cột Công ty khách, không còn cột Bộ phận, vẫn 12 cột
+ĐẠT  [1366x768] HR: lọc theo công ty khách thấy công nhân vừa thêm đợt
+ĐẠT  [1366x768] HR: lọc đợt sắp đủ 12 tháng thấy công nhân vừa thêm
+ĐẠT  [1366x768] HR: lọc Chưa có bộ phận chạy được
+ĐẠT  [1366x768] HR: danh sách không cuộn ngang
+ĐẠT  [390x844] Admin: /cai-dat/ mở tab Danh mục
+ĐẠT  [390x844] Admin: đủ 4 tab Cài đặt
+ĐẠT  [390x844] Admin: danh mục không cuộn ngang
+ĐẠT  [390x844] Admin: chuyển sang danh mục công ty khách
+ĐẠT  [390x844] Admin: bỏ trống tên công ty bị báo lỗi
+ĐẠT  [390x844] Admin: thêm công ty khách thành công
+ĐẠT  [390x844] Admin: bảng công ty khách có cột Địa điểm, không có cột Mã
+ĐẠT  [390x844] Admin: trùng tên + địa điểm (khác hoa thường) bị chặn
+ĐẠT  [390x844] Admin: tên chỉ trùng khi bỏ dấu thì lưu được và có cảnh báo
+ĐẠT  [390x844] Admin: ngừng sử dụng công ty khách
+ĐẠT  [390x844] Admin: dòng đã ngừng hiện nhãn Ngừng
+ĐẠT  [390x844] Admin: có loại Bản cam kết
+ĐẠT  [390x844] Admin: loại tài liệu hệ thống không ngừng được
+ĐẠT  [390x844] Admin: trang sinh mã có mã kế tiếp
+ĐẠT  [390x844] Admin: tiền tố có gạch ngang bị báo lỗi
+ĐẠT  [390x844] Admin: trang ngưỡng có ô thời hạn đợt làm việc
+ĐẠT  [390x844] Admin: trang ngưỡng không cuộn ngang
+ĐẠT  [390x844] Admin: ngưỡng 0 bị báo lỗi
+ĐẠT  [390x844] quanly: danh mục, sinh mã, ngưỡng đều 403
+ĐẠT  [390x844] hr: danh mục, sinh mã, ngưỡng đều 403
+ĐẠT  [390x844] viewer: danh mục, sinh mã, ngưỡng đều 403
+ĐẠT  [390x844] HR: tab Tuyển dụng có 4 nút thêm
+ĐẠT  [390x844] HR: tab Tuyển dụng không cuộn ngang
+ĐẠT  [390x844] HR: Không đạt thiếu lý do bị báo lỗi
+ĐẠT  [390x844] HR: thêm lần ứng tuyển thành công
+ĐẠT  [390x844] HR: bảng hiện mức lương 8.500.000 đ và nhãn Không đạt
+ĐẠT  [390x844] HR: năm kết thúc trước năm bắt đầu bị báo lỗi
+ĐẠT  [390x844] HR: thêm học vấn thành công
+ĐẠT  [390x844] HR: xóa dòng học vấn qua hộp xác nhận
+ĐẠT  [390x844] Viewer: thấy mức lương mong muốn, không có nút thêm/sửa
+ĐẠT  [390x844] Viewer: gọi thẳng URL thêm bị 403
+ĐẠT  [390x844] Viewer: /tuyen-dung/ mở được, có cột Mức lương
+ĐẠT  [390x844] Viewer: /tuyen-dung/ không cuộn ngang
+ĐẠT  [390x844] Quản lý: lọc Không đạt thấy hồ sơ thử
+ĐẠT  [390x844] Quản lý: lọc nhiều trạng thái không thấy hồ sơ Không đạt
+ĐẠT  [390x844] HR: mở form Tiếp nhận vào làm
+ĐẠT  [390x844] HR: ngày bắt đầu trước ngày tiếp nhận và mã quản lý sai bị báo lỗi
+ĐẠT  [390x844] HR: ngày bắt đầu trước ngày tiếp nhận bị báo lỗi
+ĐẠT  [390x844] HR: tiếp nhận thành công, có mã nhân viên
+ĐẠT  [390x844] HR: trạng thái Chờ nhận việc
+ĐẠT  [390x844] HR: tab Quá trình làm việc không cuộn ngang
+ĐẠT  [390x844] HR: không còn nút Tiếp nhận vào làm cho lần đã tiếp nhận
+ĐẠT  [390x844] HR: không đổi gì bị báo lỗi
+ĐẠT  [390x844] HR: nghỉ việc thiếu ngày và lý do bị báo lỗi
+ĐẠT  [390x844] HR: đổi trạng thái thành công
+ĐẠT  [390x844] HR: lịch sử giữ dòng Tiếp nhận và thêm dòng Đổi trạng thái
+ĐẠT  [390x844] HR: hợp đồng xác định thời hạn thiếu ngày hết hạn bị báo lỗi
+ĐẠT  [390x844] HR: thêm hợp đồng thành công
+ĐẠT  [390x844] HR: hợp đồng sắp hết hạn có nhãn Sắp hết hạn và nút tải tệp
+ĐẠT  [390x844] HR: lọc hợp đồng sắp hết hạn thấy hồ sơ vừa thêm
+ĐẠT  [390x844] Viewer: thấy lịch sử và hợp đồng, không có nút thao tác
+ĐẠT  [390x844] Viewer: gọi thẳng các URL ghi nhận bị 403
+ĐẠT  [390x844] Quản lý: tab có nút Thêm đợt làm việc
+ĐẠT  [390x844] Quản lý: thiếu công ty, vị trí, ngày bắt đầu bị báo lỗi
+ĐẠT  [390x844] Quản lý: thêm đợt 1 thành công
+ĐẠT  [390x844] Quản lý: đợt chồng lấn ngày bị báo lỗi
+ĐẠT  [390x844] Quản lý: thêm đợt 2 (cùng tên, khác địa điểm) thành công
+ĐẠT  [390x844] Quản lý: cảnh báo sắp đủ 12 tháng tính từ đầu chuỗi và nhãn Sắp hết hạn
+ĐẠT  [390x844] Quản lý: tab đợt/lương không cuộn ngang
+ĐẠT  [390x844] Quản lý: thiếu lương, ngày, lý do bị báo lỗi
+ĐẠT  [390x844] Quản lý: ngày áp dụng ngoài khoảng đợt bị báo lỗi
+ĐẠT  [390x844] Quản lý: ghi nhận lương lần 1
+ĐẠT  [390x844] Quản lý: form lương điền sẵn khoản cũ
+ĐẠT  [390x844] Quản lý: ghi nhận lương lần 2
+ĐẠT  [390x844] Quản lý: lịch sử lương có 2 dòng, lương hiện tại 9.200.000
+ĐẠT  [390x844] HR: thấy lương, không có nút Ghi nhận thay đổi lương, có nút Thêm đợt làm việc
+ĐẠT  [390x844] HR: gọi thẳng URL ghi nhận lương bị 403
+ĐẠT  [390x844] Viewer: thấy lương và đơn giá, không có nút, không thấy ghi chú/lý do
+ĐẠT  [390x844] Viewer: gọi thẳng URL lương và thêm đợt bị 403
+ĐẠT  [390x844] HR: danh sách có cột Công ty khách, không còn cột Bộ phận, vẫn 12 cột
+ĐẠT  [390x844] HR: lọc theo công ty khách thấy công nhân vừa thêm đợt
+ĐẠT  [390x844] HR: lọc đợt sắp đủ 12 tháng thấy công nhân vừa thêm
+ĐẠT  [390x844] HR: lọc Chưa có bộ phận chạy được
+ĐẠT  [390x844] HR: danh sách không cuộn ngang
+ĐẠT  Không có lỗi console ngoài 403/404/405 mong đợi
+
+149/149 bước đạt

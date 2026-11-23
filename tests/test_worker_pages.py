@@ -147,6 +147,8 @@ def test_form_co_thuoc_tinh_htmx_kiem_tra_trung_khi_roi_o():
     html = body(login_client(make_user("HR_STAFF")).get("/ho-so/them/nhap-tay/"))
     assert html.count('hx-post="/ho-so/kiem-tra-trung/"') == 4  # họ tên, SĐT, ngày sinh, CCCD
     assert 'hx-trigger="blur changed"' in html and 'id="duplicate-check"' in html
+    # Phase 8: request kiểm tra mới hủy request cũ (hai phản hồi về sai thứ tự không ghi đè nhau)
+    assert html.count('hx-sync="closest form:replace"') == 4
 
 
 def test_loi_hien_duoi_tung_o_bang_tieng_viet_va_khong_luu():

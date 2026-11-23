@@ -1,0 +1,113 @@
+ĐẠT  [1366x768] HR: danh sách hồ sơ mở được
+ĐẠT  [1366x768] HR: danh sách có 20 dòng
+ĐẠT  [1366x768] HR: phân trang 'Hiển thị 1–20 / n'
+ĐẠT  [1366x768] HR: có 12 cột đúng thứ tự
+ĐẠT  [1366x768] HR: không cuộn ngang cả trang
+ĐẠT  [1366x768] HR: tìm 'nguyen' + lọc Đã xác minh có kết quả
+ĐẠT  [1366x768] HR: không có kết quả hiện trạng thái rỗng
+ĐẠT  [1366x768] HR: trang Thêm hồ sơ có 3 thẻ
+ĐẠT  [1366x768] HR: form báo lỗi 'Nhập họ và tên.'
+ĐẠT  [1366x768] HR: form báo lỗi 'Số CCCD phải gồm 12 chữ số.'
+ĐẠT  [1366x768] HR: form báo lỗi 'Nhập ngày đúng định dạng'
+ĐẠT  [1366x768] HR: form có lỗi vẫn ở trang thêm
+ĐẠT  [1366x768] HR: rời ô CCCD báo trùng (HTMX)
+ĐẠT  [1366x768] HR: có nút Mở hồ sơ cũ
+ĐẠT  [1366x768] HR: lưu Nháp thành công, chuyển tới chi tiết
+ĐẠT  [1366x768] HR: thông báo đã lưu Nháp
+ĐẠT  [1366x768] HR: tab ca-nhan mở được
+ĐẠT  [1366x768] HR: tab ca-nhan không cuộn ngang cả trang
+ĐẠT  [1366x768] HR: tab tuyen-dung mở được
+ĐẠT  [1366x768] HR: tab tuyen-dung không cuộn ngang cả trang
+ĐẠT  [1366x768] HR: tab lam-viec mở được
+ĐẠT  [1366x768] HR: tab lam-viec không cuộn ngang cả trang
+ĐẠT  [1366x768] HR: tab tai-lieu mở được
+ĐẠT  [1366x768] HR: tab tai-lieu không cuộn ngang cả trang
+ĐẠT  [1366x768] HR: tab lich-su mở được
+ĐẠT  [1366x768] HR: tab lich-su không cuộn ngang cả trang
+ĐẠT  [1366x768] HR: bấm Hiện số đầy đủ ra số
+ĐẠT  [1366x768] HR: tệp giả PDF bị từ chối kèm lỗi tiếng Việt
+ĐẠT  [1366x768] HR: tải PDF hợp lệ thành công
+ĐẠT  [1366x768] HR: tab Tài liệu liệt kê tệp và danh sách còn thiếu
+ĐẠT  [1366x768] HR: xem trước PDF có header sandbox + nosniff
+ĐẠT  [1366x768] HR: Ký giấy không kèm tệp báo lỗi
+ĐẠT  [1366x768] HR: ghi nhận đồng ý điện tử
+ĐẠT  [1366x768] HR: trang in mẫu đồng ý có nội dung
+ĐẠT  [1366x768] HR: đầu trang có đúng một nút chính
+ĐẠT  [1366x768] HR: gửi duyệt thành công
+ĐẠT  [1366x768] HR: nhãn Chờ duyệt
+ĐẠT  [1366x768] HR: hồ sơ Chờ duyệt không còn nút Duyệt/Trả lại/Từ chối
+ĐẠT  [1366x768] HR: không vào được Duyệt hồ sơ (403)
+ĐẠT  [1366x768] Quản lý: mở hàng đợi Duyệt hồ sơ
+ĐẠT  [1366x768] Quản lý: hàng đợi có dòng
+ĐẠT  [1366x768] Quản lý: thấy Duyệt hồ sơ, Trả lại, Từ chối
+ĐẠT  [1366x768] Quản lý: trả lại không lý do hiện lỗi dưới ô
+ĐẠT  [1366x768] Quản lý: trả lại thành công
+ĐẠT  [1366x768] Quản lý: ghi chú lý do hiện trên hồ sơ
+ĐẠT  [1366x768] Quản lý: tab Lịch sử có chi tiết thay đổi
+ĐẠT  [1366x768] Viewer: danh sách không có nút Thêm hồ sơ và Sửa
+ĐẠT  [1366x768] Viewer: chi tiết không có trường nhạy cảm
+ĐẠT  [1366x768] Viewer: số CCCD hiện dạng che
+ĐẠT  [1366x768] Viewer: không có nút nào ở đầu trang
+ĐẠT  [1366x768] Viewer: tab Tài liệu không có liên kết xem/tải
+ĐẠT  [1366x768] Viewer: gọi thẳng URL sửa bị 403
+ĐẠT  [1366x768] Admin: có hồ sơ Lưu trữ trong dữ liệu mẫu
+ĐẠT  [1366x768] Admin: nút Ẩn danh hóa tắt khi chưa gõ lại mã
+ĐẠT  [1366x768] Admin: gõ đúng mã thì nút bật
+ĐẠT  [390x844] HR: danh sách hồ sơ mở được
+ĐẠT  [390x844] HR: danh sách có 20 dòng
+ĐẠT  [390x844] HR: phân trang 'Hiển thị 1–20 / n'
+ĐẠT  [390x844] HR: có 12 cột đúng thứ tự
+ĐẠT  [390x844] HR: không cuộn ngang cả trang
+ĐẠT  [390x844] HR: tìm 'nguyen' + lọc Đã xác minh có kết quả
+ĐẠT  [390x844] HR: không có kết quả hiện trạng thái rỗng
+ĐẠT  [390x844] HR: trang Thêm hồ sơ có 3 thẻ
+ĐẠT  [390x844] HR: form báo lỗi 'Nhập họ và tên.'
+ĐẠT  [390x844] HR: form báo lỗi 'Số CCCD phải gồm 12 chữ số.'
+ĐẠT  [390x844] HR: form báo lỗi 'Nhập ngày đúng định dạng'
+ĐẠT  [390x844] HR: form có lỗi vẫn ở trang thêm
+ĐẠT  [390x844] HR: rời ô CCCD báo trùng (HTMX)
+ĐẠT  [390x844] HR: có nút Mở hồ sơ cũ
+ĐẠT  [390x844] HR: lưu Nháp thành công, chuyển tới chi tiết
+ĐẠT  [390x844] HR: thông báo đã lưu Nháp
+ĐẠT  [390x844] HR: tab ca-nhan mở được
+ĐẠT  [390x844] HR: tab ca-nhan không cuộn ngang cả trang
+ĐẠT  [390x844] HR: tab tuyen-dung mở được
+ĐẠT  [390x844] HR: tab tuyen-dung không cuộn ngang cả trang
+ĐẠT  [390x844] HR: tab lam-viec mở được
+ĐẠT  [390x844] HR: tab lam-viec không cuộn ngang cả trang
+ĐẠT  [390x844] HR: tab tai-lieu mở được
+ĐẠT  [390x844] HR: tab tai-lieu không cuộn ngang cả trang
+ĐẠT  [390x844] HR: tab lich-su mở được
+ĐẠT  [390x844] HR: tab lich-su không cuộn ngang cả trang
+ĐẠT  [390x844] HR: bấm Hiện số đầy đủ ra số
+ĐẠT  [390x844] HR: tệp giả PDF bị từ chối kèm lỗi tiếng Việt
+ĐẠT  [390x844] HR: tải PDF hợp lệ thành công
+ĐẠT  [390x844] HR: tab Tài liệu liệt kê tệp và danh sách còn thiếu
+ĐẠT  [390x844] HR: xem trước PDF có header sandbox + nosniff
+ĐẠT  [390x844] HR: Ký giấy không kèm tệp báo lỗi
+ĐẠT  [390x844] HR: ghi nhận đồng ý điện tử
+ĐẠT  [390x844] HR: trang in mẫu đồng ý có nội dung
+ĐẠT  [390x844] HR: đầu trang có đúng một nút chính
+ĐẠT  [390x844] HR: gửi duyệt thành công
+ĐẠT  [390x844] HR: nhãn Chờ duyệt
+ĐẠT  [390x844] HR: hồ sơ Chờ duyệt không còn nút Duyệt/Trả lại/Từ chối
+ĐẠT  [390x844] HR: không vào được Duyệt hồ sơ (403)
+ĐẠT  [390x844] Quản lý: mở hàng đợi Duyệt hồ sơ
+ĐẠT  [390x844] Quản lý: hàng đợi có dòng
+ĐẠT  [390x844] Quản lý: thấy Duyệt hồ sơ, Trả lại, Từ chối
+ĐẠT  [390x844] Quản lý: trả lại không lý do hiện lỗi dưới ô
+ĐẠT  [390x844] Quản lý: trả lại thành công
+ĐẠT  [390x844] Quản lý: ghi chú lý do hiện trên hồ sơ
+ĐẠT  [390x844] Quản lý: tab Lịch sử có chi tiết thay đổi
+ĐẠT  [390x844] Viewer: danh sách không có nút Thêm hồ sơ và Sửa
+ĐẠT  [390x844] Viewer: chi tiết không có trường nhạy cảm
+ĐẠT  [390x844] Viewer: số CCCD hiện dạng che
+ĐẠT  [390x844] Viewer: không có nút nào ở đầu trang
+ĐẠT  [390x844] Viewer: tab Tài liệu không có liên kết xem/tải
+ĐẠT  [390x844] Viewer: gọi thẳng URL sửa bị 403
+ĐẠT  [390x844] Admin: có hồ sơ Lưu trữ trong dữ liệu mẫu
+ĐẠT  [390x844] Admin: nút Ẩn danh hóa tắt khi chưa gõ lại mã
+ĐẠT  [390x844] Admin: gõ đúng mã thì nút bật
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+
+Tổng: 111 bước, đạt 111, lỗi 0

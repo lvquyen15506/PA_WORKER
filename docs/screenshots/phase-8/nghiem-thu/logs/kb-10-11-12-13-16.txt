@@ -1,0 +1,107 @@
+ĐẠT  KB10: hợp đồng hết hạn sau 20 ngày làm thẻ “Hợp đồng sắp hết hạn” tăng 1
+ĐẠT  KB10: số dòng danh sách bằng số trên thẻ
+ĐẠT  KB10: danh sách đã lọc có công nhân vừa thêm hợp đồng
+ĐẠT  KB11 (hr): có đủ 9 thẻ
+ĐẠT  KB11: thẻ Hoàn thiện lớn hơn 0 trên dữ liệu mẫu có tài liệu
+ĐẠT  KB11: thẻ Thiếu giấy tờ lớn hơn 0
+ĐẠT  KB11: bấm thẻ Thiếu giấy tờ mở danh sách đã lọc sẵn
+ĐẠT  KB11: số dòng bằng số trên thẻ Thiếu giấy tờ
+ĐẠT  KB11 (hr): thẻ Tổng số hồ sơ = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Đang làm việc = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Hồ sơ mới trong tháng = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Chờ duyệt = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Thiếu giấy tờ = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Hoàn thiện = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Đang tuyển dụng = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Nghỉ việc trong tháng = số dòng danh sách đích
+ĐẠT  KB11 (hr): thẻ Hợp đồng sắp hết hạn = số dòng danh sách đích
+ĐẠT  KB11 (viewer): có đủ 9 thẻ
+ĐẠT  KB11 (viewer): thẻ Tổng số hồ sơ = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Đang làm việc = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Hồ sơ mới trong tháng = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Chờ duyệt = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Thiếu giấy tờ = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Hoàn thiện = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Đang tuyển dụng = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Nghỉ việc trong tháng = số dòng danh sách đích
+ĐẠT  KB11 (viewer): thẻ Hợp đồng sắp hết hạn = số dòng danh sách đích
+ĐẠT  KB11 (admin): có đủ 9 thẻ
+ĐẠT  KB11 (admin): thẻ Tổng số hồ sơ = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Đang làm việc = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Hồ sơ mới trong tháng = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Chờ duyệt = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Thiếu giấy tờ = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Hoàn thiện = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Đang tuyển dụng = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Nghỉ việc trong tháng = số dòng danh sách đích
+ĐẠT  KB11 (admin): thẻ Hợp đồng sắp hết hạn = số dòng danh sách đích
+ĐẠT  KB12: tìm “nguyen van an” (không dấu) ra hồ sơ “Nguyễn Văn An”
+ĐẠT  KB12: tìm kiếm dưới 2 giây (0.62s)
+ĐẠT  KB13: mở danh sách đang lọc dưới 2 giây (0.61s)
+ĐẠT  KB13: số dòng file Excel bằng số dòng trên màn hình
+ĐẠT  KB13: nội dung 3 dòng đầu khớp màn hình (cùng thứ tự)
+ĐẠT  KB13: HR nhận số CCCD đã che
+ĐẠT  KB13: HR không có nút xuất kèm số CCCD đầy đủ
+ĐẠT  KB13: xuất Excel ghi nhật ký EXPORT
+ĐẠT  KB13: Quản lý chọn xuất kèm số CCCD thì file có số đầy đủ
+ĐẠT  KB13: nhật ký ghi rõ có số CCCD đầy đủ
+ĐẠT  KB13: Viewer không có nút Xuất Excel
+ĐẠT  KB13: Viewer gọi thẳng URL xuất bị từ chối (403)
+ĐẠT  KB13: Viewer không có nút In/Xuất ở báo cáo
+ĐẠT  KB13: Viewer gọi thẳng URL in báo cáo bị từ chối (403)
+ĐẠT  KB16: thẻ “Từ file Excel” mở trang nhập
+ĐẠT  KB16: file mẫu có 3 sheet và 34 cột
+ĐẠT  KB16: tóm tắt đúng “nhập thành công 7 hồ sơ, 3 dòng lỗi”
+ĐẠT  KB16: báo rõ dòng 4, 7, 10 và lý do
+ĐẠT  KB16: bảng lỗi có đúng 3 dòng 4, 7, 10
+ĐẠT  KB16: dòng đúng được nhập (7 hồ sơ mới ở trạng thái Nháp)
+ĐẠT  KB16: hồ sơ nhập là Nháp, người tạo là người nhập
+ĐẠT  KB16: có lời nhắc cần tài khoản khác duyệt
+ĐẠT  KB16: ghi nhật ký IMPORT
+ĐẠT  KB16 (v1.1): HR nhập dòng có thông tin làm việc bị báo lỗi dòng đó
+ĐẠT  KB16 (v1.1): Quản lý nhập dòng có phần B thành công
+ĐẠT  KB16 (v1.1): hồ sơ Nháp có mã NV cũ, đợt làm việc mở từ 01/03/2023, không có lương
+ĐẠT  Chờ hủy: danh sách có các hồ sơ quá hạn lưu trữ
+ĐẠT  Chờ hủy: sau khi xác nhận sang trang biên bản
+ĐẠT  Chờ hủy: biên bản liệt kê đúng 2 hồ sơ đã chọn, loại Hết hạn lưu trữ
+ĐẠT  Chờ hủy: 2 hồ sơ đã ẩn danh, 2 dòng biên bản, 2 dòng nhật ký ANONYMIZE, không còn giá trị cá nhân trong nhật ký
+ĐẠT  Chờ hủy: mọi lý do do người gõ ở dòng thời gian trạng thái là “(đã ẩn danh)”
+ĐẠT  Chờ hủy: hồ sơ đã hủy rời khỏi danh sách chờ hủy
+ĐẠT  Biên bản: mở bản in ghi nhật ký PRINT
+ĐẠT  v1.1: Dashboard có khối “Đợt làm việc sắp đủ 12 tháng”
+ĐẠT  v1.1: số trong khối bằng số dòng của /ho-so/?dot_sap_du_han=1
+ĐẠT  v1.1: không có thẻ thứ 10 (vẫn 9 thẻ)
+ĐẠT  v1.1: Dashboard vẫn đúng 9 thẻ
+ĐẠT  Báo cáo cong-ty-khach: có số liệu bấm được
+ĐẠT  Báo cáo cong-ty-khach: mỗi số bằng số dòng danh sách đích (6 liên kết)
+ĐẠT  Báo cáo phong-ban: có số liệu bấm được
+ĐẠT  Báo cáo phong-ban: mỗi số bằng số dòng danh sách đích (6 liên kết)
+ĐẠT  Báo cáo phòng ban có nhóm “Chưa có bộ phận”
+ĐẠT  Báo cáo chuc-danh: có số liệu bấm được
+ĐẠT  Báo cáo chuc-danh: mỗi số bằng số dòng danh sách đích (7 liên kết)
+ĐẠT  Báo cáo trinh-do: có số liệu bấm được
+ĐẠT  Báo cáo trinh-do: mỗi số bằng số dòng danh sách đích (8 liên kết)
+ĐẠT  Quyền: admin /nhat-ky/ → 200
+ĐẠT  Quyền: admin /cai-dat/cho-huy/ → 200
+ĐẠT  Quyền: admin /cai-dat/bien-ban-huy/ → 200
+ĐẠT  Quyền: admin /bao-cao/ → 200
+ĐẠT  Quyền: admin /ho-so/nhap-excel/ → 200
+ĐẠT  Quyền: quanly /nhat-ky/ → 200
+ĐẠT  Quyền: quanly /cai-dat/cho-huy/ → 403
+ĐẠT  Quyền: quanly /cai-dat/bien-ban-huy/ → 403
+ĐẠT  Quyền: quanly /bao-cao/ → 200
+ĐẠT  Quyền: quanly /ho-so/nhap-excel/ → 200
+ĐẠT  Quyền: hr /nhat-ky/ → 403
+ĐẠT  Quyền: hr /cai-dat/cho-huy/ → 403
+ĐẠT  Quyền: hr /cai-dat/bien-ban-huy/ → 403
+ĐẠT  Quyền: hr /bao-cao/ → 200
+ĐẠT  Quyền: hr /ho-so/nhap-excel/ → 200
+ĐẠT  Quyền: viewer /nhat-ky/ → 403
+ĐẠT  Quyền: viewer /cai-dat/cho-huy/ → 403
+ĐẠT  Quyền: viewer /cai-dat/bien-ban-huy/ → 403
+ĐẠT  Quyền: viewer /bao-cao/ → 200
+ĐẠT  Quyền: viewer /ho-so/nhap-excel/ → 403
+ĐẠT  Quyền: Viewer không thấy khối “Chờ duyệt” ở việc cần làm
+ĐẠT  Không có lỗi console ngoài 403/404/405 mong đợi
+
+105/105 bước đạt

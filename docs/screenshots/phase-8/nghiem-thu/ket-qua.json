@@ -1,0 +1,131 @@
+{
+ "ngay": "24/11/2026",
+ "buoc": [
+  {
+   "ma": "cai-dat",
+   "ten": "Kịch bản 1 (phần cài đặt): máy mới chỉ có Docker Desktop, PA Worker.bat bản Demo",
+   "dat": true,
+   "giay": 115,
+   "khong_cache": true,
+   "so_tai_khoan_mau": 4
+  },
+  {
+   "ma": "kb-1-15",
+   "ten": "Kịch bản 1, 15",
+   "dat": true,
+   "so_buoc_dat": 52,
+   "tong_buoc": 52,
+   "giay": 30
+  },
+  {
+   "ma": "kb-2-5-6-7-14",
+   "ten": "Kịch bản 2, 5, 6, 7, 14",
+   "dat": false,
+   "so_buoc_dat": null,
+   "tong_buoc": null,
+   "giay": 18
+  },
+  {
+   "ma": "kb-3-4-5",
+   "ten": "Kịch bản 3, 4, 5",
+   "dat": false,
+   "so_buoc_dat": null,
+   "tong_buoc": null,
+   "giay": 52,
+   "loi": [
+    "LỖI  K3 thẻ 07 (CAN_CUOC_2024): có nhãn nguồn QR, không tô vàng"
+   ]
+  },
+  {
+   "ma": "kb-8-9-10-v11",
+   "ten": "Kịch bản 8, 9, 10 và kịch bản v1.1",
+   "dat": true,
+   "so_buoc_dat": 39,
+   "tong_buoc": 39,
+   "giay": 46
+  },
+  {
+   "ma": "kb-10-11-12-13-16",
+   "ten": "Kịch bản 10, 11, 12, 13, 16",
+   "dat": true,
+   "so_buoc_dat": 105,
+   "tong_buoc": 105,
+   "giay": 114
+  },
+  {
+   "ma": "kb-17",
+   "ten": "Kịch bản 17",
+   "dat": true,
+   "so_buoc_dat": 25,
+   "tong_buoc": 25,
+   "giay": 77
+  },
+  {
+   "ma": "kiem_thu_giao_dien_phase3",
+   "ten": "Kiểm thử giao diện Phase 3",
+   "dat": true,
+   "so_buoc_dat": 81,
+   "tong_buoc": 81,
+   "giay": 39
+  },
+  {
+   "ma": "kiem_thu_giao_dien_phase4",
+   "ten": "Kiểm thử giao diện Phase 4",
+   "dat": true,
+   "so_buoc_dat": 111,
+   "tong_buoc": 111,
+   "giay": 62
+  },
+  {
+   "ma": "kiem_thu_giao_dien_phase5",
+   "ten": "Kiểm thử giao diện Phase 5",
+   "dat": true,
+   "so_buoc_dat": 88,
+   "tong_buoc": 88,
+   "giay": 67
+  },
+  {
+   "ma": "kiem_thu_giao_dien_phase6",
+   "ten": "Kiểm thử giao diện Phase 6",
+   "dat": true,
+   "so_buoc_dat": 149,
+   "tong_buoc": 149,
+   "giay": 142
+  },
+  {
+   "ma": "kiem_thu_giao_dien_phase7",
+   "ten": "Kiểm thử giao diện Phase 7",
+   "dat": true,
+   "so_buoc_dat": 173,
+   "tong_buoc": 173,
+   "giay": 67
+  },
+  {
+   "ma": "kiem_thu_giao_dien_phase8",
+   "ten": "Kiểm thử giao diện Phase 8",
+   "dat": true,
+   "so_buoc_dat": 21,
+   "tong_buoc": 21,
+   "giay": 22
+  },
+  {
+   "ma": "ban-that",
+   "ten": "Bản Thật: Admin đầu tiên, buộc đổi mật khẩu, seed_demo bị chặn, 404 tiếng Việt, IP LAN",
+   "dat": true,
+   "so_buoc_dat": 7,
+   "tong_buoc": 7,
+   "giay": 28,
+   "chi_tiet": {
+    "PA Worker.bat bản Thật chạy xong, tạo Admin quantri": true,
+    "seed_demo bị chặn ở bản Thật": true,
+    "chỉ có 1 tài khoản Admin, buộc đổi mật khẩu": true,
+    "DEMO_MODE=0, DEBUG=0": true,
+    "đăng nhập lần đầu bị chuyển tới Đổi mật khẩu": true,
+    "đổi mật khẩu xong vào Tổng quan, menu Admin 9 mục": true,
+    "trang 404 tiếng Việt (DEBUG=0)": true
+   }
+  }
+ ],
+ "tong_giay": 929,
+ "dat_het": false
+}

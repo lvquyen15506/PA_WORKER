@@ -1,0 +1,54 @@
+ĐẠT  [1] admin: mật khẩu tạm bị buộc đổi
+ĐẠT  [1] admin: có thông báo mật khẩu tạm
+ĐẠT  [1] admin: trang khác bị chuyển về đổi mật khẩu
+ĐẠT  [1] admin: đổi mật khẩu xong về trang tổng quan
+ĐẠT  [1] admin: có thông báo đã đổi mật khẩu
+ĐẠT  [1] admin: menu có 9 mục
+ĐẠT  [1] admin: tên và vai trò ở thanh trên
+ĐẠT  [1] admin: đăng xuất về trang đăng nhập
+ĐẠT  [1] admin: đăng nhập lại bằng mật khẩu mới
+ĐẠT  [1] quanly: mật khẩu tạm bị buộc đổi
+ĐẠT  [1] quanly: có thông báo mật khẩu tạm
+ĐẠT  [1] quanly: trang khác bị chuyển về đổi mật khẩu
+ĐẠT  [1] quanly: đổi mật khẩu xong về trang tổng quan
+ĐẠT  [1] quanly: có thông báo đã đổi mật khẩu
+ĐẠT  [1] quanly: menu có 7 mục
+ĐẠT  [1] quanly: tên và vai trò ở thanh trên
+ĐẠT  [1] quanly: đăng xuất về trang đăng nhập
+ĐẠT  [1] quanly: đăng nhập lại bằng mật khẩu mới
+ĐẠT  [1] hr: mật khẩu tạm bị buộc đổi
+ĐẠT  [1] hr: có thông báo mật khẩu tạm
+ĐẠT  [1] hr: trang khác bị chuyển về đổi mật khẩu
+ĐẠT  [1] hr: đổi mật khẩu xong về trang tổng quan
+ĐẠT  [1] hr: có thông báo đã đổi mật khẩu
+ĐẠT  [1] hr: menu có 5 mục
+ĐẠT  [1] hr: tên và vai trò ở thanh trên
+ĐẠT  [1] hr: đăng xuất về trang đăng nhập
+ĐẠT  [1] hr: đăng nhập lại bằng mật khẩu mới
+ĐẠT  [1] viewer: mật khẩu tạm bị buộc đổi
+ĐẠT  [1] viewer: có thông báo mật khẩu tạm
+ĐẠT  [1] viewer: trang khác bị chuyển về đổi mật khẩu
+ĐẠT  [1] viewer: đổi mật khẩu xong về trang tổng quan
+ĐẠT  [1] viewer: có thông báo đã đổi mật khẩu
+ĐẠT  [1] viewer: menu có 4 mục
+ĐẠT  [1] viewer: tên và vai trò ở thanh trên
+ĐẠT  [1] viewer: đăng xuất về trang đăng nhập
+ĐẠT  [1] viewer: đăng nhập lại bằng mật khẩu mới
+ĐẠT  [15] lần sai 1: báo sai chung
+ĐẠT  [15] lần sai 2: báo sai chung
+ĐẠT  [15] lần sai 3: báo sai chung
+ĐẠT  [15] lần sai 4: báo sai chung
+ĐẠT  [15] lần sai 5: khóa tạm kèm giờ
+ĐẠT  [15] lần 6 (đúng mật khẩu): báo khóa tạm kèm giờ
+ĐẠT  [15] lần 6: vẫn chưa vào được
+ĐẠT  [15] Admin thấy hr ở trạng thái Khóa tạm
+ĐẠT  [15] nhãn Khóa tạm màu vàng
+ĐẠT  [15] Admin mở khóa: thông báo thành công
+ĐẠT  [15] hr trở lại Đang hoạt động
+ĐẠT  [15] hr đăng nhập lại được sau khi mở khóa
+ĐẠT  [15] Admin khóa viewer: nhãn Bị khóa màu đỏ
+ĐẠT  [15] viewer bị Admin khóa: thông báo khác khóa tạm
+ĐẠT  [15] Admin mở khóa viewer
+ĐẠT  không có lỗi console
+
+52/52 bước đạt

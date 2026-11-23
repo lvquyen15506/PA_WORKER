@@ -265,8 +265,8 @@ def production_browser(temp_password, new_password):
 
 def lan_ip():
     out = subprocess.run(
-        ["powershell", "-NoProfile", "-Command",
-         ". .\\scripts\\windows\\common.ps1; Get-LanIP"],
+        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
+         f". '{ROOT / 'scripts' / 'windows' / 'common.ps1'}'; Get-LanIP"],
         cwd=ROOT, capture_output=True, text=True,
     ).stdout.strip().splitlines()  # fmt: skip
     return out[-1].strip() if out else ""

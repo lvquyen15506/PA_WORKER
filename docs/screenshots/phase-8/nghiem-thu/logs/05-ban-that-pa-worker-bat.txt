@@ -1,0 +1,176 @@
+
+==== PA Worker – khởi động ====
+-> Ổ C: còn 70.2 GB trống.
+
+==== Cài đặt lần đầu ====
+-> Đang tạo tệp .env và sinh khóa mã hóa…
+Đã tạo tệp .env (bản Thật).
+
+QUAN TRỌNG: Cất bản sao FIELD_ENCRYPTION_KEY và HASH_KEY ở nơi riêng
+(USB hoặc giấy niêm phong). Mất khóa là mất dữ liệu đã mã hóa.
+Hai khóa này không nằm trong file sao lưu; file sao lưu được mã hóa bằng khóa này,
+nên mất khóa thì cũng không phục hồi được bản sao lưu.
+
+QUAN TRỌNG – CẤT KHÓA MÃ HÓA
+Tệp .env trong thư mục C:\Users\Admin\AppData\Local\Temp\pa-ban-that-up8eta11\PA Worker that chứa khóa mã hóa dữ liệu.
+Chép tệp .env vào USB riêng (hoặc in ra giấy và niêm phong), cất ở nơi an toàn.
+Mất khóa thì KHÔNG đọc lại được dữ liệu đã mã hóa và KHÔNG phục hồi được bản sao lưu.
+Đã cập nhật ALLOWED_HOSTS trong .env. Chạy lại PA Worker.bat để áp dụng.
+-> Nhớ mở cổng 8002 trên tường lửa: chạy scripts\windows\mo-cong-8000.ps1 (Hướng dẫn cài đặt, bước 6).
+
+==== Khởi động hệ thống ====
+-> Đang dựng và chạy các container (lần đầu cần Internet và có thể mất 10–20 phút)…
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.65kB done
+#1 DONE 0.0s
+
+#2 [db internal] load build definition from db.Dockerfile
+#2 transferring dockerfile: 890B 0.0s done
+#2 DONE 0.0s
+
+#3 [web internal] load build definition from Dockerfile
+#3 transferring dockerfile: 2.98kB 0.0s done
+#3 DONE 0.1s
+
+#4 [web internal] load metadata for docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#4 DONE 1.7s
+
+#5 [db internal] load metadata for docker.io/library/postgres:16.16@sha256:3950ad7c3148ca2175ef1b6c36c9efbf78957ae8fbe8b3a5d7c35af50500382f
+#5 DONE 1.7s
+
+#6 [web internal] load .dockerignore
+#6 transferring context: 171B 0.0s done
+#6 DONE 0.0s
+
+#7 [db 1/2] FROM docker.io/library/postgres:16.16@sha256:3950ad7c3148ca2175ef1b6c36c9efbf78957ae8fbe8b3a5d7c35af50500382f
+#7 resolve docker.io/library/postgres:16.16@sha256:3950ad7c3148ca2175ef1b6c36c9efbf78957ae8fbe8b3a5d7c35af50500382f 0.0s done
+#7 DONE 0.0s
+
+#8 [db 2/2] RUN apt-get update     && apt-get install -y --no-install-recommends --only-upgrade         libgssapi-krb5-2 libk5crypto3 libkrb5-3 libkrb5support0 zlib1g     && apt-get clean     && rm -rf /var/lib/apt/lists/*     && rm /usr/local/bin/gosu
+#8 CACHED
+
+#9 [web 1/8] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#9 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
+#9 DONE 0.0s
+
+#10 [db] exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:00b4c28fce1c5a05caa0e2805a1b77ec2db6338ca39b25bba6df0a4e4b86140f 0.0s done
+#10 exporting config sha256:99a76f8ecddaf80c7b1ae808eea0ca421d017ccd5d9f3412e0a8e63ff919385c 0.0s done
+#10 exporting attestation manifest sha256:b5e47f9eab9b060a59598ce4a89a81706e0522507dd8de77a5c97a30fd01cf56 0.0s done
+#10 exporting manifest list sha256:c09b9794fd98121e192c5366deb9b158a363471b1eedbd26111f9e84e6b7de34 0.0s done
+#10 naming to docker.io/library/pa_worker-db:latest done
+#10 unpacking to docker.io/library/pa_worker-db:latest done
+#10 DONE 0.2s
+
+#11 [scheduler internal] load build context
+#11 ...
+
+#12 [db] resolving provenance for metadata file
+#12 DONE 0.0s
+
+#11 [scheduler internal] load build context
+#11 transferring context: 4.89MB 1.2s done
+#11 DONE 1.2s
+
+#13 [scheduler 5/8] COPY requirements.txt .
+#13 CACHED
+
+#14 [scheduler 2/8] RUN apt-get update     && apt-get upgrade -y     && apt-get install -y --no-install-recommends         tesseract-ocr tesseract-ocr-vie libzbar0 antiword fonts-dejavu-core libglib2.0-0         postgresql-common ca-certificates     && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y     && apt-get install -y --no-install-recommends postgresql-client-16     && apt-get clean     && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [scheduler 3/8] RUN groupadd --gid 1000 app && useradd --uid 1000 --gid app --create-home app
+#15 CACHED
+
+#16 [scheduler 4/8] WORKDIR /app
+#16 CACHED
+
+#17 [web 6/8] RUN pip install --no-cache-dir -r requirements.txt
+#17 CACHED
+
+#18 [scheduler 7/8] COPY . .
+#18 DONE 0.1s
+
+#18 [web 7/8] COPY . .
+#18 DONE 0.1s
+
+#19 [scheduler 8/8] RUN chmod +x docker/entrypoint.sh     && mkdir -p /app/private_media /backups     && chown app:app /app/private_media /backups     && SECRET_KEY=chi-dung-luc-build        FIELD_ENCRYPTION_KEY=QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUE=        HASH_KEY=QkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkI=        python manage.py collectstatic --noinput
+#19 0.739 
+#19 0.739 11 static files copied to '/app/staticfiles'.
+#19 DONE 0.8s
+
+#20 [scheduler] exporting to image
+#20 exporting layers 0.2s done
+#20 exporting manifest sha256:0bcd27097fe57b0a793d9923efd54b31ca39ff80af96a768e6a3270c80c78d53 0.0s done
+#20 exporting config sha256:e5a3795669232c6df7d5c3c5211b7ce3d8c1d2026045c9175fab38c007347620 0.0s done
+#20 exporting attestation manifest sha256:e480d5bb530659ec26200b984960aacbddfb8283d14ff02be7012c0697461c32 0.0s done
+#20 exporting manifest list sha256:7ea121cba5d78e1e5c3281b0ac68383e0c97e345a07bec7838361d038982c423 0.0s done
+#20 naming to docker.io/library/pa_worker-web:latest
+#20 naming to docker.io/library/pa_worker-web:latest done
+#20 unpacking to docker.io/library/pa_worker-web:latest 0.1s done
+#20 DONE 0.4s
+
+#21 [web] exporting to image
+#21 exporting layers 0.2s done
+#21 exporting manifest sha256:de9f3e27ccd75a187a81c2e5e63e8d2e0679edd6ae482b6041109bd03df1b6f5 0.0s done
+#21 exporting config sha256:eae6feb180398e812d098991f1274164c1620cf63faf2f69c6dc2d21fc468a43 0.0s done
+#21 exporting attestation manifest sha256:a263c2ae5bfc4b779a965b1c742e611d1b920323fa87d4c8ba3345800ecb4158 0.0s done
+#21 exporting manifest list sha256:7aed34a8f0f3ac203027ead6af890bc17ffe036ce8c9b22d1fcb746787b5cccd 0.0s done
+#21 naming to docker.io/library/pa_worker-web:latest done
+#21 unpacking to docker.io/library/pa_worker-web:latest 0.1s done
+#21 DONE 0.4s
+
+#22 [scheduler] resolving provenance for metadata file
+#22 DONE 0.0s
+
+#23 [web] resolving provenance for metadata file
+#23 DONE 0.1s
+-> Đang chờ hệ thống sẵn sàng (lần đầu có thể mất vài phút)…
+OK: Hệ thống đã sẵn sàng.
+
+==== Tạo tài khoản Admin đầu tiên ====
+Đã tạo tài khoản Admin: quantri
+Mật khẩu tạm (chỉ hiện một lần): ********
+Ghi lại mật khẩu tạm rồi đăng nhập; hệ thống sẽ yêu cầu đổi mật khẩu ngay lần đầu.
+Ghi lại mật khẩu tạm ở trên; khi đăng nhập lần đầu hệ thống yêu cầu đổi mật khẩu.
+
+==== PA Worker đã chạy ====
+Trên máy này:            http://localhost:8002
+Từ máy khác trong mạng:  http://192.168.10.27:8002
+ Image pa_worker-db Building 
+ Image pa_worker-web Building 
+ Image pa_worker-web Building 
+ Image pa_worker-db Built 
+ Image pa_worker-web Built 
+ Image pa_worker-web Built 
+ Volume pa_ban_that_pgdata Creating 
+ Volume pa_ban_that_pgdata Creating 
+ Network pa_ban_that_default Creating 
+ Network pa_ban_that_default Creating 
+ Volume pa_ban_that_pgdata Created 
+ Volume pa_ban_that_pgdata Created 
+ Network pa_ban_that_default Created 
+ Network pa_ban_that_default Created 
+ Container pa_ban_that-db-1 Creating 
+ Container pa_ban_that-db-1 Created 
+ Container pa_ban_that-db-1 Starting 
+ Container pa_ban_that-db-1 Started 
+ Volume pa_ban_that_media Creating 
+ Volume pa_ban_that_media Creating 
+ Volume pa_ban_that_media Created 
+ Volume pa_ban_that_media Created 
+ Container pa_ban_that-web-run-8fc9f6b615f3 Creating 
+ Container pa_ban_that-web-run-8fc9f6b615f3 Created 
+ Container pa_ban_that-db-1 Running 
+ Container pa_ban_that-web-1 Creating 
+ Container pa_ban_that-web-1 Created 
+ Container pa_ban_that-scheduler-1 Creating 
+ Container pa_ban_that-scheduler-1 Created 
+ Container pa_ban_that-db-1 Waiting 
+ Container pa_ban_that-db-1 Healthy 
+ Container pa_ban_that-web-1 Starting 
+ Container pa_ban_that-web-1 Started 
+ Container pa_ban_that-web-1 Waiting 
+ Container pa_ban_that-web-1 Healthy 
+ Container pa_ban_that-scheduler-1 Starting 
+ Container pa_ban_that-scheduler-1 Started 

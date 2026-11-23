@@ -1,0 +1,175 @@
+ĐẠT  admin 1366x768 / → 200
+ĐẠT  admin 1366x768 /: không cuộn ngang
+ĐẠT  admin: Dashboard có 9 thẻ và 6 biểu đồ
+ĐẠT  admin 1366x768 /bao-cao/?loai=phong-ban → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=phong-ban: không cuộn ngang
+ĐẠT  admin: báo cáo phong-ban có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=gioi-tinh → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=gioi-tinh: không cuộn ngang
+ĐẠT  admin: báo cáo gioi-tinh có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=nhom-tuoi → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=nhom-tuoi: không cuộn ngang
+ĐẠT  admin: báo cáo nhom-tuoi có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=trinh-do → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=trinh-do: không cuộn ngang
+ĐẠT  admin: báo cáo trinh-do có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=chuc-danh → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=chuc-danh: không cuộn ngang
+ĐẠT  admin: báo cáo chuc-danh có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=hoan-thien → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=hoan-thien: không cuộn ngang
+ĐẠT  admin: báo cáo hoan-thien có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=ho-so-moi → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=ho-so-moi: không cuộn ngang
+ĐẠT  admin: báo cáo ho-so-moi có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=vao-lam-nghi-viec → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=vao-lam-nghi-viec: không cuộn ngang
+ĐẠT  admin: báo cáo vao-lam-nghi-viec có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/?loai=cong-ty-khach → 200
+ĐẠT  admin 1366x768 /bao-cao/?loai=cong-ty-khach: không cuộn ngang
+ĐẠT  admin: báo cáo cong-ty-khach có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 1366x768 /bao-cao/in/?loai=nhom-tuoi → 200
+ĐẠT  admin 1366x768 /bao-cao/in/?loai=nhom-tuoi: không cuộn ngang
+ĐẠT  báo cáo: khoảng ngày sai hiện lỗi tiếng Việt, trang không sập
+ĐẠT  admin 1366x768 /nhat-ky/ → 200
+ĐẠT  admin 1366x768 /nhat-ky/: không cuộn ngang
+ĐẠT  nhật ký: ngày sai hiện lỗi
+ĐẠT  admin 1366x768 /nhat-ky/165/ → 200
+ĐẠT  admin 1366x768 /nhat-ky/165/: không cuộn ngang
+ĐẠT  admin 1366x768 /cai-dat/cho-huy/ → 200
+ĐẠT  admin 1366x768 /cai-dat/cho-huy/: không cuộn ngang
+ĐẠT  admin 1366x768 /cai-dat/bien-ban-huy/ → 200
+ĐẠT  admin 1366x768 /cai-dat/bien-ban-huy/: không cuộn ngang
+ĐẠT  admin 1366x768 /ho-so/nhap-excel/ → 200
+ĐẠT  admin 1366x768 /ho-so/nhap-excel/: không cuộn ngang
+ĐẠT  nhập Excel: không chọn tệp hiện lỗi
+ĐẠT  nhập Excel: tệp giả .xlsx bị từ chối bằng tiếng Việt
+ĐẠT  admin 1366x768 /ho-so/ → 200
+ĐẠT  admin 1366x768 /ho-so/: không cuộn ngang
+ĐẠT  admin: danh sách có Xuất Excel và Xuất kèm số CCCD
+ĐẠT  admin 1366x768 /ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE&tao_tu=01%2F01%2F2020&cccd_sap_het_han=1 → 200
+ĐẠT  admin 1366x768 /ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE&tao_tu=01%2F01%2F2020&cccd_sap_het_han=1: không cuộn ngang
+ĐẠT  admin: ô lọc riêng của Dashboard hiện khi có giá trị
+ĐẠT  admin 1366x768 /ui-kit/ → 200
+ĐẠT  admin 1366x768 /ui-kit/: không cuộn ngang
+ĐẠT  ui-kit: có biểu đồ nhiều chuỗi, cột ngang và bảng ô chọn
+ĐẠT  quanly 1366x768 / → 200
+ĐẠT  quanly 1366x768 /: không cuộn ngang
+ĐẠT  quanly 1366x768 /bao-cao/ → 200
+ĐẠT  quanly 1366x768 /bao-cao/: không cuộn ngang
+ĐẠT  quanly 1366x768 /nhat-ky/ → 200
+ĐẠT  quanly 1366x768 /nhat-ky/: không cuộn ngang
+ĐẠT  quanly 1366x768 /cai-dat/cho-huy/ → 403
+ĐẠT  quanly 1366x768 /ho-so/nhap-excel/ → 200
+ĐẠT  quanly 1366x768 /ho-so/nhap-excel/: không cuộn ngang
+ĐẠT  quanly 1366x768 /bao-cao/in/ → 200
+ĐẠT  quanly 1366x768 /bao-cao/in/: không cuộn ngang
+ĐẠT  hr 1366x768 / → 200
+ĐẠT  hr 1366x768 /: không cuộn ngang
+ĐẠT  hr 1366x768 /bao-cao/ → 200
+ĐẠT  hr 1366x768 /bao-cao/: không cuộn ngang
+ĐẠT  hr 1366x768 /nhat-ky/ → 403
+ĐẠT  hr 1366x768 /cai-dat/bien-ban-huy/ → 403
+ĐẠT  hr 1366x768 /ho-so/nhap-excel/ → 200
+ĐẠT  hr 1366x768 /ho-so/nhap-excel/: không cuộn ngang
+ĐẠT  hr: có Xuất Excel nhưng không có Xuất kèm số CCCD
+ĐẠT  viewer 1366x768 / → 200
+ĐẠT  viewer 1366x768 /: không cuộn ngang
+ĐẠT  viewer 1366x768 /bao-cao/ → 200
+ĐẠT  viewer 1366x768 /bao-cao/: không cuộn ngang
+ĐẠT  viewer 1366x768 /nhat-ky/ → 403
+ĐẠT  viewer 1366x768 /ho-so/nhap-excel/ → 403
+ĐẠT  viewer 1366x768 /bao-cao/in/ → 403
+ĐẠT  viewer 1366x768 /bao-cao/xuat-excel/ → 403
+ĐẠT  viewer 1366x768 /ho-so/xuat-excel/ → 403
+ĐẠT  viewer: báo cáo không có nút In/Xuất Excel
+ĐẠT  viewer: danh sách không có nút xuất
+ĐẠT  admin 390x844 / → 200
+ĐẠT  admin 390x844 /: không cuộn ngang
+ĐẠT  admin: Dashboard có 9 thẻ và 6 biểu đồ
+ĐẠT  admin 390x844 /bao-cao/?loai=phong-ban → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=phong-ban: không cuộn ngang
+ĐẠT  admin: báo cáo phong-ban có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=gioi-tinh → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=gioi-tinh: không cuộn ngang
+ĐẠT  admin: báo cáo gioi-tinh có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=nhom-tuoi → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=nhom-tuoi: không cuộn ngang
+ĐẠT  admin: báo cáo nhom-tuoi có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=trinh-do → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=trinh-do: không cuộn ngang
+ĐẠT  admin: báo cáo trinh-do có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=chuc-danh → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=chuc-danh: không cuộn ngang
+ĐẠT  admin: báo cáo chuc-danh có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=hoan-thien → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=hoan-thien: không cuộn ngang
+ĐẠT  admin: báo cáo hoan-thien có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=ho-so-moi → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=ho-so-moi: không cuộn ngang
+ĐẠT  admin: báo cáo ho-so-moi có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=vao-lam-nghi-viec → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=vao-lam-nghi-viec: không cuộn ngang
+ĐẠT  admin: báo cáo vao-lam-nghi-viec có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/?loai=cong-ty-khach → 200
+ĐẠT  admin 390x844 /bao-cao/?loai=cong-ty-khach: không cuộn ngang
+ĐẠT  admin: báo cáo cong-ty-khach có biểu đồ hoặc thông báo không có số liệu
+ĐẠT  admin 390x844 /bao-cao/in/?loai=nhom-tuoi → 200
+ĐẠT  admin 390x844 /bao-cao/in/?loai=nhom-tuoi: không cuộn ngang
+ĐẠT  báo cáo: khoảng ngày sai hiện lỗi tiếng Việt, trang không sập
+ĐẠT  admin 390x844 /nhat-ky/ → 200
+ĐẠT  admin 390x844 /nhat-ky/: không cuộn ngang
+ĐẠT  nhật ký: ngày sai hiện lỗi
+ĐẠT  admin 390x844 /nhat-ky/167/ → 200
+ĐẠT  admin 390x844 /nhat-ky/167/: không cuộn ngang
+ĐẠT  admin 390x844 /cai-dat/cho-huy/ → 200
+ĐẠT  admin 390x844 /cai-dat/cho-huy/: không cuộn ngang
+ĐẠT  admin 390x844 /cai-dat/bien-ban-huy/ → 200
+ĐẠT  admin 390x844 /cai-dat/bien-ban-huy/: không cuộn ngang
+ĐẠT  admin 390x844 /ho-so/nhap-excel/ → 200
+ĐẠT  admin 390x844 /ho-so/nhap-excel/: không cuộn ngang
+ĐẠT  nhập Excel: không chọn tệp hiện lỗi
+ĐẠT  nhập Excel: tệp giả .xlsx bị từ chối bằng tiếng Việt
+ĐẠT  admin 390x844 /ho-so/ → 200
+ĐẠT  admin 390x844 /ho-so/: không cuộn ngang
+ĐẠT  admin: danh sách có Xuất Excel và Xuất kèm số CCCD
+ĐẠT  admin 390x844 /ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE&tao_tu=01%2F01%2F2020&cccd_sap_het_han=1 → 200
+ĐẠT  admin 390x844 /ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE&tao_tu=01%2F01%2F2020&cccd_sap_het_han=1: không cuộn ngang
+ĐẠT  admin: ô lọc riêng của Dashboard hiện khi có giá trị
+ĐẠT  admin 390x844 /ui-kit/ → 200
+ĐẠT  admin 390x844 /ui-kit/: không cuộn ngang
+ĐẠT  ui-kit: có biểu đồ nhiều chuỗi, cột ngang và bảng ô chọn
+ĐẠT  quanly 390x844 / → 200
+ĐẠT  quanly 390x844 /: không cuộn ngang
+ĐẠT  quanly 390x844 /bao-cao/ → 200
+ĐẠT  quanly 390x844 /bao-cao/: không cuộn ngang
+ĐẠT  quanly 390x844 /nhat-ky/ → 200
+ĐẠT  quanly 390x844 /nhat-ky/: không cuộn ngang
+ĐẠT  quanly 390x844 /cai-dat/cho-huy/ → 403
+ĐẠT  quanly 390x844 /ho-so/nhap-excel/ → 200
+ĐẠT  quanly 390x844 /ho-so/nhap-excel/: không cuộn ngang
+ĐẠT  quanly 390x844 /bao-cao/in/ → 200
+ĐẠT  quanly 390x844 /bao-cao/in/: không cuộn ngang
+ĐẠT  hr 390x844 / → 200
+ĐẠT  hr 390x844 /: không cuộn ngang
+ĐẠT  hr 390x844 /bao-cao/ → 200
+ĐẠT  hr 390x844 /bao-cao/: không cuộn ngang
+ĐẠT  hr 390x844 /nhat-ky/ → 403
+ĐẠT  hr 390x844 /cai-dat/bien-ban-huy/ → 403
+ĐẠT  hr 390x844 /ho-so/nhap-excel/ → 200
+ĐẠT  hr 390x844 /ho-so/nhap-excel/: không cuộn ngang
+ĐẠT  hr: có Xuất Excel nhưng không có Xuất kèm số CCCD
+ĐẠT  viewer 390x844 / → 200
+ĐẠT  viewer 390x844 /: không cuộn ngang
+ĐẠT  viewer 390x844 /bao-cao/ → 200
+ĐẠT  viewer 390x844 /bao-cao/: không cuộn ngang
+ĐẠT  viewer 390x844 /nhat-ky/ → 403
+ĐẠT  viewer 390x844 /ho-so/nhap-excel/ → 403
+ĐẠT  viewer 390x844 /bao-cao/in/ → 403
+ĐẠT  viewer 390x844 /bao-cao/xuat-excel/ → 403
+ĐẠT  viewer 390x844 /ho-so/xuat-excel/ → 403
+ĐẠT  viewer: báo cáo không có nút In/Xuất Excel
+ĐẠT  viewer: danh sách không có nút xuất
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+
+Tổng: 173 bước, đạt 173, lỗi 0
