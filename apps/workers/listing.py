@@ -88,6 +88,9 @@ class WorkerFilterForm(forms.Form):
     )
     thieu_giay_to = forms.ChoiceField(label="Thiếu giấy tờ", required=False, choices=YES)
     hoan_thien = forms.ChoiceField(label="Hoàn thiện", required=False, choices=YES)
+    hop_dong_sap_het_han = forms.ChoiceField(
+        label="Hợp đồng sắp hết hạn", required=False, choices=YES
+    )
     tiep_nhan_tu = _date("Tiếp nhận từ ngày")
     tiep_nhan_den = _date("Tiếp nhận đến ngày")
     sap_xep = forms.ChoiceField(
@@ -160,6 +163,8 @@ def build_queryset(user, cleaned):
         qs = qs.annotate(latest_application=Subquery(latest.values("status")[:1])).filter(
             latest_application=cleaned["trang_thai_tuyen_dung"]
         )
+    if cleaned.get("hop_dong_sap_het_han"):  # liên kết thẻ Dashboard (trang.md 5.3)
+        qs = indicators.contract_expiring(qs)
     if cleaned.get("thieu_giay_to") or cleaned.get("hoan_thien"):
         qs = indicators.annotate_documents(qs)  # chỉ thêm cột một lần dù dùng cả hai bộ lọc
     if cleaned.get("thieu_giay_to"):

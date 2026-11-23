@@ -10,6 +10,12 @@ MSG_DATETIME = "Nhập giờ đúng định dạng dd/mm/yyyy hh:mm."
 REASON_HINT = "Không ghi họ tên, chỉ dùng mã hồ sơ."
 
 
+def is_unbound(args, kwargs):
+    """True khi form chưa nhận dữ liệu (view truyền `request.POST or None` nên args[0] là None)."""
+    data = args[0] if args else kwargs.get("data")
+    return data is None
+
+
 def date_field(label, *, required=False, **kwargs):
     return forms.DateField(
         label=label,

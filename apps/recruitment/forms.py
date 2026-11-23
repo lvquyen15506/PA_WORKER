@@ -6,7 +6,13 @@ Quy tắc kiểm tra nằm ở apps.recruitment.services (kiểm tra ở máy ch
 from django import forms
 
 from apps.core.choices import RecruitmentStatus
-from apps.core.formfields import REASON_HINT, active_or_current, date_field, datetime_field
+from apps.core.formfields import (
+    REASON_HINT,
+    active_or_current,
+    date_field,
+    datetime_field,
+    is_unbound,
+)
 from apps.core.models import ApplicationSource, EducationLevel, Position
 
 
@@ -52,7 +58,7 @@ class ApplicationForm(forms.Form):
     )
 
     def __init__(self, *args, instance=None, **kwargs):
-        if instance is not None and not args and "data" not in kwargs:
+        if instance is not None and is_unbound(args, kwargs):
             kwargs.setdefault("initial", self.initial_from(instance))
         super().__init__(*args, **kwargs)
         self.fields["position"].queryset = active_or_current(
@@ -108,7 +114,7 @@ class EducationForm(forms.Form):
     )
 
     def __init__(self, *args, instance=None, **kwargs):
-        if instance is not None and not args and "data" not in kwargs:
+        if instance is not None and is_unbound(args, kwargs):
             kwargs.setdefault(
                 "initial",
                 {
@@ -141,7 +147,7 @@ class CertificateForm(forms.Form):
     )
 
     def __init__(self, *args, instance=None, **kwargs):
-        if instance is not None and not args and "data" not in kwargs:
+        if instance is not None and is_unbound(args, kwargs):
             kwargs.setdefault(
                 "initial",
                 {
@@ -167,7 +173,7 @@ class ExperienceForm(forms.Form):
     )
 
     def __init__(self, *args, instance=None, **kwargs):
-        if instance is not None and not args and "data" not in kwargs:
+        if instance is not None and is_unbound(args, kwargs):
             kwargs.setdefault(
                 "initial",
                 {

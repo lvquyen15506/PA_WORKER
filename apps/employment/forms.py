@@ -1,0 +1,255 @@
+"""Form quá trình làm việc (trang.md mục 5.8): tiếp nhận, ghi nhận thay đổi, hợp đồng.
+
+Quy tắc nghiệp vụ kiểm tra ở apps.employment.services; form lấy dữ liệu và chuyển lỗi xuống ô."""
+
+from django import forms
+
+from apps.core.choices import ContractType, ResignReason, WorkStatus
+from apps.core.formfields import REASON_HINT, active_or_current, date_field, is_unbound
+from apps.core.models import Position, Section, Shift, Team
+from apps.documents.forms import FILE_HINT
+from apps.documents.validators import MAX_SIZE, validate_upload
+from apps.workers.models import Worker
+
+
+def _section_label(section):
+    return f"{section.name} ({section.department.name})"
+
+
+def _team_label(team):
+    return f"{team.name} ({team.section.name})"
+
+
+class _StructureMixin:
+    """Bộ phận, tổ, chức danh, ca, người quản lý (nhập mã nhân viên) dùng chung cho hai form."""
+
+    def _add_structure(self, current=None):
+        self.fields["section"] = forms.ModelChoiceField(
+            label="Bộ phận",
+            required=False,
+            queryset=active_or_current(
+                Section.objects.select_related("department").order_by(
+                    "department__sort_order", "sort_order", "name"
+                ),
+                current.section if current and current.section_id else None,
+            ),
+            empty_label="Chưa có bộ phận",
+            help_text="Không bắt buộc: công nhân cung ứng có thể chưa thuộc bộ phận nội bộ nào.",
+        )
+        self.fields["section"].label_from_instance = _section_label
+        self.fields["team"] = forms.ModelChoiceField(
+            label="Tổ",
+            required=False,
+            queryset=active_or_current(
+                Team.objects.select_related("section").order_by(
+                    "section__sort_order", "sort_order", "name"
+                ),
+                current.team if current and current.team_id else None,
+            ),
+            empty_label="Không có tổ",
+            help_text="Chỉ chọn khi đã chọn bộ phận; tổ phải thuộc bộ phận đó.",
+        )
+        self.fields["team"].label_from_instance = _team_label
+        self.fields["position"] = forms.ModelChoiceField(
+            label="Chức danh",
+            queryset=active_or_current(
+                Position.objects.order_by("name"), current.position if current else None
+            ),
+            empty_label="— Chọn —",
+            error_messages={"required": "Chọn chức danh."},
+        )
+        self.fields["shift"] = forms.ModelChoiceField(
+            label="Ca làm việc",
+            required=False,
+            queryset=active_or_current(
+                Shift.objects.order_by("name"),
+                current.shift if current and current.shift_id else None,
+            ),
+            empty_label="Chưa có ca",
+        )
+        self.fields["manager_code"] = forms.CharField(
+            label="Mã nhân viên của người quản lý trực tiếp",
+            required=False,
+            max_length=20,
+            help_text="Không bắt buộc. Nhập mã nhân viên của một công nhân khác.",
+        )
+
+    def clean_manager_code(self):
+        code = (self.cleaned_data.get("manager_code") or "").strip()
+        if not code:
+            self.manager = None
+            return ""
+        manager = Worker.objects.filter(employee_code__iexact=code).first()
+        if manager is None:
+            raise forms.ValidationError("Không tìm thấy công nhân có mã nhân viên này.")
+        self.manager = manager
+        return code
+
+    def structure_data(self):
+        data = self.cleaned_data
+        return {
+            "section": data.get("section"),
+            "team": data.get("team"),
+            "position": data.get("position"),
+            "shift": data.get("shift"),
+            "manager": getattr(self, "manager", None),
+        }
+
+
+class OnboardForm(_StructureMixin, forms.Form):
+    received_date = date_field("Ngày tiếp nhận", required=True)
+    start_date = date_field("Ngày bắt đầu", required=True)
+
+    def __init__(self, *args, application=None, **kwargs):
+        if application is not None and is_unbound(args, kwargs):
+            kwargs.setdefault("initial", {"position": application.position_id})
+        super().__init__(*args, **kwargs)
+        self._add_structure()
+        self.order_fields(
+            [
+                "received_date",
+                "start_date",
+                "section",
+                "team",
+                "position",
+                "shift",
+                "manager_code",
+            ]
+        )
+
+    def service_data(self):
+        data = {k: self.cleaned_data[k] for k in ("received_date", "start_date")}
+        data.update(self.structure_data())
+        return data
+
+
+class ChangeForm(_StructureMixin, forms.Form):
+    effective_date = date_field("Ngày hiệu lực", required=True)
+    work_status = forms.ChoiceField(label="Trạng thái làm việc", choices=WorkStatus.choices)
+    resign_date = date_field("Ngày nghỉ việc")
+    resign_reason = forms.ChoiceField(
+        label="Lý do nghỉ việc", required=False, choices=[("", "— Chọn —")] + ResignReason.choices
+    )
+    resign_note = forms.CharField(
+        label="Ghi chú nghỉ việc",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 2}),
+        help_text=REASON_HINT,
+    )
+    decision_no = forms.CharField(label="Số quyết định", required=False, max_length=50)
+    reason = forms.CharField(
+        label="Lý do thay đổi",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 2}),
+        help_text=REASON_HINT,
+    )
+
+    def __init__(self, *args, employment, **kwargs):
+        if is_unbound(args, kwargs):
+            manager = employment.manager
+            kwargs.setdefault(
+                "initial",
+                {
+                    "section": employment.section_id,
+                    "team": employment.team_id,
+                    "position": employment.position_id,
+                    "shift": employment.shift_id,
+                    "manager_code": manager.employee_code if manager else "",
+                    "work_status": employment.work_status,
+                },
+            )
+        super().__init__(*args, **kwargs)
+        self._add_structure(employment)
+        self.fields[
+            "work_status"
+        ].help_text = "Đã nghỉ việc cần ngày nghỉ và lý do; sau đó không đổi tiếp được."
+        self.order_fields(
+            [
+                "effective_date",
+                "section",
+                "team",
+                "position",
+                "shift",
+                "manager_code",
+                "work_status",
+                "resign_date",
+                "resign_reason",
+                "resign_note",
+                "decision_no",
+                "reason",
+            ]
+        )
+
+    def service_data(self):
+        data = self.structure_data()
+        for name in (
+            "effective_date",
+            "work_status",
+            "resign_date",
+            "resign_reason",
+            "resign_note",
+            "decision_no",
+            "reason",
+        ):
+            data[name] = self.cleaned_data.get(name)
+        return data
+
+
+class ContractForm(forms.Form):
+    contract_no = forms.CharField(
+        label="Số hợp đồng", max_length=60, error_messages={"required": "Nhập số hợp đồng."}
+    )
+    contract_type = forms.ChoiceField(label="Loại hợp đồng", choices=ContractType.choices)
+    signed_date = date_field("Ngày ký", required=True)
+    effective_date = date_field("Ngày hiệu lực", required=True)
+    expiry_date = date_field(
+        "Ngày hết hạn", help_text="Bắt buộc trừ hợp đồng không xác định thời hạn."
+    )
+    file = forms.FileField(label="Tệp hợp đồng", required=False, help_text=FILE_HINT)
+    note = forms.CharField(
+        label="Ghi chú", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(self, *args, instance=None, allow_file=True, **kwargs):
+        if instance is not None and is_unbound(args, kwargs):
+            kwargs.setdefault(
+                "initial",
+                {
+                    f: getattr(instance, f)
+                    for f in (
+                        "contract_no",
+                        "contract_type",
+                        "signed_date",
+                        "effective_date",
+                        "expiry_date",
+                        "note",
+                    )
+                },
+            )
+        super().__init__(*args, **kwargs)
+        if not allow_file:
+            # Hồ sơ không cho tải tài liệu ở trạng thái này (ma trận 4.4): bỏ ô tệp.
+            del self.fields["file"]
+
+    def clean_file(self):
+        uploaded = self.cleaned_data.get("file")
+        if uploaded:
+            if uploaded.size > MAX_SIZE:
+                raise forms.ValidationError("Tệp vượt quá 10 MB.")
+            validate_upload(uploaded)  # ném ValidationError tiếng Việt nếu không hợp lệ
+        return uploaded
+
+    def service_data(self):
+        data = {
+            k: self.cleaned_data.get(k)
+            for k in (
+                "contract_no",
+                "contract_type",
+                "signed_date",
+                "effective_date",
+                "expiry_date",
+                "note",
+            )
+        }
+        data["uploaded"] = self.cleaned_data.get("file")
+        return data

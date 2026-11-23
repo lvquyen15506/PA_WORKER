@@ -1,9 +1,14 @@
+{% if can_edit_work %}
+<div class="mb-3 d-flex flex-wrap gap-2">
+  {% for label, url, shown in work_links %}{% if shown %}<a class="btn btn-outline-secondary" href="{{ url }}">{{ label }}</a>{% endif %}{% endfor %}
+</div>
+{% endif %}
 {% if employment_items %}
   {% include "components/_form_section.html" with title="Thông tin hiện tại" items=employment_items %}
 {% else %}
 <section class="pa-form-section">
   <h2 class="pa-card-title">Thông tin hiện tại</h2>
-  {% include "components/_empty_state.html" with text="Chưa có thông tin làm việc. Thông tin này được tạo khi tiếp nhận vào làm." %}
+  {% include "components/_empty_state.html" with text="Chưa có thông tin làm việc. Thông tin này được tạo khi tiếp nhận vào làm (ở tab Tuyển dụng & CV, khi lần ứng tuyển Đạt và hồ sơ Đã xác minh)." %}
 </section>
 {% endif %}
 <section class="pa-form-section">

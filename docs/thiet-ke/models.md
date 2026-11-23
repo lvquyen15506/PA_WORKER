@@ -462,6 +462,8 @@ Vòng đời (khớp `erd.md` mục 6):
 | `resign_note` | `TextField(blank)` | Không | |
 | `created_at`, `updated_at` | `DateTimeField` | Tự động | |
 
+**Cách cài ở Phase 6:** `change_type` của dòng lịch sử do máy chủ tự suy ra từ trường đổi (trạng thái làm việc → `STATUS_CHANGE`; bộ phận, tổ, người quản lý → `TRANSFER`; chức danh → `POSITION_CHANGE`; ca → `SHIFT_CHANGE`, theo thứ tự ưu tiên đó), không có ô chọn loại; dòng lịch sử chỉ ghi `from_*`/`to_*` của trường **đổi**. Người quản lý nhập bằng mã nhân viên (người đó phải có mã NV, không phải chính mình). Hợp đồng và tệp hợp đồng đi qua `apps.documents.services.upload_document` (hồ sơ Chờ duyệt không tải được tệp theo bảng 4.4, nên form ẩn ô tệp). `can_onboard` cho phép tiếp nhận lại người đã nghỉ việc (dùng lại dòng `Employment`, giữ mã NV cũ).
+
 Không sửa trực tiếp `section`, `team`, `position`, `shift`, `manager`, `work_status`: mọi thay đổi đi qua `apps.employment.services.change_employment(...)`, hàm này cập nhật `Employment` và **thêm** một dòng `EmploymentHistory` (không ghi đè).
 
 **`EmploymentHistory`** – chỉ thêm.

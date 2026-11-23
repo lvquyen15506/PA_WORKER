@@ -167,8 +167,9 @@ def ensure_ui_worker():
         db(
             "from apps.workers.models import Worker;from apps.accounts.models import User;"
             f"w=Worker.objects.filter(worker_code='{UI_WORKER_CODE}').first() or "
-            f"Worker.objects.create(worker_code='{UI_WORKER_CODE}',full_name='Nguyễn Văn Thử Giao Diện',"
-            "phone='0900000666',created_by=User.objects.get(username='admin'));print(w.pk)"
+            f"Worker.objects.create(worker_code='{UI_WORKER_CODE}',"
+            "full_name='Nguyễn Văn Thử Giao Diện',phone='0900000666',"
+            "created_by=User.objects.get(username='admin'));print(w.pk)"
         )
     )
 
@@ -271,7 +272,153 @@ def part_recruitment(browser, s, size):
     ctx.close()
 
 
-PARTS = {"cai-dat": part_settings, "tuyen-dung": part_recruitment}
+# ===== Tiếp nhận, quá trình làm việc, hợp đồng =================================================
+def pick_candidate():
+    """Hồ sơ Đã xác minh chưa có thông tin làm việc, kèm một lần ứng tuyển Đạt; trả pk."""
+    return int(
+        db(
+            "from apps.workers.models import Worker;"
+            "from apps.recruitment.models import Application;"
+            "from apps.core.models import Position, ApplicationSource;"
+            "import datetime;"
+            "w=Worker.objects.filter(verification_status='VERIFIED',employment__isnull=True)"
+            ".order_by('-pk').first();"
+            "Application.objects.create(worker=w,position=Position.objects.first(),"
+            "source=ApplicationSource.objects.first(),applied_date=datetime.date.today(),"
+            "status='PASSED',result_date=datetime.date.today(),created_by=w.created_by);"
+            "print(w.pk)"
+        )
+    )
+
+
+def part_employment(browser, s, size):
+    import datetime
+    import tempfile
+
+    pk = pick_candidate()
+    today = datetime.date.today()
+    ctx, page = new_page(browser, size)
+    login(page, "hr")
+    goto(page, f"/ho-so/{pk}/?tab=tuyen-dung")
+    page.locator("tr", has_text="Đạt").first.locator(".dropdown-toggle").click()
+    pw.shot(OUT, page, s, "20-menu-tiep-nhan")
+    page.locator(".dropdown-menu.show a", has_text="Tiếp nhận vào làm").first.click()
+    page.wait_for_load_state("networkidle")
+    check(f"[{s}] HR: mở form Tiếp nhận vào làm", "Tiếp nhận vào làm" in page.content())
+    pw.shot(OUT, page, s, "21-form-tiep-nhan")
+    page.fill("input[name=received_date]", "09/03/2026")
+    page.fill("input[name=start_date]", "05/03/2026")
+    page.fill("input[name=manager_code]", "ZZZ-999")
+    submit(page, "Tiếp nhận vào làm")
+    check(
+        f"[{s}] HR: ngày bắt đầu trước ngày tiếp nhận và mã quản lý sai bị báo lỗi",
+        "Không tìm thấy công nhân có mã nhân viên này." in page.content(),
+    )
+    page.fill("input[name=manager_code]", "")
+    submit(page, "Tiếp nhận vào làm")
+    check(
+        f"[{s}] HR: ngày bắt đầu trước ngày tiếp nhận bị báo lỗi",
+        "Ngày bắt đầu không được trước ngày tiếp nhận." in page.content(),
+    )
+    pw.shot(OUT, page, s, "22-tiep-nhan-loi")
+    page.fill("input[name=start_date]", "10/03/2026")
+    submit(page, "Tiếp nhận vào làm")
+    check(f"[{s}] HR: tiếp nhận thành công, có mã nhân viên", "Mã nhân viên CN-" in page.content())
+    check(
+        f"[{s}] HR: trạng thái Chờ nhận việc",
+        page.locator(".pa-badge:has-text('Chờ nhận việc')").count() >= 1,
+    )
+    check(f"[{s}] HR: tab Quá trình làm việc không cuộn ngang", no_h_scroll(page))
+    pw.shot(OUT, page, s, "23-lam-viec-sau-tiep-nhan")
+    check(
+        f"[{s}] HR: không còn nút Tiếp nhận vào làm cho lần đã tiếp nhận",
+        goto(page, f"/ho-so/{pk}/?tab=tuyen-dung") == 200
+        and "Tiếp nhận vào làm" not in page.content(),
+    )
+
+    # Ghi nhận thay đổi: không đổi gì thì báo lỗi; đổi trạng thái thì thêm dòng lịch sử
+    goto(page, f"/ho-so/{pk}/lam-viec/thay-doi/")
+    page.fill("input[name=effective_date]", "01/04/2026")
+    pw.shot(OUT, page, s, "24-form-thay-doi")
+    submit(page, "Ghi nhận thay đổi")
+    check(
+        f"[{s}] HR: không đổi gì bị báo lỗi", "Không có thay đổi nào để ghi nhận." in page.content()
+    )
+    page.select_option("select[name=work_status]", "RESIGNED")
+    submit(page, "Ghi nhận thay đổi")
+    check(
+        f"[{s}] HR: nghỉ việc thiếu ngày và lý do bị báo lỗi",
+        "Nhập ngày nghỉ việc." in page.content() and "Chọn lý do nghỉ việc." in page.content(),
+    )
+    page.select_option("select[name=work_status]", "PROBATION")
+    page.fill("input[name=decision_no]", "QĐ-UI-01")
+    submit(page, "Ghi nhận thay đổi")
+    check(f"[{s}] HR: đổi trạng thái thành công", "Đã ghi nhận thay đổi." in page.content())
+    check(
+        f"[{s}] HR: lịch sử giữ dòng Tiếp nhận và thêm dòng Đổi trạng thái",
+        "Tiếp nhận vào làm" in page.content()
+        and "Đổi trạng thái làm việc" in page.content()
+        and "Chờ nhận việc → Thử việc" in page.content(),
+    )
+
+    # Hợp đồng: thiếu hạn, rồi có tệp và hết hạn sau 20 ngày → nhãn Sắp hết hạn
+    pdf = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    pdf.write(b"%PDF-1.4 hop dong gia de kiem thu giao dien")
+    pdf.close()
+    goto(page, f"/ho-so/{pk}/hop-dong/them/")
+    page.fill("input[name=contract_no]", f"HD-UI-{RUN_ID}-{s}")
+    page.fill("input[name=signed_date]", "01/03/2026")
+    page.fill("input[name=effective_date]", "05/03/2026")
+    submit(page, "Lưu hợp đồng")
+    check(
+        f"[{s}] HR: hợp đồng xác định thời hạn thiếu ngày hết hạn bị báo lỗi",
+        "Nhập ngày hết hạn." in page.content(),
+    )
+    page.fill(
+        "input[name=effective_date]", (today - datetime.timedelta(days=345)).strftime("%d/%m/%Y")
+    )
+    page.fill("input[name=expiry_date]", (today + datetime.timedelta(days=20)).strftime("%d/%m/%Y"))
+    page.set_input_files("input[name=file]", pdf.name)
+    pw.shot(OUT, page, s, "25-form-hop-dong")
+    submit(page, "Lưu hợp đồng")
+    check(f"[{s}] HR: thêm hợp đồng thành công", "Đã thêm hợp đồng." in page.content())
+    check(
+        f"[{s}] HR: hợp đồng sắp hết hạn có nhãn Sắp hết hạn và nút tải tệp",
+        page.locator(".pa-badge:has-text('Sắp hết hạn')").count() == 1
+        and page.locator("a[href*='/tai-xuong/']").count() == 1,
+    )
+    pw.shot(OUT, page, s, "26-lam-viec-day-du")
+    goto(page, "/ho-so/?hop_dong_sap_het_han=1")
+    check(
+        f"[{s}] HR: lọc hợp đồng sắp hết hạn thấy hồ sơ vừa thêm",
+        page.locator("td", has_text="CN-").count() >= 1,
+    )
+    ctx.close()
+
+    ctx, page = new_page(browser, size)
+    login(page, "viewer")
+    goto(page, f"/ho-so/{pk}/?tab=lam-viec")
+    check(
+        f"[{s}] Viewer: thấy lịch sử và hợp đồng, không có nút thao tác",
+        "Sắp hết hạn" in page.content()
+        and page.locator("a.btn:has-text('Ghi nhận thay đổi')").count() == 0
+        and "/sua/" not in page.content(),
+    )
+    check(
+        f"[{s}] Viewer: gọi thẳng các URL ghi nhận bị 403",
+        all(
+            goto(page, u) == 403
+            for u in (f"/ho-so/{pk}/lam-viec/thay-doi/", f"/ho-so/{pk}/hop-dong/them/")
+        ),
+    )
+    ctx.close()
+
+
+PARTS = {
+    "cai-dat": part_settings,
+    "tuyen-dung": part_recruitment,
+    "lam-viec": part_employment,
+}
 
 
 def main():

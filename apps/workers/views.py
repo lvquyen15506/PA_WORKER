@@ -17,6 +17,7 @@ from django.views.decorators.http import require_GET, require_POST
 from apps.accounts.permissions import ALL_ROLES, role_required
 from apps.audit.models import AuditLog
 from apps.audit.services import log
+from apps.core import badges
 from apps.core.choices import (
     AuditAction,
     ContractType,
@@ -30,7 +31,8 @@ from apps.core.text import mask_id_number
 from apps.documents import services as document_services
 from apps.documents.forms import VerifyForm
 from apps.documents.models import WorkerDocument
-from apps.workers import rules, workflow
+from apps.employment import services as employment_services
+from apps.workers import indicators, rules, workflow
 
 from . import history_labels, services
 from .forms import (
@@ -555,6 +557,18 @@ def _recruitment_tab(request, worker, employment, identity, staff, role):
 
     applications = []
     for app in worker.applications.select_related("position", "source"):
+        actions = edit_action(f"/ung-tuyen/{app.pk}/sua/")
+        # Nút chỉ hiện khi Đạt + Đã xác minh (câu 7); máy chủ kiểm tra lại ở service.
+        if can_edit and employment_services.can_onboard(app, worker):
+            actions.append(
+                {
+                    "kind": "menu",
+                    "label": "Thêm",
+                    "items": [
+                        {"label": "Tiếp nhận vào làm", "url": f"/ung-tuyen/{app.pk}/tiep-nhan/"}
+                    ],
+                }
+            )
         applications.append(
             {
                 "position": app.position.name,
@@ -562,7 +576,7 @@ def _recruitment_tab(request, worker, employment, identity, staff, role):
                 "applied_date": app.applied_date,
                 "salary": _money(app.expected_salary),
                 "status": app.status,
-                "actions": edit_action(f"/ung-tuyen/{app.pk}/sua/"),
+                "actions": actions,
             }
         )
     education, certificates, experiences = [], [], []
@@ -665,12 +679,28 @@ def _employment_tab(request, worker, employment, identity, staff, role):
             ]
     history = []
     for h in worker.employment_history.select_related(
-        "from_section", "to_section", "from_position", "to_position"
+        "from_section",
+        "to_section",
+        "from_team",
+        "to_team",
+        "from_position",
+        "to_position",
+        "from_shift",
+        "to_shift",
+        "from_manager",
+        "to_manager",
     ):
         parts = []
         for label, old, new in (
             ("Bộ phận", h.from_section, h.to_section),
+            ("Tổ", h.from_team, h.to_team),
             ("Chức danh", h.from_position, h.to_position),
+            ("Ca", h.from_shift, h.to_shift),
+            (
+                "Người quản lý",
+                h.from_manager.employee_code if h.from_manager else None,
+                h.to_manager.employee_code if h.to_manager else None,
+            ),
         ):
             if old or new:
                 parts.append(f"{label}: {old or DASH} → {new or DASH}")
@@ -694,24 +724,37 @@ def _employment_tab(request, worker, employment, identity, staff, role):
         {"key": "effective_date", "label": "Từ ngày", "kind": "date"},
         {"key": "expiry_date", "label": "Đến ngày", "kind": "date"},
     ]
+    contract_columns.append({"key": "warning", "label": "Cảnh báo", "kind": "badge"})
     if staff:
-        contract_columns.append({"key": "actions", "label": "Tệp", "kind": "actions"})
+        contract_columns.append({"key": "actions", "label": "Thao tác", "kind": "actions"})
+    can_edit = rules.can_edit_work_tabs(request.user, worker)
     contracts = []
+    expiring_pks = set(
+        indicators.contract_expiring_q().filter(worker=worker).values_list("pk", flat=True)
+    )
     for c in worker.contracts.select_related("document"):
         row = {
             "type": ContractType(c.contract_type).label,
             "contract_no": c.contract_no,
             "effective_date": c.effective_date,
             "expiry_date": c.expiry_date,
+            "warning": badges.EXPIRING if c.pk in expiring_pks else "",
             "actions": [],
         }
         current = c.current_document  # bản hiện hành của chuỗi thay thế (câu 32)
         if staff and current is not None and current.stored_file:
-            row["actions"] = [
+            row["actions"].append(
                 _link("bi-download", "Tải tệp hợp đồng", f"/tai-lieu/{current.pk}/tai-xuong/")
-            ]
+            )
+        if can_edit:
+            row["actions"].append(_link("bi-pencil", "Sửa hợp đồng", f"/hop-dong/{c.pk}/sua/"))
         contracts.append(row)
     return {
+        "can_edit_work": can_edit,
+        "work_links": [
+            ("Ghi nhận thay đổi", f"/ho-so/{worker.pk}/lam-viec/thay-doi/", employment is not None),
+            ("Thêm hợp đồng", f"/ho-so/{worker.pk}/hop-dong/them/", employment is not None),
+        ],
         "employment_items": items,
         "history_columns": [
             {"key": "effective_date", "label": "Ngày hiệu lực", "kind": "date"},
