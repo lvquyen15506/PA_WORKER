@@ -1,28 +1,29 @@
 # Chạy khi phát triển và khi nghiệm thu
 
-## Phát triển (có `docker-compose.override.yml`)
+## Phát triển (có `docker-compose.dev.yml`)
 
 ```
 python scripts/make_env.py            # một lần, không ghi đè .env đã có
-docker compose up -d --build          # tự đọc docker-compose.override.yml
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 docker compose exec web pytest        # sửa code xong chạy ngay, không build lại image
 docker compose exec web ruff check .
 ```
 
-Override mount mã nguồn vào `web` (`.:/app`, trừ `staticfiles`) và chạy gunicorn `--reload`.
-Đổi `requirements.txt` hoặc `Dockerfile` thì vẫn phải `docker compose up -d --build`.
+Tệp dev mount mã nguồn vào `web` (`.:/app`, trừ `staticfiles`) và chạy gunicorn `--reload`.
+Đổi `requirements.txt` hoặc `Dockerfile` thì phải chạy lại lệnh `up -d --build` ở trên.
 `scheduler` không được mount nên vẫn chạy mã trong image.
+Từ Phase 8 tệp này **không** còn tên `docker-compose.override.yml`, nên `docker compose up` không tự đọc nó (bản bàn giao không chạy nhầm chế độ dev).
 
-## Nghiệm thu và cài thật (KHÔNG có override)
+## Nghiệm thu và cài thật
 
-Kịch bản nghiệm thu 1 (cài mới) bắt buộc chạy bằng file compose gốc, trên volume sạch:
+Kịch bản nghiệm thu 1 (cài mới) chạy bằng file compose gốc, trên volume sạch:
 
 ```
-docker compose -f docker-compose.yml down -v
-docker compose -f docker-compose.yml up -d --build
+docker compose down -v
+docker compose up -d --build
 ```
 
-Cờ `-f docker-compose.yml` làm Compose bỏ qua override, nên chạy đúng mã đã đóng vào image.
+Container chạy bằng người dùng `app` (UID 1000). Volume `media` tạo từ bản trước Phase 8 (chạy bằng root) cần đổi quyền một lần: `Cap nhat.bat` làm tự động, hoặc chạy `docker compose run --rm --no-deps -u root --entrypoint chown web -R app:app /app/private_media`.
 
 ## Dữ liệu mẫu
 

@@ -1,7 +1,21 @@
+# Tên dự án cố định: giải nén bản mới vào thư mục tên khác vẫn dùng đúng volume dữ liệu cũ.
+name: pa_worker
+
+# Xoay vòng log của mọi container: tối đa 5 tệp × 10 MB mỗi container.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   db:
-    image: postgres:16
+    build:
+      context: .
+      dockerfile: docker/db.Dockerfile
+    image: pa_worker-db
     restart: unless-stopped
+    logging: *logging
     environment: # chỉ 3 biến; Compose lấy giá trị từ .env
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -16,13 +30,15 @@ services:
 
   web:
     build: .
+    image: pa_worker-web
     restart: unless-stopped
+    logging: *logging
     env_file: .env
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "${PA_PORT:-8000}:8000"
     volumes:
       - media:/app/private_media
     healthcheck:
@@ -33,7 +49,9 @@ services:
 
   scheduler:
     build: .
+    image: pa_worker-web
     restart: unless-stopped
+    logging: *logging
     env_file: .env
     depends_on:
       web:

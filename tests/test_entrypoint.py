@@ -24,7 +24,7 @@ def test_entrypoint_khong_chua_seed_demo():
 
 
 def test_dockerfile_va_compose_khong_goi_seed_demo():
-    for name in ("Dockerfile", "docker-compose.yml", "docker-compose.override.yml"):
+    for name in ("Dockerfile", "docker-compose.yml", "docker-compose.dev.yml"):
         assert "seed_demo" not in (ROOT / name).read_text(encoding="utf-8"), name
 
 

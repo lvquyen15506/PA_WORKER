@@ -51,7 +51,8 @@ scripts/           sao lưu, phục hồi, khởi động nhanh
 ## Lệnh thường dùng
 
 ```
-docker compose up -d --build                          # chạy hệ thống
+docker compose up -d --build                          # chạy hệ thống (bản cài thật, nghiệm thu)
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build   # phát triển (mount mã nguồn)
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py seed_demo    # dữ liệu giả lập (tạo ở phase 2)
 docker compose exec web pytest

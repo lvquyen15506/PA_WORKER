@@ -1,7 +1,7 @@
-# CHỈ DÙNG KHI PHÁT TRIỂN. Docker Compose tự đọc file này cùng docker-compose.yml.
+# CHỈ DÙNG KHI PHÁT TRIỂN (không bàn giao cho khách dùng). Phải ghi rõ khi chạy:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 # Mount mã nguồn vào web và chạy gunicorn --reload để sửa code/chạy test không cần build lại image.
-# Khi nghiệm thu hoặc cài thật, chạy KHÔNG có file này:
-#   docker compose -f docker-compose.yml up -d --build
+# Cài thật và nghiệm thu chỉ dùng docker-compose.yml (lệnh "docker compose up" không đọc file này).
 # Chỉ service web được mount; scheduler vẫn chạy mã trong image (không cần reload).
 services:
   web:
@@ -16,6 +16,10 @@ services:
         "0.0.0.0:8000",
         "--workers",
         "3",
+        "--worker-class",
+        "gthread",
+        "--threads",
+        "4",
         "--timeout",
         "120",
         "--reload",
