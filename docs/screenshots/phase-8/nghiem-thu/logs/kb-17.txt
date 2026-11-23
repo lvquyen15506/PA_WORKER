@@ -3,7 +3,7 @@
 ĐẠT  Sao luu.bat chạy thành công
 ĐẠT  File sao lưu có ngày giờ trong tên
 ĐẠT  Sao lưu nhắc cất khóa riêng
-   sao lưu pa-worker-20261124-022602.pawbk: 4.9 MB, 3 giây
+   sao lưu pa-worker-20261124-024341.pawbk: 4.9 MB, 3 giây
 ĐẠT  File bị sửa 1 byte: bị từ chối
 ĐẠT  Khóa sai: phục hồi bị từ chối với thông báo tiếng Việt
 ĐẠT  Khóa sai: dữ liệu đang có giữ nguyên

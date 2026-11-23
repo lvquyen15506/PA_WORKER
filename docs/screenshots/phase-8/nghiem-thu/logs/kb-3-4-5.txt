@@ -38,6 +38,6 @@
 ĐẠT  K5: phiên nhận diện đã đóng
 ĐẠT  K5: phiên cũ không còn mở được
 ĐẠT  Nhật ký ghi đủ INTAKE_CREATE, INTAKE_SAVE, INTAKE_CANCEL
-LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:sendAbort, [object HTMLDivElement]')]
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
 
-Tổng: 41 bước, đạt 40, lỗi 1
+Tổng: 41 bước, đạt 41, lỗi 0

@@ -37,6 +37,6 @@
 ĐẠT  [14] Quản lý thấy giá trị cũ và mới trong chi tiết
 ĐẠT  [14] AuditLog không chứa họ tên (chỉ AuditPersonalValue mã hóa)
 ĐẠT  [14] AuditPersonalValue có dòng giá trị cũ/mới của họ tên
-LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]')]
+ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
 
-Tổng: 40 bước, đạt 39, lỗi 1
+Tổng: 40 bước, đạt 40, lỗi 0

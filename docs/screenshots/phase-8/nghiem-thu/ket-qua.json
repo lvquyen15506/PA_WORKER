@@ -5,7 +5,7 @@
    "ma": "cai-dat",
    "ten": "Kịch bản 1 (phần cài đặt): máy mới chỉ có Docker Desktop, PA Worker.bat bản Demo",
    "dat": true,
-   "giay": 108,
+   "giay": 116,
    "khong_cache": true,
    "so_tai_khoan_mau": 4
   },
@@ -15,29 +15,23 @@
    "dat": true,
    "so_buoc_dat": 52,
    "tong_buoc": 52,
-   "giay": 30
+   "giay": 31
   },
   {
    "ma": "kb-2-5-6-7-14",
    "ten": "Kịch bản 2, 5, 6, 7, 14",
-   "dat": false,
-   "so_buoc_dat": 39,
+   "dat": true,
+   "so_buoc_dat": 40,
    "tong_buoc": 40,
-   "giay": 48,
-   "loi": [
-    "LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]')]"
-   ]
+   "giay": 48
   },
   {
    "ma": "kb-3-4-5",
    "ten": "Kịch bản 3, 4, 5",
-   "dat": false,
-   "so_buoc_dat": 40,
+   "dat": true,
+   "so_buoc_dat": 41,
    "tong_buoc": 41,
-   "giay": 56,
-   "loi": [
-    "LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:sendAbort, [object HTMLDivElement]')]"
-   ]
+   "giay": 57
   },
   {
    "ma": "kb-8-9-10-v11",
@@ -45,7 +39,7 @@
    "dat": true,
    "so_buoc_dat": 39,
    "tong_buoc": 39,
-   "giay": 44
+   "giay": 46
   },
   {
    "ma": "kb-10-11-12-13-16",
@@ -53,7 +47,7 @@
    "dat": true,
    "so_buoc_dat": 105,
    "tong_buoc": 105,
-   "giay": 112
+   "giay": 113
   },
   {
    "ma": "kb-17",
@@ -61,7 +55,7 @@
    "dat": true,
    "so_buoc_dat": 25,
    "tong_buoc": 25,
-   "giay": 76
+   "giay": 77
   },
   {
    "ma": "kiem_thu_giao_dien_phase3",
@@ -74,24 +68,18 @@
   {
    "ma": "kiem_thu_giao_dien_phase4",
    "ten": "Kiểm thử giao diện Phase 4",
-   "dat": false,
-   "so_buoc_dat": 110,
+   "dat": true,
+   "so_buoc_dat": 111,
    "tong_buoc": 111,
-   "giay": 62,
-   "loi": [
-    "LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]')]"
-   ]
+   "giay": 62
   },
   {
    "ma": "kiem_thu_giao_dien_phase5",
    "ten": "Kiểm thử giao diện Phase 5",
-   "dat": false,
-   "so_buoc_dat": 87,
+   "dat": true,
+   "so_buoc_dat": 88,
    "tong_buoc": 88,
-   "giay": 67,
-   "loi": [
-    "LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/nhap-cccd/d76a6e83-d540-4fc9-a376-ccc03dfd82cf/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/d76a6e83-d540-4fc9-a376-ccc03dfd82cf/', 'htmx:sendAbort, [object HTMLDivElement]')]"
-   ]
+   "giay": 67
   },
   {
    "ma": "kiem_thu_giao_dien_phase6",
@@ -99,7 +87,7 @@
    "dat": true,
    "so_buoc_dat": 149,
    "tong_buoc": 149,
-   "giay": 143
+   "giay": 142
   },
   {
    "ma": "kiem_thu_giao_dien_phase7",
@@ -136,6 +124,6 @@
    }
   }
  ],
- "tong_giay": 936,
- "dat_het": false
+ "tong_giay": 952,
+ "dat_het": true
 }
