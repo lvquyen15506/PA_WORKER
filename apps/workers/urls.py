@@ -1,9 +1,10 @@
 from django.urls import path
 
-from . import views, views_workflow
+from . import export, views, views_workflow
 
 urlpatterns = [
     path("ho-so/", views.worker_list, name="worker_list"),
+    path("ho-so/xuat-excel/", export.export_workers, name="worker_export"),
     path("ho-so/them/", views.worker_add, name="worker_add"),
     path("ho-so/them/nhap-tay/", views.worker_create, name="worker_create"),
     path("ho-so/kiem-tra-trung/", views.check_duplicate, name="worker_check_duplicate"),

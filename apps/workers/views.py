@@ -173,11 +173,16 @@ def worker_list(request):
         )
     query = params.copy()
     query.pop("trang", None)
-    actions = (
-        [{"label": "Thêm hồ sơ", "kind": "primary", "url": "/ho-so/them/"}]
-        if role_code(request.user) in ALL_STAFF
-        else []
-    )
+    actions = []
+    export_action = ""
+    if role_code(request.user) in ALL_STAFF:  # Viewer không xuất Excel (câu 18)
+        export_action = "/ho-so/xuat-excel/?" + query.urlencode()
+        actions.append({"label": "Xuất Excel", "kind": "secondary", "url": export_action})
+        if role_code(request.user) in MANAGERS:  # chỉ A, Q được chọn xuất kèm số CCCD đầy đủ
+            actions.append(
+                {"label": "Xuất kèm số CCCD", "kind": "secondary", "modal": "modal-export-full"}
+            )
+        actions.append({"label": "Thêm hồ sơ", "kind": "primary", "url": "/ho-so/them/"})
     return render(
         request,
         "workers/list.html",
@@ -188,6 +193,7 @@ def worker_list(request):
             "page": page,
             "query": query.urlencode(),
             "header_actions": actions,
+            "export_full_action": export_action if role_code(request.user) in MANAGERS else "",
         },
     )
 

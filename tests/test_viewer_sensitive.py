@@ -148,5 +148,10 @@ def test_doi_chung_hr_thay_cac_truong_nhay_cam_nen_test_o_tren_khong_rong(worker
 def test_doi_chung_hr_tim_theo_so_cccd(worker):
     _, page = html(login_client(make_user("HR_STAFF")), f"/ho-so/?q={SENSITIVE['id_number']}")
     assert Worker.objects.get(pk=worker.pk).full_name in page
-    # Số chỉ xuất hiện một lần: ô tìm kiếm echo lại chữ người dùng vừa gõ; bảng không in số CCCD.
-    assert page.count(SENSITIVE["id_number"]) == 1
+    # Số chỉ nằm ở chữ người dùng vừa gõ: ô tìm kiếm echo lại và liên kết "Xuất Excel" mang theo bộ
+    # lọc đang áp (Phase 7). Bảng kết quả không in số CCCD.
+    number = SENSITIVE["id_number"]
+    table = page[page.index("<table") : page.index("</table>")]
+    assert number not in table
+    without_echo = page.replace(f'value="{number}"', "").replace(f"q={number}", "")
+    assert number not in without_echo  # không còn chỗ nào khác lộ số

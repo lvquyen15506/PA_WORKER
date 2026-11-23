@@ -5,4 +5,7 @@
 {% include "components/_filter_bar.html" with form=form reset_url="/ho-so/?reset=1" %}
 {% include "components/_table.html" with columns=columns rows=rows empty_text="Không có hồ sơ phù hợp." empty_action_label="Xóa lọc" empty_action_url="/ho-so/?reset=1" %}
 {% include "components/_pagination.html" with page=page query=query %}
+{% if export_full_action %}
+{% include "workers/_export_full_modal.html" with id="modal-export-full" title="Xuất kèm số CCCD đầy đủ" message="File Excel sẽ chứa số CCCD đầy đủ của mọi hồ sơ đang lọc. Mỗi lần xuất được ghi nhật ký." action=export_full_action confirm_label="Xuất Excel kèm số CCCD" danger=True %}
+{% endif %}
 {% endblock %}

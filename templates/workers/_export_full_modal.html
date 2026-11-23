@@ -1,0 +1,7 @@
+{% extends "components/_confirm_modal.html" %}
+{% comment %}Hộp xác nhận xuất danh sách kèm số CCCD đầy đủ (chỉ Admin, Quản lý nhân sự). Gửi POST có CSRF tới địa
+   chỉ xuất (bộ lọc nằm trên địa chỉ); máy chủ kiểm tra lại vai trò.{% endcomment %}
+{% block body %}
+<p class="pa-small pa-muted">File chứa số CCCD không bị che. Chỉ lưu và chia sẻ ở nơi an toàn.</p>
+<input type="hidden" name="cccd_day_du" value="1">
+{% endblock %}
