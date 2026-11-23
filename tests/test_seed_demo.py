@@ -307,3 +307,56 @@ def test_ho_so_luu_tru_du_6_can_cu_va_khop_quy_tac_tu_luu_tru(seeded):
             assert rejected_at.date() > limit, w.worker_code
         if w.verification_status in ("DRAFT", "NEEDS_INFO"):
             assert (TODAY - timezone.localtime(w.updated_at).date()).days < 183, w.worker_code
+
+
+# --- v1.1: công ty khách, đợt làm việc, lương, bộ phận không bắt buộc -----------------------------
+def test_v11_cong_ty_khach_dot_lam_viec_va_luong_hop_le(seeded):
+    from apps.core.models import ClientCompany
+    from apps.employment.models import SalaryHistory, WorkAssignment
+
+    names = Counter(ClientCompany.objects.values_list("name", flat=True))
+    assert len(names) >= 4 and any(n >= 2 for n in names.values())  # có tên ở nhiều địa điểm
+    assignments = list(WorkAssignment.objects.select_related("worker"))
+    assert len(assignments) > 200
+    open_per_worker = Counter(a.worker_id for a in assignments if a.end_date is None)
+    assert max(open_per_worker.values()) == 1  # mỗi công nhân tối đa một đợt đang mở
+    by_worker = {}
+    for a in assignments:
+        assert a.end_date is None or a.end_date >= a.start_date
+        by_worker.setdefault(a.worker_id, []).append(a)
+    for rows in by_worker.values():  # không chồng lấn ngày
+        rows.sort(key=lambda a: a.start_date)
+        for first, second in zip(rows, rows[1:], strict=False):
+            assert first.end_date is not None and first.end_date < second.start_date
+    emp_status = {e.worker_id: e.work_status for e in Employment.objects.all()}
+    assert all(emp_status[w] != "AWAITING" for w in by_worker)  # chưa nhận việc thì chưa có đợt
+    salaries = list(SalaryHistory.objects.select_related("assignment"))
+    assert len(salaries) >= len(assignments) * 0.9
+    for s in salaries:  # lương nằm trong khoảng đợt, cùng hồ sơ với đợt
+        a = s.assignment
+        assert s.worker_id == a.worker_id and s.effective_date >= a.start_date
+        assert a.end_date is None or s.effective_date <= a.end_date
+        assert s.monthly_salary >= 5_500_000
+
+
+def test_v11_luong_ma_hoa_trong_csdl_va_nhat_ky_khong_chua_so_luong(seeded):
+    from apps.employment.models import SalaryHistory
+
+    with connection.cursor() as cur:
+        cur.execute(
+            "SELECT monthly_salary_enc, client_unit_price_enc FROM employment_salaryhistory"
+        )
+        for monthly, price in cur.fetchall():
+            assert monthly.startswith("gAAAA") and (price is None or price.startswith("gAAAA"))
+    assert SalaryHistory.objects.exists()
+    logs = " | ".join(f"{a.note}{a.changes}{a.object_repr}" for a in AuditLog.objects.all())
+    assert "salary" not in logs.lower()  # seed không ghi nhật ký giá trị lương
+
+
+def test_v11_co_cong_nhan_khong_bo_phan_va_dot_sap_du_12_thang(seeded):
+    from apps.workers import indicators
+
+    assert Employment.objects.filter(section__isnull=True).exists()
+    assert not Employment.objects.filter(team__isnull=False, section__isnull=True).exists()
+    due = indicators.assignment_due_info()
+    assert len(due) >= 3  # đủ dữ liệu cho thẻ việc cần làm và bộ lọc ở Phase 7

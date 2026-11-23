@@ -41,6 +41,7 @@ from apps.core.codes import next_code
 from apps.core.crypto import compute_id_hash
 from apps.core.models import (
     ApplicationSource,
+    ClientCompany,
     Department,
     EducationLevel,
     Position,
@@ -49,7 +50,13 @@ from apps.core.models import (
     Team,
 )
 from apps.core.text import compute_name_search
-from apps.employment.models import Contract, Employment, EmploymentHistory
+from apps.employment.models import (
+    Contract,
+    Employment,
+    EmploymentHistory,
+    SalaryHistory,
+    WorkAssignment,
+)
 from apps.recruitment.models import Application, Certificate, Education, WorkExperience
 from apps.workers.models import (
     DataConsent,
@@ -118,6 +125,16 @@ SHIFTS = [
     ("Hành chính", "08:00-17:00"),
 ]
 SOURCES = ["Giới thiệu", "Website", "Mạng xã hội", "Tuyển trực tiếp", "Trung tâm việc làm"]
+
+# Công ty khách hàng hư cấu (v1.1, câu 39): mỗi địa điểm một dòng. Hai dòng đầu cùng tên, khác địa
+# điểm, để thử chuỗi đợt liền nhau cộng dồn 12 tháng theo TÊN (câu 43, 48).
+CLIENT_COMPANIES = [
+    ("Công ty TNHH Điện tử Mẫu A", "Bình Dương"),
+    ("Công ty TNHH Điện tử Mẫu A", "Đồng Nai"),
+    ("Công ty CP May mặc Mẫu B", "Long An"),
+    ("Công ty TNHH Cơ khí Mẫu C", "Bắc Ninh"),
+    ("Công ty CP Bao bì Mẫu D", "Hải Phòng"),
+]
 RELATIONSHIPS = ["Cha", "Mẹ", "Vợ", "Chồng", "Anh", "Chị", "Em", "Bạn"]
 JOBS = ["Công nhân may", "Nhân viên bán hàng", "Thợ hàn", "Nhân viên kho", "Phục vụ", "Lái xe"]
 SKILLS = [
@@ -429,7 +446,12 @@ class Command(BaseCommand):
         ]
         sources = [ApplicationSource.objects.get_or_create(name=n)[0] for n in SOURCES]
         levels = {lv.name: lv for lv in EducationLevel.objects.all()}
+        clients = [
+            ClientCompany.objects.get_or_create(name=name, location=location)[0]
+            for name, location in CLIENT_COMPANIES
+        ]
         return {
+            "clients": clients,
             "sections": sections,
             "positions": positions,
             "shifts": shifts,
@@ -557,6 +579,17 @@ class Command(BaseCommand):
             Employment.objects.bulk_create(employments, batch_size=200)
             EmploymentHistory.objects.bulk_create(history, batch_size=200)
             Contract.objects.bulk_create(contracts, batch_size=200)
+
+        # 4. Đợt làm việc tại công ty khách và lịch sử lương (v1.1)
+        assignments = []
+        for p in plans:
+            if p["emp"]:
+                self.assignments(p, today, catalog, users, assignments)
+        with keep_dates(WorkAssignment):
+            WorkAssignment.objects.bulk_create(assignments, batch_size=200)
+        salaries = [row for a in assignments for row in a.salary_plan]
+        with keep_dates(SalaryHistory):
+            SalaryHistory.objects.bulk_create(salaries, batch_size=200)
 
     def children(self, p, rows, today, catalog, users):
         rng, person, worker = p["rng"], p["person"], p["worker"]
@@ -716,12 +749,17 @@ class Command(BaseCommand):
         shift = (
             catalog["shifts"][3] if sec_name == "Văn phòng" else rng.choice(catalog["shifts"][:3])
         )
+        # v1.1 (câu 48): bộ phận không bắt buộc; khoảng 5% công nhân chưa có bộ phận (bộ sinh riêng
+        # để không đổi các giá trị ngẫu nhiên đã có).
+        no_section = random.Random(p["index"] * 104729 + 7).random() < 0.05
+        if no_section:
+            section = team = None
         start = day(emp["start"])
         hist_rows = [(kind, frm, to, day(off)) for kind, frm, to, off in emp["hist"]]
         # Điều chuyển bộ phận (một số công nhân đang làm lâu)
         final_section, final_team = section, team
         tenure = (today - start).days
-        if emp["status"] == W.ACTIVE and tenure >= 120 and rng.random() < 0.25:
+        if emp["status"] == W.ACTIVE and tenure >= 120 and rng.random() < 0.25 and section:
             others = [n for n in POSITIONS if n not in ("Văn phòng", sec_name)]
             new_name = rng.choice(others)
             final_section, new_teams = catalog["sections"][new_name]
@@ -778,6 +816,78 @@ class Command(BaseCommand):
                 )
             )
         self.contracts(p, worker, start, tenure, contracts, today, users)
+
+    def assignments(self, p, today, catalog, users, out):
+        """Đợt làm việc và lương giả của một công nhân. Dùng bộ sinh ngẫu nhiên riêng theo số thứ tự
+        để không làm đổi các giá trị ngẫu nhiên đã có. Một phần công nhân chưa có đợt; một phần
+        có hai đợt liền nhau cùng tên công ty khác địa điểm; một số đợt sắp đủ 12 tháng."""
+        emp, worker = p["emp"], p["worker"]
+        if emp["status"] == W.AWAITING:
+            return
+        rng = random.Random(p["index"] * 7919 + 13)
+        if rng.random() < 0.12:
+            return
+        start = p["created"] + datetime.timedelta(days=emp["start"])
+        tenure = (today - start).days
+        end_final = (
+            p["created"] + datetime.timedelta(days=emp["resign"])
+            if emp["status"] == W.RESIGNED and emp["resign"] is not None
+            else None
+        )
+        if tenure < 1 or (end_final is not None and end_final < start):
+            return
+        if emp["status"] == W.ACTIVE and tenure >= 345 and rng.random() < 0.5:
+            start = today - datetime.timedelta(days=rng.randint(330, 350))  # sắp đủ 12 tháng
+            tenure = (today - start).days
+        clients = catalog["clients"]
+        position = rng.choice(list(catalog["positions"].values()))
+        span_days = ((end_final or today) - start).days  # công nhân đã nghỉ: tính tới ngày nghỉ
+        if span_days >= 200 and rng.random() < 0.3:
+            split = start + datetime.timedelta(days=span_days // 2)
+            spans = [
+                (clients[0], start, split - datetime.timedelta(days=1)),
+                (clients[1], split, end_final),
+            ]
+        else:
+            spans = [(rng.choice(clients), start, end_final)]
+        for client, span_start, span_end in spans:
+            assignment = WorkAssignment(
+                worker=worker,
+                client_company=client,
+                position=position,
+                start_date=span_start,
+                end_date=span_end,
+                created_by=users["quanly"],
+                created_at=at(span_start, 9),
+                updated_at=at(span_start, 9),
+            )
+            assignment.salary_plan = self.salary_rows(
+                rng, assignment, min(span_end or today, today), users
+            )
+            out.append(assignment)
+
+    def salary_rows(self, rng, assignment, last_day, users):
+        """1–3 dòng lương, ngày áp dụng nằm trong khoảng đợt (lương gắn với đợt, câu 48)."""
+        base = rng.randint(55, 120) * 100_000
+        rows, day, step = [], assignment.start_date, 0
+        while day <= last_day and step < 3:
+            salary = base + step * rng.randint(2, 6) * 100_000
+            price = round(salary * 1.3, -4) if rng.random() < 0.8 else None
+            rows.append(
+                SalaryHistory(
+                    assignment=assignment,
+                    worker=assignment.worker,
+                    monthly_salary_enc=str(int(salary)),
+                    client_unit_price_enc=str(int(price)) if price else None,
+                    effective_date=day,
+                    reason="Thiết lập ban đầu" if step == 0 else "Tăng lương theo bậc",
+                    created_by=users["quanly"],
+                    created_at=at(day, 9),
+                )
+            )
+            day += datetime.timedelta(days=rng.randint(90, 200))
+            step += 1
+        return rows
 
     def contracts(self, p, worker, start, tenure, contracts, today, users):
         rng, emp = p["rng"], p["emp"]
