@@ -14,6 +14,15 @@ Tệp dev mount mã nguồn vào `web` (`.:/app`, trừ `staticfiles`) và chạ
 `scheduler` không được mount nên vẫn chạy mã trong image.
 Từ Phase 8 tệp này **không** còn tên `docker-compose.override.yml`, nên `docker compose up` không tự đọc nó (bản bàn giao không chạy nhầm chế độ dev).
 
+Container chạy bằng người dùng `app`: thư mục mã nguồn mount từ Windows cho sửa tệp có sẵn nhưng **không cho tạo tệp mới**. Lệnh tạo tệp trong mã nguồn chạy bằng root, ví dụ:
+
+```
+docker compose exec -u root web python manage.py makemigrations audit -n ten_migration
+```
+
+Sau khi sửa tệp trong `static/` phải dựng lại kèm `-V` (bỏ volume `staticfiles` cũ):
+`docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build -V`.
+
 ## Nghiệm thu và cài thật
 
 Kịch bản nghiệm thu 1 (cài mới) chạy bằng file compose gốc, trên volume sạch:
