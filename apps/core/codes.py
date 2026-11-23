@@ -63,6 +63,20 @@ def next_code(code_type):
         return code
 
 
+def preview_code(code_type, setting=None):
+    """Mã sẽ được cấp ở lần kế tiếp theo cấu hình hiện tại; KHÔNG tăng bộ đếm (trang Cài đặt)."""
+    code_type = CodeType(code_type)
+    prefix, use_year, digits = _config(setting or SystemSetting.load(), code_type)
+    year = timezone.localtime().year if use_year else 0
+    seq = CodeSequence.objects.filter(code_type=code_type, year=year).first()
+    number = seq.last_number if seq else 0
+    while True:
+        number += 1
+        code = format_code(prefix, year, number, digits)
+        if not _exists(code_type, code):
+            return code
+
+
 def bump_sequence(code_type, code):
     """Đẩy bộ đếm lên số của mã cũ nhập từ Excel, chỉ khi mã khớp định dạng đang cấu hình
     (câu 27). Mã khác định dạng không đụng tới bộ đếm. Trả True nếu khớp định dạng."""

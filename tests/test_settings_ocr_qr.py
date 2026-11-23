@@ -67,10 +67,11 @@ def test_chua_dang_nhap_chuyen_toi_dang_nhap():
     assert Client().post(URL, post_data()).status_code == 302
 
 
-def test_admin_vao_duoc_va_cai_dat_chuyen_toi_tab_ocr_qr():
+def test_admin_vao_duoc_tab_ocr_qr():
+    # Phase 6 đổi tab đầu của /cai-dat/ về Danh mục (trang.md 5.2, phác thảo 2.12); test
+    # chuyển hướng nằm ở tests/test_settings_phase6.py. Ở đây chỉ kiểm tab OCR và QR.
     client = admin()
     assert client.get("/cai-dat/").status_code == 302
-    assert client.get("/cai-dat/")["Location"] == URL
     response = client.get(URL)
     assert response.status_code == 200
     html = response.content.decode()

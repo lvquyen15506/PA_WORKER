@@ -175,3 +175,118 @@ class OcrQrForm(forms.Form):
 
 def load_qr_formats():
     return QrFormat.objects.order_by("id_doc_type")
+
+
+# --- Tab Sinh mã (trang.md 5.2: tiền tố, có năm, số chữ số; xem trước mã kế tiếp) ---------------
+MSG_PREFIX = "Tiền tố chỉ gồm chữ cái không dấu và chữ số, 1 đến 10 ký tự."
+MSG_CODE_TOO_LONG = "Mã sinh ra dài {n} ký tự, vượt giới hạn 20. Giảm tiền tố hoặc số chữ số."
+
+
+def _int_field(label, lo, hi, help_text=""):
+    message = f"Nhập số nguyên từ {lo} đến {hi}."
+    return forms.IntegerField(
+        label=label,
+        min_value=lo,
+        max_value=hi,
+        help_text=help_text,
+        error_messages={
+            "required": message,
+            "invalid": message,
+            "min_value": message,
+            "max_value": message,
+        },
+    )
+
+
+def _prefix_field(label):
+    return forms.RegexField(
+        label=label,
+        regex=r"^[A-Za-z0-9]{1,10}$",
+        max_length=10,
+        error_messages={"required": MSG_PREFIX, "invalid": MSG_PREFIX, "max_length": MSG_PREFIX},
+    )
+
+
+class CodeRulesForm(forms.Form):
+    worker_code_prefix = _prefix_field("Tiền tố mã hồ sơ")
+    worker_code_use_year = forms.BooleanField(label="Mã hồ sơ có năm", required=False)
+    worker_code_digits = _int_field("Số chữ số của mã hồ sơ", 3, 8)
+    employee_code_prefix = _prefix_field("Tiền tố mã nhân viên")
+    employee_code_use_year = forms.BooleanField(label="Mã nhân viên có năm", required=False)
+    employee_code_digits = _int_field("Số chữ số của mã nhân viên", 3, 8)
+
+    GROUPS = (
+        ("Mã hồ sơ", ("worker_code_prefix", "worker_code_use_year", "worker_code_digits")),
+        (
+            "Mã nhân viên",
+            ("employee_code_prefix", "employee_code_use_year", "employee_code_digits"),
+        ),
+    )
+
+    def sections(self):
+        return [(title, [self[name] for name in names]) for title, names in self.GROUPS]
+
+    def clean(self):
+        from .codes import MAX_CODE_LENGTH
+
+        cleaned = super().clean()
+        for kind in ("worker", "employee"):
+            prefix = cleaned.get(f"{kind}_code_prefix")
+            digits = cleaned.get(f"{kind}_code_digits")
+            if prefix and digits:
+                length = len(prefix) + 1 + (5 if cleaned.get(f"{kind}_code_use_year") else 0)
+                length += digits
+                if length > MAX_CODE_LENGTH:
+                    self.add_error(f"{kind}_code_digits", MSG_CODE_TOO_LONG.format(n=length))
+        return cleaned
+
+
+# --- Tab Ngưỡng và thời hạn ---------------------------------------------------------------------
+class ThresholdsForm(forms.Form):
+    expiry_warning_days = _int_field(
+        "Cảnh báo sắp hết hạn (ngày)",
+        1,
+        365,
+        "Dùng chung cho CCCD, hợp đồng và đợt làm việc sắp đủ thời hạn.",
+    )
+    assignment_limit_months = _int_field(
+        "Thời hạn đợt làm việc để cảnh báo (tháng)",
+        1,
+        60,
+        "Cộng dồn các đợt liền nhau cùng tên công ty khách. Mặc định 12.",
+    )
+    failed_retention_months = _int_field(
+        "Lưu hồ sơ ứng viên không được tuyển (tháng)", 1, 120, "Mặc định 12."
+    )
+    resigned_retention_years = _int_field(
+        "Lưu hồ sơ công nhân đã nghỉ (năm)",
+        1,
+        50,
+        "Tính từ ngày chấm dứt hợp đồng lao động cuối cùng. Mặc định 10.",
+    )
+    auto_archive_resigned_days = _int_field(
+        "Tự Lưu trữ sau khi nghỉ việc (ngày)", 1, 365, "Mặc định 30."
+    )
+    auto_archive_failed_days = _int_field(
+        "Tự Lưu trữ sau kết quả không đạt hoặc bị từ chối (ngày)", 1, 365, "Mặc định 30."
+    )
+    stale_draft_months = _int_field("Hồ sơ bỏ dở (tháng)", 1, 60, "Mặc định 6.")
+    intake_ttl_hours = _int_field(
+        "Thời hạn phiên nhận diện (giờ)", 1, 168, "Phiên bỏ dở tự xóa sau thời hạn này."
+    )
+
+    GROUPS = (
+        ("Cảnh báo", ("expiry_warning_days", "assignment_limit_months")),
+        (
+            "Thời hạn lưu trữ",
+            ("failed_retention_months", "resigned_retention_years"),
+        ),
+        (
+            "Tự động Lưu trữ",
+            ("auto_archive_resigned_days", "auto_archive_failed_days", "stale_draft_months"),
+        ),
+        ("Nhận diện CCCD và CV", ("intake_ttl_hours",)),
+    )
+
+    def sections(self):
+        return [(title, [self[name] for name in names]) for title, names in self.GROUPS]

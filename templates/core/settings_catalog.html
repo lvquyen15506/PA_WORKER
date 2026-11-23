@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Danh mục – {{ catalog.title }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs actions=header_actions %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% include "components/_filter_bar.html" with form=pick_form reset_url="/cai-dat/danh-muc/" %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">{{ catalog.title }}</h2>
+  <p class="pa-small pa-muted">Không có thao tác xóa. Mục không còn dùng thì chọn Ngừng sử dụng: mục đó không hiện khi tạo mới nhưng vẫn giữ ở dữ liệu cũ.</p>
+  {% include "components/_table.html" with columns=columns rows=rows modal_id="catalog-confirm" empty_text="Danh mục này chưa có mục nào." %}
+  {% include "components/_pagination.html" with page=page %}
+</section>
+{% include "components/_confirm_modal.html" with id="catalog-confirm" title="Xác nhận" message="" action="" confirm_label="Xác nhận" danger=True %}
+{% endblock %}

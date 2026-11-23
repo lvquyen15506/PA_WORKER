@@ -19,6 +19,17 @@ def mask_id_number(value):
     return digits[:keep] + MASK_CHAR * (len(digits) - 2 * keep) + digits[-keep:]
 
 
+def collapse_spaces(text):
+    """Bỏ khoảng trắng đầu/cuối, gộp khoảng trắng liên tiếp; chuẩn Unicode NFC (giữ dấu)."""
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFC", text or "")).strip()
+
+
+def normalize_key(text):
+    """Khóa so khớp tên danh mục và tên công ty khách (câu 43, 48): không phân biệt hoa thường,
+    gộp khoảng trắng thừa, GIỮ dấu tiếng Việt ("Công ty An" khác "Cong ty An")."""
+    return collapse_spaces(text).casefold()
+
+
 def compute_name_search(text):
     """Họ tên không dấu, chữ thường, gộp khoảng trắng (đ -> d). Dùng cho Worker.name_search.
 

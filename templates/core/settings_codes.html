@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Cài đặt sinh mã{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% if form.errors %}{% include "components/_alert.html" with kind="danger" text="Quy tắc sinh mã chưa được lưu. Kiểm tra các ô báo lỗi bên dưới." %}{% endif %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-xl-8">
+    {% include "components/_form_section.html" with title="Mã kế tiếp theo cấu hình đang lưu" items=examples %}
+    {% include "components/_alert.html" with kind="info" text="Đổi quy tắc chỉ ảnh hưởng mã cấp sau đó. Mã đã cấp giữ nguyên và không bao giờ cấp lại cho người khác." %}
+    {% for title, fields in form.sections %}
+      {% include "components/_form_section.html" with title=title fields=fields %}
+    {% endfor %}
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="{% url 'settings_codes' %}">Hủy</a>
+      <button class="btn btn-primary" type="submit">Lưu cài đặt</button>
+    </div>
+  </div></div>
+</form>
+{% endblock %}

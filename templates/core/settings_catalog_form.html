@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title=page_title breadcrumbs=crumbs %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
+{% if form.errors %}{% include "components/_alert.html" with kind="danger" text="Chưa lưu được. Kiểm tra các ô báo lỗi bên dưới." %}{% endif %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-lg-6">
+    {% include "components/_form_section.html" with title=catalog.title fields=form.visible_fields single=True %}
+    {% if system_code %}
+    <p class="pa-small pa-muted">Mã hệ thống: {{ system_code }}. Phần mềm dùng mã này nên không sửa được và loại tài liệu này không ngừng sử dụng được.</p>
+    {% endif %}
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Hủy</a>
+      <button class="btn btn-primary" type="submit">Lưu danh mục</button>
+    </div>
+  </div></div>
+</form>
+{% endblock %}

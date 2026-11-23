@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Cài đặt ngưỡng và thời hạn{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% if form.errors %}{% include "components/_alert.html" with kind="danger" text="Cài đặt chưa được lưu. Kiểm tra các ô báo lỗi bên dưới." %}{% endif %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="row"><div class="col-xl-8">
+    {% for title, fields in form.sections %}
+      {% include "components/_form_section.html" with title=title fields=fields %}
+    {% endfor %}
+    {% include "components/_alert.html" with kind="info" text="Đổi thời hạn lưu trữ thì phải sửa văn bản đồng ý xử lý dữ liệu cho khớp (mục 5 của văn bản)." %}
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="{% url 'settings_thresholds' %}">Hủy</a>
+      <button class="btn btn-primary" type="submit">Lưu cài đặt</button>
+    </div>
+  </div></div>
+</form>
+{% endblock %}
