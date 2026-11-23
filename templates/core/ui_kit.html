@@ -52,6 +52,12 @@
   {% include "components/_table.html" with columns=columns rows=rows modal_id="modal-row" %}
   <p class="pa-small pa-muted mt-3">Bảng không có dòng nào:</p>
   {% include "components/_table.html" with columns=columns rows=none_rows empty_text="Không có hồ sơ phù hợp với bộ lọc." empty_action_label="Xóa lọc" empty_action_url="#bang" %}
+  <p class="pa-small pa-muted mt-3">Bảng có ô chọn dòng (gắn với form ở ngoài bảng bằng thuộc tính form=) và số liệu bấm được (cột liên kết căn phải; dòng bị khóa không chọn được):</p>
+  <form id="form-demo-chon" method="get" action="#bang"></form>
+  {% include "components/_table.html" with columns=pick_columns rows=pick_rows %}
+  <div class="pa-form-actions">
+    <button class="btn btn-outline-danger" type="submit" form="form-demo-chon">Hủy hồ sơ đã chọn</button>
+  </div>
 </section>
 
 <section class="pa-section" id="phan-trang">
@@ -136,11 +142,23 @@
 </section>
 
 <section class="pa-section" id="bieu-do">
-  <h2 class="pa-section__title">13. Biểu đồ cột</h2>
+  <h2 class="pa-section__title">13. Biểu đồ cột (một chuỗi, nhiều chuỗi, cột ngang)</h2>
   <div class="pa-form-section">
     <h3 class="pa-card-title">Hồ sơ mới tăng đều, đạt 42 hồ sơ trong tháng 11</h3>
     <div class="pa-chart"><canvas data-pa-chart="chart-demo" aria-label="Biểu đồ cột số hồ sơ mới theo tháng, đơn vị hồ sơ" role="img"></canvas></div>
     {{ chart|json_script:"chart-demo" }}
+  </div>
+  <p class="pa-small pa-muted">Nhiều chuỗi (navy, blue, muted theo thứ tự; có chú thích):</p>
+  <div class="pa-form-section">
+    <h3 class="pa-card-title">Vào làm nhiều hơn nghỉ việc ở cả sáu tháng gần nhất</h3>
+    <div class="pa-chart"><canvas data-pa-chart="chart-group" aria-label="Biểu đồ cột nhóm vào làm và nghỉ việc theo tháng, đơn vị người" role="img"></canvas></div>
+    {{ chart_group|json_script:"chart-group" }}
+  </div>
+  <p class="pa-small pa-muted">Cột ngang (nhãn dài như tên phòng ban, công ty khách):</p>
+  <div class="pa-form-section">
+    <h3 class="pa-card-title">Xưởng may có nhiều công nhân nhất, 180 người</h3>
+    <div class="pa-chart"><canvas data-pa-chart="chart-horizontal" aria-label="Biểu đồ cột ngang số công nhân theo bộ phận, đơn vị người" role="img"></canvas></div>
+    {{ chart_horizontal|json_script:"chart-horizontal" }}
   </div>
 </section>
 

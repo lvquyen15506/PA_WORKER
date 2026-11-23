@@ -1,5 +1,8 @@
 {% comment %}Bảng danh sách. Tham số:
-   columns: danh sách dict {key, label, kind = text | num | date | datetime | badge | actions, nowrap}
+   columns: danh sách dict {key, label, kind = text | num | date | datetime | badge | link | check | actions, nowrap}
+         link: ô là dict {text, url} (không có url thì chỉ hiện chữ); thêm num=True để căn phải (số liệu bấm được)
+         check: ô chọn dòng, giá trị ô là mã dòng; cột có thêm name (tên trường gửi đi) và form (id form ở
+                ngoài bảng, gắn bằng thuộc tính form=) ; dòng có row.disabled=True thì ô chọn bị khóa
    rows: danh sách dict; giá trị lấy theo columns[].key. Ô badge: mã trạng thái, hoặc dict {value, label}.
          Ô actions: row.actions = danh sách dict
            {kind: "link", icon, tooltip, url, disabled}  hoặc
@@ -14,7 +17,7 @@
     <thead>
       <tr>
         {% for col in columns %}
-        <th scope="col" class="{% if col.kind == 'num' %}is-num{% elif col.kind == 'actions' %}is-actions{% endif %}">{{ col.label }}</th>
+        <th scope="col" class="{% if col.kind == 'num' or col.num %}is-num{% elif col.kind == 'actions' %}is-actions{% endif %}">{{ col.label }}</th>
         {% endfor %}
       </tr>
     </thead>
@@ -23,8 +26,10 @@
       <tr>
         {% for col in columns %}
         {% with cell=row|get_item:col.key %}
-        <td class="{% if col.kind == 'num' %}is-num{% elif col.kind == 'actions' %}is-actions{% endif %}{% if col.nowrap or col.kind == 'badge' or col.kind == 'date' or col.kind == 'datetime' %} is-nowrap{% endif %}">
-          {% if col.kind == "badge" %}
+        <td class="{% if col.kind == 'num' or col.num %}is-num{% elif col.kind == 'actions' %}is-actions{% endif %}{% if col.nowrap or col.kind == 'badge' or col.kind == 'date' or col.kind == 'datetime' or col.kind == 'check' %} is-nowrap{% endif %}">
+          {% if col.kind == "check" %}<input class="form-check-input" type="checkbox" name="{{ col.name }}" value="{{ cell }}" form="{{ col.form }}" aria-label="{{ col.label }}"{% if row.disabled %} disabled{% endif %}>
+          {% elif col.kind == "link" %}{% if cell.url %}<a href="{{ cell.url }}">{{ cell.text }}</a>{% elif cell.text == 0 %}0{% else %}{{ cell.text|default_if_none:"—"|default:"—" }}{% endif %}
+          {% elif col.kind == "badge" %}
             {% if cell.value %}{% include "components/_status_badge.html" with value=cell.value label=cell.label %}{% else %}{% include "components/_status_badge.html" with value=cell label="" %}{% endif %}
           {% elif col.kind == "date" %}{{ cell|date:"d/m/Y"|default:"—" }}
           {% elif col.kind == "datetime" %}{{ cell|date:"d/m/Y H:i"|default:"—" }}
@@ -49,6 +54,7 @@
               <a class="btn btn-sm btn-outline-secondary pa-icon-btn" href="{{ a.url }}" data-bs-toggle="tooltip" title="{{ a.tooltip }}" aria-label="{{ a.tooltip }}"><i class="bi {{ a.icon }}" aria-hidden="true"></i></a>
               {% endif %}
             {% endfor %}
+          {% elif cell == 0 %}0
           {% else %}{{ cell|default_if_none:"—"|default:"—" }}{% endif %}
         </td>
         {% endwith %}

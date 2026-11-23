@@ -136,6 +136,30 @@ COLUMNS = [
 ]
 
 
+PICK_COLUMNS = [
+    {"key": "pick", "label": "Chọn", "kind": "check", "name": "ids", "form": "form-demo-chon"},
+    {"key": "code", "label": "Mã hồ sơ", "kind": "text", "nowrap": True},
+    {"key": "basis", "label": "Căn cứ lưu trữ", "kind": "text"},
+    {"key": "expires", "label": "Hết hạn lưu trữ", "kind": "date"},
+    {"key": "count", "label": "Số công nhân", "kind": "link", "num": True},
+]
+
+
+def _pick_rows():
+    basis = ["Công nhân đã nghỉ", "Ứng viên không được tuyển", "Hồ sơ bị từ chối"]
+    return [
+        {
+            "pick": 100 + i,
+            "code": f"HS-DEMO-{i + 1:04d}",
+            "basis": basis[i % 3],
+            "expires": datetime.date(2026, 1 + i, 10),
+            "count": {"text": i * 3, "url": "#bang"},
+            "disabled": i == 3,  # dòng không chọn được
+        }
+        for i in range(4)
+    ]
+
+
 def _status_groups():
     def group(title, choices):
         return {"title": title, "values": [c.value for c in choices]}
@@ -227,4 +251,22 @@ def build_context():
             "values": [18, 24, 31, 27, 35, 42],
             "unit": "hồ sơ",
         },
+        "chart_group": {
+            "type": "bar",
+            "labels": ["T6", "T7", "T8", "T9", "T10", "T11"],
+            "datasets": [
+                {"label": "Vào làm", "values": [12, 15, 20, 14, 22, 25]},
+                {"label": "Nghỉ việc", "values": [4, 6, 3, 8, 5, 7]},
+            ],
+            "unit": "người",
+        },
+        "chart_horizontal": {
+            "type": "bar",
+            "horizontal": True,
+            "labels": ["Xưởng may", "Kho vận", "Khối văn phòng", "Chưa có bộ phận"],
+            "values": [180, 96, 41, 17],
+            "unit": "người",
+        },
+        "pick_columns": PICK_COLUMNS,
+        "pick_rows": _pick_rows(),
     }
