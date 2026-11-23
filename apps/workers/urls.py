@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import export, views, views_workflow
+from . import export, views, views_retention, views_workflow
 
 urlpatterns = [
     path("ho-so/", views.worker_list, name="worker_list"),
@@ -26,4 +26,13 @@ urlpatterns = [
         name="worker_anonymize",
     ),
     path("duyet-ho-so/", views_workflow.review_queue, name="review_queue"),
+    path("cai-dat/cho-huy/", views_retention.waiting_list, name="settings_waiting"),
+    path("cai-dat/cho-huy/huy/", views_retention.waiting_destroy, name="settings_destroy"),
+    path("cai-dat/bien-ban-huy/", views_retention.record_list, name="settings_records"),
+    path("cai-dat/bien-ban-huy/<int:pk>/", views_retention.record_detail, name="settings_record"),
+    path(
+        "cai-dat/bien-ban-huy/<int:pk>/in/",
+        views_retention.record_print,
+        name="settings_record_print",
+    ),
 ]

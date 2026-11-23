@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Biên bản hủy {{ record.record_no }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Biên bản hủy hồ sơ" %}
+<div class="mb-3 d-print-none"><button class="btn btn-primary" type="button" onclick="window.print()">In biên bản</button></div>
+<section class="pa-form-section">
+  <p class="mb-1"><strong>Số biên bản: {{ record.record_no }}</strong></p>
+  <p class="pa-small pa-muted">Hủy hồ sơ nghĩa là ẩn danh hóa: xóa thông tin cá nhân, giấy tờ và giá trị chi tiết trong nhật ký; giữ mã hồ sơ, mã nhân viên và nhật ký thao tác.</p>
+  {% include "components/_form_section.html" with items=info %}
+  {% for note in notes %}<p class="pa-small">{{ note }}</p>{% endfor %}
+  <h3 class="pa-card-title">Hồ sơ đã hủy</h3>
+  {% include "components/_table.html" with columns=columns rows=rows empty_text="Biên bản không có hồ sơ nào." %}
+  <table class="table table-bordered mt-4">
+    <thead><tr><th scope="col">Người duyệt hủy</th><th scope="col">Người chứng kiến</th></tr></thead>
+    <tbody>
+      <tr><td>Họ và tên: {{ record.performed_by.full_name|default:record.performed_by.username }}</td><td>Họ và tên: ………………………</td></tr>
+      <tr><td>Chữ ký:<br><br></td><td>Chữ ký:<br><br></td></tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}

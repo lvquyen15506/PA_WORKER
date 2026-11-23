@@ -2,11 +2,13 @@
    máy chủ kiểm tra lại mọi trường (lý do bắt buộc, mã hồ sơ gõ lại…).
    Tham số: id, title, message, action (địa chỉ POST; có thể để trống nếu nút mở hộp truyền data-pa-action),
    confirm_label (động từ cụ thể), danger (nút xác nhận đỏ),
-   fields (tùy chọn: danh sách BoundField, vẽ bằng _form_field).
+   fields (tùy chọn: danh sách BoundField, vẽ bằng _form_field),
+   form_id (tùy chọn: id của form trong hộp, để ô chọn dòng ở NGOÀI hộp gắn vào bằng thuộc tính
+   form= — ví dụ chọn nhiều hồ sơ ở bảng Chờ hủy rồi xác nhận trong hộp).
    Cần nội dung riêng: tạo template con extends components/_confirm_modal.html và ghi đè block body.{% endcomment %}
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}-title" aria-hidden="true" data-pa-confirm>
   <div class="modal-dialog">
-    <form class="modal-content" method="post" action="{{ action }}">
+    <form {% if form_id %}id="{{ form_id }}" {% endif %}class="modal-content" method="post" action="{{ action }}">
       {% csrf_token %}
       <div class="modal-header">
         <h2 class="modal-title" id="{{ id }}-title" data-pa-title>{{ title }}</h2>

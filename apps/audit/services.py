@@ -12,7 +12,13 @@ from django.db import transaction
 from apps.core.choices import AuditAction
 
 from .models import AuditLog, AuditPersonalValue
-from .personal_fields import PERSONAL_FIELDS, attr_name, field_label, is_personal
+from .personal_fields import (
+    PERSONAL_FIELDS,
+    VIRTUAL_FIELDS,
+    attr_name,
+    field_label,
+    is_personal,
+)
 
 PERSONAL_PLACEHOLDER = "(xem giá trị chi tiết)"
 SYSTEM_LABEL = "Hệ thống"
@@ -96,10 +102,11 @@ def log(
         if label is None:
             raise ValueError("Ghi thay đổi từng trường cần có obj.")
         attr = attr_name(label, logical)
-        try:
-            obj._meta.get_field(attr)
-        except Exception as exc:
-            raise ValueError(f"{label} không có trường {logical!r}.") from exc
+        if logical not in VIRTUAL_FIELDS.get(label, ()):  # trường ảo không có cột trong model
+            try:
+                obj._meta.get_field(attr)
+            except Exception as exc:
+                raise ValueError(f"{label} không có trường {logical!r}.") from exc
         name = field_label(label, logical, pk)
         if is_personal(label, logical):
             personal.append((name, _text(old), _text(new)))

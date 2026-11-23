@@ -20,12 +20,15 @@ from .models import SystemSetting
 
 admin_only = role_required(RoleCode.ADMIN)
 
-# Danh sách tab khai báo một chỗ: (mã, nhãn, URL). Phase 7 thêm Chờ hủy, Biên bản hủy.
+# Danh sách tab khai báo một chỗ: (mã, nhãn, URL). Chờ hủy và Biên bản hủy: view ở
+# apps/workers/views_retention.py (Phase 7).
 SETTINGS_TABS = [
     ("danh-muc", "Danh mục", "/cai-dat/danh-muc/"),
     ("sinh-ma", "Sinh mã", "/cai-dat/sinh-ma/"),
     ("nguong", "Ngưỡng và thời hạn", "/cai-dat/nguong/"),
     ("ocr-qr", "OCR và QR", "/cai-dat/ocr-qr/"),
+    ("cho-huy", "Chờ hủy", "/cai-dat/cho-huy/"),
+    ("bien-ban-huy", "Biên bản hủy", "/cai-dat/bien-ban-huy/"),
 ]
 CRUMBS = [("Cài đặt", None)]
 PAGE_SIZE = 20

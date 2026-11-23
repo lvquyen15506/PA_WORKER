@@ -170,6 +170,9 @@ class StatusChange(AppendOnlyModel):
     to_status = models.CharField(max_length=20, choices=VerificationStatus.choices)
     # Lý do hệ thống tự điền chỉ dùng mã hồ sơ, không họ tên (câu 30).
     reason = models.TextField(blank=True)
+    # True khi lý do do người dùng gõ (có thể chứa tên): ẩn danh hóa thay bằng "(đã ẩn danh)"
+    # (retention._redact_status_reasons, models.md 4.7). Lý do hệ thống tự điền là False.
+    reason_by_user = models.BooleanField(default=False)
     changed_by = models.ForeignKey(
         "accounts.User", null=True, blank=True, on_delete=models.PROTECT, related_name="+"
     )

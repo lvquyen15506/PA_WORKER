@@ -53,11 +53,11 @@
   <p class="pa-small pa-muted mt-3">Bảng không có dòng nào:</p>
   {% include "components/_table.html" with columns=columns rows=none_rows empty_text="Không có hồ sơ phù hợp với bộ lọc." empty_action_label="Xóa lọc" empty_action_url="#bang" %}
   <p class="pa-small pa-muted mt-3">Bảng có ô chọn dòng (gắn với form ở ngoài bảng bằng thuộc tính form=) và số liệu bấm được (cột liên kết căn phải; dòng bị khóa không chọn được):</p>
-  <form id="form-demo-chon" method="get" action="#bang"></form>
   {% include "components/_table.html" with columns=pick_columns rows=pick_rows %}
   <div class="pa-form-actions">
-    <button class="btn btn-outline-danger" type="submit" form="form-demo-chon">Hủy hồ sơ đã chọn</button>
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modal-pick">Hủy hồ sơ đã chọn</button>
   </div>
+  {% include "components/_confirm_modal.html" with id="modal-pick" form_id="form-demo-chon" title="Hủy hồ sơ đã chọn" message="Các hồ sơ đã chọn ở bảng trên sẽ được gửi cùng hộp xác nhận này (ô chọn gắn với form trong hộp bằng thuộc tính form=)." action="#" confirm_label="Hủy hồ sơ đã chọn" danger=True %}
 </section>
 
 <section class="pa-section" id="phan-trang">

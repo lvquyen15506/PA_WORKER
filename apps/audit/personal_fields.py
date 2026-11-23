@@ -26,6 +26,9 @@ PERSONAL_FIELDS = {
         "current_address",
         "skills",
         "note",
+        # Phase 7: lý do do người dùng gõ khi đổi trạng thái xác minh (có thể chứa tên). Trường ảo,
+        # xem VIRTUAL_FIELDS: không phải cột của Worker, chỉ để ghi vào AuditPersonalValue.
+        "status_reason",
     },
     "workers.IdentityDocument": {
         "id_number",
@@ -49,6 +52,9 @@ PERSONAL_FIELDS = {
     "employment.SalaryHistory": {"monthly_salary", "client_unit_price", "reason"},
 }
 
+
+# Trường cá nhân "ảo": ghi qua log() nhưng không có cột tương ứng trong model.
+VIRTUAL_FIELDS = {"workers.Worker": {"status_reason"}}
 
 # Tên logic -> tên thuộc tính của model, chỉ khi hai tên khác nhau (cột mã hóa có hậu tố _enc).
 LOGICAL_TO_ATTR = {

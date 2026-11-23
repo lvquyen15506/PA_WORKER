@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Biên bản hủy {{ record.record_no }}{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs %}
+{% include "components/_tabs.html" with tabs=tabs %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="pa-section__title mb-0">Biên bản hủy {{ record.record_no }}</h2>
+  <a class="btn btn-outline-secondary" href="{{ print_url }}">In biên bản</a>
+</div>
+{% include "components/_form_section.html" with title="Thông tin biên bản" items=info %}
+{% for note in notes %}<p class="pa-small">{{ note }}</p>{% endfor %}
+<div class="pa-form-section">
+  <h3 class="pa-card-title">Hồ sơ đã hủy</h3>
+  {% include "components/_table.html" with columns=columns rows=rows empty_text="Biên bản không có hồ sơ nào." %}
+</div>
+{% endblock %}

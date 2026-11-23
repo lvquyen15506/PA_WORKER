@@ -246,19 +246,27 @@ def transition(
         Worker.objects.filter(pk=locked.pk).update(
             verification_status=to_status.value, updated_at=now
         )
+        # Lý do do người dùng gõ có thể chứa họ tên (câu 30): đánh dấu để ẩn danh hóa thay bằng
+        # "(đã ẩn danh)", và ghi vào nhật ký như trường cá nhân (AuditPersonalValue, bị xóa khi
+        # ẩn danh hóa) thay vì AuditLog.note. Lý do hệ thống tự điền chỉ có mã hồ sơ nên giữ ở note.
+        reason_by_user = trigger == Trigger.MANUAL and bool(reason_text)
         change = StatusChange.objects.create(
             worker=locked,
             from_status=from_status.value,
             to_status=to_status.value,
             reason=reason_text,
+            reason_by_user=reason_by_user,
             changed_by=user,
         )
+        changes = {"verification_status": (from_status.value, to_status.value)}
+        if reason_by_user:
+            changes["status_reason"] = (None, reason_text)
         log(
             AuditAction.REOPEN if rule.reopen else AuditAction.STATUS_CHANGE,
             user=user,
             obj=locked,
-            changes={"verification_status": (from_status.value, to_status.value)},
-            note=reason_text,
+            changes=changes,
+            note="" if reason_by_user else reason_text,
             request=request,
         )
         worker.verification_status = to_status.value

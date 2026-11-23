@@ -6,7 +6,7 @@ import datetime
 import pytest
 from django.apps import apps
 
-from apps.audit.personal_fields import PERSONAL_FIELDS, attr_name
+from apps.audit.personal_fields import PERSONAL_FIELDS, VIRTUAL_FIELDS, attr_name
 from apps.core.models import (
     ApplicationSource,
     ClientCompany,
@@ -32,7 +32,7 @@ def _marker(model, field):
 def _text_values(label, model_cls):
     """Giá trị giả có dấu hiệu nhận biết cho mọi trường chữ cá nhân của model."""
     values = {}
-    for name in PERSONAL_FIELDS[label]:
+    for name in PERSONAL_FIELDS[label] - VIRTUAL_FIELDS.get(label, set()):  # trường ảo không có cột
         attr = attr_name(label, name)
         field = model_cls._meta.get_field(attr)
         if field.get_internal_type() in {"CharField", "TextField", "EmailField"}:
@@ -146,7 +146,9 @@ def _build():
 def _forbidden_values(obj, label):
     """Mọi giá trị cá nhân của đối tượng dưới dạng chuỗi (cả định dạng ngày dd/mm/yyyy)."""
     out = []
-    for name in PERSONAL_FIELDS[label]:
+    for name in PERSONAL_FIELDS[label] - VIRTUAL_FIELDS.get(
+        label, set()
+    ):  # trường ảo: không có cột
         value = getattr(obj, attr_name(label, name))
         if value in (None, ""):
             continue
@@ -161,7 +163,7 @@ def test_moi_model_co_truong_ca_nhan_deu_duoc_kiem_tra():
     assert set(objs) == set(PERSONAL_FIELDS)
     for label in PERSONAL_FIELDS:  # mọi nhãn model tồn tại, mọi tên trường tồn tại
         model = apps.get_model(label)
-        for name in PERSONAL_FIELDS[label]:
+        for name in PERSONAL_FIELDS[label] - VIRTUAL_FIELDS.get(label, set()):
             model._meta.get_field(attr_name(label, name))
 
 

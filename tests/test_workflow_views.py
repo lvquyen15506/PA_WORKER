@@ -234,9 +234,10 @@ def test_ly_do_tra_lai_va_tu_choi_ghi_dung_vao_status_change_va_nhat_ky():
     post(login_client(make_user("HR_MANAGER")), worker, "tu-choi", {"reject-reason": "Giấy tờ sai"})
     assert status_of(worker) == VS.REJECTED
     assert StatusChange.objects.filter(worker=worker).last().reason == "Giấy tờ sai"
-    assert (
-        AuditLog.objects.filter(worker=worker, action="STATUS_CHANGE").first().note == "Giấy tờ sai"
-    )
+    entry = AuditLog.objects.filter(worker=worker, action="STATUS_CHANGE").first()
+    # Phase 7: lý do người gõ nằm ở AuditPersonalValue chứ không ở AuditLog.note.
+    assert entry.note == "" and "Giấy tờ sai" not in str(entry.changes)
+    assert entry.personal_values.get(field_name="status_reason").new_value_enc == "Giấy tờ sai"
     page = text(login_client(make_user("HR_STAFF")).get(f"/ho-so/{worker.pk}/"))
     assert "Từ chối: Giấy tờ sai" in page
 

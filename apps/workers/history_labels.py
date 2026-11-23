@@ -28,6 +28,7 @@ _BASE_LABELS = {
     "skills": "Kỹ năng",
     "note": "Ghi chú",
     "verification_status": "Trạng thái hồ sơ",
+    "status_reason": "Lý do đổi trạng thái",
     "id_doc_type": "Loại giấy tờ",
     "id_number": "Số CCCD",
     "old_id_number": "Số CMND cũ",

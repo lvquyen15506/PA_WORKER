@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Cài đặt – Chờ hủy{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs %}
+{% include "components/_tabs.html" with tabs=tabs %}
+{% if rows %}
+  <p class="pa-small pa-muted">Hồ sơ Lưu trữ đã quá hạn lưu trữ: {{ total }} hồ sơ, hết hạn sớm nhất trước. “Hủy” là ẩn danh hóa: hồ sơ vẫn còn dòng khung và mã, dữ liệu cá nhân bị xóa.</p>
+  {% include "components/_table.html" with columns=columns rows=rows %}
+  {% include "components/_pagination.html" with page=page %}
+  <div class="pa-form-actions">
+    <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#modal-huy">Hủy hồ sơ đã chọn</button>
+  </div>
+  {% include "components/_confirm_modal.html" with id="modal-huy" form_id="form-huy" title="Hủy hồ sơ đã chọn" message="Thao tác này không hoàn tác được. Thông tin cá nhân, giấy tờ và giá trị chi tiết trong nhật ký của các hồ sơ đã chọn sẽ bị xóa. Mã hồ sơ, mã nhân viên và nhật ký thao tác được giữ lại; mỗi lần hủy sinh một biên bản." action="/cai-dat/cho-huy/huy/" confirm_label="Hủy hồ sơ đã chọn" danger=True %}
+{% else %}
+  {% include "components/_empty_state.html" with text="Không có hồ sơ nào quá hạn lưu trữ." %}
+{% endif %}
+{% endblock %}

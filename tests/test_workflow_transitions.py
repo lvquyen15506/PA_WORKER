@@ -64,13 +64,18 @@ def test_bang_chuyen_trang_thai(src, dst, actor):
         assert entry.action == (
             "REOPEN" if (src, dst) == (VS.ARCHIVED, VS.DRAFT) else "STATUS_CHANGE"
         )
-        assert entry.changes == {"verification_status": [src.value, dst.value]}
+        expected_changes = {"verification_status": [src.value, dst.value]}
+        if actor != SYSTEM:  # Phase 7: lý do người dùng gõ là trường cá nhân (không ở note)
+            expected_changes["status_reason"] = "(xem giá trị chi tiết)"
+        assert entry.changes == expected_changes
         assert entry.object_repr == worker.worker_code
         if actor == SYSTEM:
             assert change.changed_by is None and entry.user is None
             assert entry.actor_label == "Hệ thống"
+            assert not change.reason_by_user  # lý do hệ thống giữ ở note
         else:
             assert change.changed_by.role.code == actor
+            assert change.reason_by_user and entry.note == ""
     else:
         with pytest.raises(TransitionError):
             run(worker, dst, actor)
@@ -166,8 +171,13 @@ def test_cac_cap_khong_bat_buoc_ly_do_van_chay_khi_de_trong(src, dst, actor):
 def test_ly_do_duoc_cat_khoang_trang_va_luu_o_status_change_va_nhat_ky():
     worker = prepare(VS.PENDING)
     change = run(worker, VS.NEEDS_INFO, MGR, reason="  Bổ sung ảnh CCCD  ")
-    assert change.reason == "Bổ sung ảnh CCCD"
-    assert AuditLog.objects.first().note == "Bổ sung ảnh CCCD"
+    assert change.reason == "Bổ sung ảnh CCCD" and change.reason_by_user
+    entry = AuditLog.objects.first()
+    # Phase 7: lý do do người dùng gõ là trường cá nhân: AuditLog.note không chứa, giá trị nằm ở
+    # AuditPersonalValue (mã hóa, bị xóa khi ẩn danh hóa).
+    assert entry.note == "" and entry.changes["status_reason"] == "(xem giá trị chi tiết)"
+    saved = entry.personal_values.get(field_name="status_reason")
+    assert (saved.old_value_enc, saved.new_value_enc) == (None, "Bổ sung ảnh CCCD")
 
 
 # ----- Đã xác minh -> Lưu trữ: chặn khi đang làm việc ----------------------------------

@@ -15,6 +15,7 @@ from apps.audit.personal_fields import (
     LOGICAL_TO_ATTR,
     PERSONAL_FIELDS,
     SINGLE_PREFIX,
+    VIRTUAL_FIELDS,
     attr_name,
     field_label,
 )
@@ -264,8 +265,14 @@ def test_personal_fields_dung_ten_logic_va_anh_xa():
 def test_moi_ten_logic_ung_voi_mot_truong_that_cua_model():
     for label, names in PERSONAL_FIELDS.items():
         model = apps.get_model(label)
-        for name in names:
+        # Phase 7: trường ảo (VIRTUAL_FIELDS) cố ý không có cột; mọi tên còn lại phải có cột thật.
+        for name in names - VIRTUAL_FIELDS.get(label, set()):
             model._meta.get_field(attr_name(label, name))
+
+
+def test_truong_ao_chi_la_status_reason_cua_worker():
+    assert VIRTUAL_FIELDS == {"workers.Worker": {"status_reason"}}
+    assert VIRTUAL_FIELDS["workers.Worker"] <= PERSONAL_FIELDS["workers.Worker"]
 
 
 def test_ten_luu_tru_nhu_models_md():

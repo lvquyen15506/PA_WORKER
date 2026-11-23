@@ -11,7 +11,7 @@
 import logging
 from collections import namedtuple
 
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -48,6 +48,7 @@ logger = logging.getLogger(__name__)
 # người thực hiện là Hệ thống (người dùng gõ tay cùng chữ vẫn không tính).
 ABANDONED_REASON = "Hồ sơ bỏ dở"
 ANONYMIZED_NAME = "(Đã ẩn danh)"
+ANONYMIZED_REASON = "(đã ẩn danh)"  # thay lý do do người dùng gõ ở StatusChange (models.md 4.7)
 
 Retention = namedtuple("Retention", ["basis", "expires_on"])
 
@@ -75,6 +76,11 @@ def _archived_change(worker):
     if change is None:
         raise RetentionError(f"Hồ sơ {worker.worker_code} không có lịch sử chuyển sang Lưu trữ.")
     return change
+
+
+def archived_on(worker):
+    """Ngày (giờ Việt Nam) hồ sơ được chuyển sang Lưu trữ lần gần nhất."""
+    return timezone.localtime(_archived_change(worker).changed_at).date()
 
 
 def _resign_date(worker):
@@ -178,6 +184,21 @@ def _delete_files(names):
             logger.exception("Không xóa được tệp %s khi ẩn danh hóa", name)
 
 
+def _redact_status_reasons(worker):
+    """Thay lý do do người dùng gõ (`reason_by_user`) ở dòng thời gian trạng thái bằng
+    "(đã ẩn danh)"; lý do hệ thống tự điền (chỉ có mã hồ sơ) giữ nguyên.
+
+    StatusChange là bảng chỉ thêm (QuerySet của nó chặn update). Đây là NGOẠI LỆ CÓ KIỂM SOÁT duy
+    nhất, chỉ gọi từ `_wipe` (trong `anonymize`): dùng QuerySet gốc của Django để ghi. Có test quét
+    mã nguồn khẳng định không nơi nào khác làm vậy."""
+    plain = models.QuerySet(model=StatusChange)
+    return (
+        plain.filter(worker=worker, reason_by_user=True)
+        .exclude(reason="")
+        .update(reason=ANONYMIZED_REASON)
+    )
+
+
 def _wipe(worker, now):
     """Xóa dữ liệu cá nhân theo bảng 4.7; trả danh sách đường dẫn tệp cần xóa khỏi đĩa."""
     Worker.objects.filter(pk=worker.pk).update(
@@ -231,6 +252,7 @@ def _wipe(worker, now):
     )
     # Giá trị trước/sau của trường cá nhân trong nhật ký (câu 30). Dòng nhật ký vẫn giữ.
     AuditPersonalValue.objects.filter(worker=worker).delete()
+    _redact_status_reasons(worker)
     return names
 
 
