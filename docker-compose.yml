@@ -41,6 +41,7 @@ services:
       - "${PA_PORT:-8000}:8000"
     volumes:
       - media:/app/private_media
+      - ./backups:/backups # file sao lưu (mã hóa) nằm ở thư mục backups cạnh tệp này
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/dang-nhap/', timeout=5)"]
       interval: 10s
@@ -59,6 +60,7 @@ services:
     command: ["python", "manage.py", "run_scheduler"]
     volumes:
       - media:/app/private_media
+      - ./backups:/backups
 
 volumes:
   pgdata:

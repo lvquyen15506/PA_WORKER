@@ -40,5 +40,6 @@ def test_nhan_tieng_viet():
 
 def test_khong_co_trang_thai_cho_huy():
     assert "PENDING_DESTROY" not in choices.VerificationStatus.values
-    assert len(choices.AuditAction) == 21
+    # 21 mã của models.md + BACKUP, RESTORE (Phase 8, sao lưu/phục hồi ghi nhật ký).
+    assert len(choices.AuditAction) == 23
     assert len(choices.RetentionBasis) == 6

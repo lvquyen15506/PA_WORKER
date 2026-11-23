@@ -11,10 +11,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Tesseract (tiếng Việt), zbar (đọc QR), antiword (đọc .doc) dùng từ Phase 5.
 # fonts-dejavu-core: phông có dấu tiếng Việt cho ảnh/CV giả; libglib2.0-0: OpenCV cần.
 # apt-get upgrade: lấy bản vá bảo mật Debian mới hơn image gốc (krb5, zlib…).
+# postgresql-client-16 (pg_dump/pg_restore cho sao lưu, Phase 8) lấy từ kho PGDG để khớp đúng
+# phiên bản máy chủ PostgreSQL 16 (bản của Debian 13 là 17, sinh lệnh mà máy chủ 16 không hiểu).
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         tesseract-ocr tesseract-ocr-vie libzbar0 antiword fonts-dejavu-core libglib2.0-0 \
+        postgresql-common ca-certificates \
+    && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y \
+    && apt-get install -y --no-install-recommends postgresql-client-16 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

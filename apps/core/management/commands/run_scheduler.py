@@ -1,17 +1,42 @@
-"""Vòng lặp của container scheduler: check_keys -> kiểm tra migration -> run_daily_jobs -> nghỉ.
+"""Vòng lặp của container scheduler: check_keys -> kiểm tra migration -> run_daily_jobs ->
+sao lưu tự động (Phase 8) -> nghỉ.
 
 Không có cron: máy demo không bật 24/7 nên chạy mỗi giờ, tác vụ idempotent
 (kien-truc.md mục 2.1). Còn migration chưa áp dụng thì chờ rồi thử lại, không chạy tác vụ.
+Sao lưu tự động chạy khi chưa có bản sao lưu nào trong BACKUP_INTERVAL_HOURS giờ qua; lỗi sao lưu
+chỉ ghi log (không dừng scheduler). Đĩa còn dưới DISK_WARNING_BYTES thì ghi cảnh báo vào log.
 """
 
+import logging
 import time
 
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
+from apps.core.backup import service as backup_service
+from apps.core.backup.stream import BackupError
 from apps.core.keys import KeyConfigError, check_against_database, check_format
+
+logger = logging.getLogger(__name__)
+
+
+def auto_backup():
+    """Sao lưu tự động nếu đến hạn; trả tên file vừa tạo hoặc None."""
+    for label, path, free, _total in backup_service.disk_status():
+        if free < settings.DISK_WARNING_BYTES:
+            logger.warning("%s (%s) còn trống %s", label, path, backup_service.human(free))
+    if not settings.BACKUP_AUTO or not backup_service.auto_backup_due():
+        return None
+    try:
+        result = backup_service.create_backup()
+    except BackupError as exc:
+        logger.error("Sao lưu tự động không thành công: %s", exc)
+        return None
+    logger.info("Đã sao lưu tự động: %s", result["path"].name)
+    return result["path"].name
 
 
 def has_pending_migrations():
@@ -43,6 +68,7 @@ class Command(BaseCommand):
                 time.sleep(options["retry_wait"])
                 continue
             call_command("run_daily_jobs", stdout=self.stdout)
+            auto_backup()
             if options["once"]:
                 return
             time.sleep(options["interval"])

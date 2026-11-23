@@ -165,6 +165,16 @@ MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 # Tổng một request: 3 tệp 10 MB (ảnh mặt trước, mặt sau, CV) + phần dư cho trường form.
 MAX_REQUEST_BYTES = 35 * 1024 * 1024
 
+# Sao lưu (Phase 8, apps/core/backup/). Trong Docker, /backups gắn với thư mục backups cạnh
+# docker-compose.yml trên máy chủ. File sao lưu được mã hóa, không chứa khóa.
+BACKUP_DIR = Path(
+    _env("BACKUP_DIR") or ("/backups" if _env("POSTGRES_HOST") else BASE_DIR / "backups")
+)
+BACKUP_KEEP = int(_env("BACKUP_KEEP", "14"))  # số bản sao lưu thường được giữ lại
+BACKUP_AUTO = _env("BACKUP_AUTO", "1") == "1"  # scheduler tự sao lưu mỗi ngày một lần
+BACKUP_INTERVAL_HOURS = 24
+DISK_WARNING_BYTES = 2 * 1024**3  # còn dưới 2 GB thì cảnh báo
+
 # Nhận diện CCCD/CV (Phase 5). Gunicorn timeout 120 giây nên toàn bộ một lượt nhận diện chỉ được
 # dùng tối đa 90 giây (mỗi giai đoạn lấy phần còn lại); hết thì trường chưa đọc để trống, tô vàng.
 INTAKE_TOTAL_BUDGET_SECONDS = 90

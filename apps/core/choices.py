@@ -138,3 +138,5 @@ class AuditAction(models.TextChoices):
     ACCOUNT_LOCK = "ACCOUNT_LOCK", "Khóa tài khoản"
     ACCOUNT_UNLOCK = "ACCOUNT_UNLOCK", "Mở khóa tài khoản"
     PASSWORD_RESET = "PASSWORD_RESET", "Đặt lại mật khẩu"
+    BACKUP = "BACKUP", "Sao lưu"
+    RESTORE = "RESTORE", "Phục hồi"

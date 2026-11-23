@@ -17,3 +17,6 @@ def khoa_test(settings, tmp_path):
     settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
     # Môi trường test là bản Demo (seed_demo được chạy); test chặn ở bản Thật tự đặt False.
     settings.DEMO_MODE = True
+    # Sao lưu trong test ghi vào thư mục tạm; scheduler không tự sao lưu (test sao lưu bật riêng).
+    settings.BACKUP_DIR = tmp_path / "backups"
+    settings.BACKUP_AUTO = False
