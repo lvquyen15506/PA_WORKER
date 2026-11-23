@@ -16,6 +16,7 @@ from django.utils.formats import date_format
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.accounts.permissions import ALL_ROLES, role_required
+from apps.audit import presenters as audit_presenters
 from apps.audit.models import AuditLog
 from apps.audit.services import log
 from apps.core import badges
@@ -38,7 +39,7 @@ from apps.employment.assignments import current_q
 from apps.employment.models import WorkAssignment
 from apps.workers import indicators, rules, workflow
 
-from . import history_labels, services
+from . import services
 from .forms import (
     AnonymizeForm,
     ConsentForm,
@@ -1048,38 +1049,19 @@ def history_detail(request, pk):
         AuditLog.objects.filter(worker=worker)
         .exclude(action__in=skipped)
         .prefetch_related("personal_values")
-        .select_related("user")[:200]
+        .select_related("user", "worker")[:200]
     )
-    masked = {"identity.id_number", "identity.old_id_number"}
     rows = []
     for entry in entries:
-        values = {p.field_name: p for p in entry.personal_values.all()}
         base = {
             "at": entry.created_at,
             "who": entry.user.full_name if entry.user else entry.actor_label,
             "action": entry.get_action_display(),
         }
-        if not entry.changes:
+        changes = audit_presenters.change_rows(entry)  # dùng chung với trang /nhat-ky/<id>/
+        if not changes:
             rows.append({**base, "field": None, "old": None, "new": None})
-        for field_name, value in entry.changes.items():
-            if isinstance(value, list):  # trường không cá nhân: giá trị nằm ngay trong nhật ký
-                old, new = value
-            else:  # trường cá nhân: giải mã từ AuditPersonalValue
-                saved = values.get(field_name)
-                if saved is None:
-                    old = new = "(đã ẩn danh)" if worker.anonymized_at else None
-                else:
-                    old, new = saved.old_value_enc, saved.new_value_enc
-                    if field_name in masked:
-                        old, new = mask_id_number(old) or None, mask_id_number(new) or None
-            rows.append(
-                {
-                    **base,
-                    "field": history_labels.field_label(field_name, entry.object_type),
-                    "old": history_labels.value_label(field_name, entry.object_type, old),
-                    "new": history_labels.value_label(field_name, entry.object_type, new),
-                }
-            )
+        rows.extend({**base, **change} for change in changes)
     return render(
         request,
         "workers/_history_detail.html",

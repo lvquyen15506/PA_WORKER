@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Chi tiết nhật ký{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Chi tiết nhật ký" breadcrumbs=crumbs %}
+{% include "components/_form_section.html" with title="Thông tin" items=items %}
+<div class="pa-form-section">
+  <h3 class="pa-card-title">Giá trị trước và sau</h3>
+  {% if anonymized %}<p class="pa-small pa-muted">Hồ sơ đã được ẩn danh hóa: giá trị cá nhân đã bị xóa. Số CCCD và CMND cũ luôn hiện dạng che.</p>
+  {% else %}<p class="pa-small pa-muted">Số CCCD và CMND cũ luôn hiện dạng che.</p>{% endif %}
+  {% include "components/_table.html" with columns=columns rows=rows empty_text="Dòng nhật ký này không có thay đổi giá trị." %}
+</div>
+{% endblock %}
