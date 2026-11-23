@@ -5,13 +5,20 @@ Quy tắc tô vàng (`low = True`): trường OCR có độ tin cậy dưới ng
 có nhưng không đọc được / sai định dạng (để trống, không đoán). Trường QR hợp lệ không tô vàng.
 """
 
+import datetime
 import time
 
 from . import imaging, qr_reader
 from .budget import Budget
 from .fields import CARD_FIELDS, FIELD_NAMES, UNKNOWN_CARD_FIELDS
+from .hints import (
+    CAN_CUOC_2024_START,
+    ISSUE_PLACE_HINT,
+    NATIONALITY_HINT,
+    compute_expiry,
+)
 from .ocr import detect_title, extract_fields, ocr_lines
-from .qr import choose_format
+from .qr import WARN_BAD_QR, choose_format
 
 WARN_TIMEOUT = "Hết thời gian xử lý, vui lòng kiểm tra tay."
 SIDE_LABEL = {"front": "Mặt trước", "back": "Mặt sau"}
@@ -43,6 +50,77 @@ def _pick_type(chosen, title, raw_qr):
     if title == "legacy":
         return "CCCD_2016", "title", None, None
     return None, "none", None, None
+
+
+def _iso_date(field):
+    value = field.get("value") if field else None
+    try:
+        return datetime.date.fromisoformat(value) if value else None
+    except ValueError:
+        return None
+
+
+def _build_fields(card_type, lines, images, qr_values, threshold):
+    """Ghép QR, OCR (theo nhãn của đúng mẫu thẻ) và gợi ý thành các trường. Trả (fields, ghi chú).
+
+    Thứ tự ưu tiên: QR > OCR > Gợi ý. Giá trị gợi ý (nơi cấp, quốc tịch, có giá trị đến) luôn
+    `low` để HR tích Đã kiểm tra; OCR khác giá trị tính theo quy định thì giữ OCR và cảnh báo."""
+    ocr_values = extract_fields(lines, card_type)
+    wanted = _expected(card_type, images)
+    fields, notes = {}, []
+    for name in FIELD_NAMES:
+        found = ocr_values.get(name)
+        if name in qr_values:
+            fields[name] = {
+                "value": qr_values[name],
+                "source": "QR",
+                "confidence": None,
+                "low": False,
+            }
+        elif found is not None and found.value:
+            fields[name] = {
+                "value": found.value,
+                "source": "OCR",
+                "confidence": round(found.confidence, 1),
+                "low": found.confidence < threshold,
+            }
+        elif name in wanted:
+            fields[name] = {"value": None, "source": None, "confidence": None, "low": True}
+    if card_type in CARD_FIELDS:
+        notes += _apply_hints(fields, card_type, wanted)
+    return fields, notes
+
+
+def _hint(value):
+    return {"value": value, "source": "HINT", "confidence": None, "low": True}
+
+
+def _apply_hints(fields, card_type, wanted):
+    """Điền gợi ý cho trường phải có mà chưa có giá trị; trả danh sách cảnh báo."""
+    notes = []
+    for name, text in (
+        ("issue_place", ISSUE_PLACE_HINT.get(card_type)),
+        ("nationality", NATIONALITY_HINT),
+    ):
+        if name in wanted and text and not (fields.get(name) or {}).get("value"):
+            fields[name] = _hint(text)
+    if "expiry_date" in wanted:
+        expected = compute_expiry(
+            _iso_date(fields.get("date_of_birth")), _iso_date(fields.get("issue_date"))
+        )
+        current = fields.get("expiry_date") or {}
+        if current.get("value"):
+            if expected is not None and current["value"] != expected.isoformat():
+                current["low"] = True  # giữ giá trị OCR, tô vàng và báo khác biệt
+                notes.append(
+                    "Có giá trị đến: Khác với hạn tính theo quy định "
+                    f"({expected.strftime('%d/%m/%Y')})."
+                )
+        elif expected is not None:
+            fields["expiry_date"] = _hint(expected.isoformat())
+        elif _iso_date(fields.get("date_of_birth")) and _iso_date(fields.get("issue_date")):
+            notes.append("Có giá trị đến: thẻ cấp từ 60 tuổi không thời hạn, để trống.")
+    return notes
 
 
 def recognize(front, back, doc_type="", threshold=80, budget=None, engine=None):
@@ -85,28 +163,17 @@ def recognize(front, back, doc_type="", threshold=80, budget=None, engine=None):
     title = detect_title(lines)
     card_type, type_source, qr_format, qr_result = _pick_type(doc_type, title, raw_qr)
     qr_values = qr_result.values if qr_result else {}
-    ocr_values = extract_fields(lines)
-    wanted = _expected(card_type, images)
+    if raw_qr and (qr_result is None or qr_result.rejected):
+        warnings.append(WARN_BAD_QR)  # QR đọc được nhưng chữ sai bảng mã: HR nhập tay
 
-    fields = {}
-    for name in FIELD_NAMES:
-        found = ocr_values.get(name)
-        if name in qr_values:
-            fields[name] = {
-                "value": qr_values[name],
-                "source": "QR",
-                "confidence": None,
-                "low": False,
-            }
-        elif found is not None and found.value:
-            fields[name] = {
-                "value": found.value,
-                "source": "OCR",
-                "confidence": round(found.confidence, 1),
-                "low": found.confidence < threshold,
-            }
-        elif name in wanted:
-            fields[name] = {"value": None, "source": None, "confidence": None, "low": True}
+    fields, hint_notes = _build_fields(card_type, lines, images, qr_values, threshold)
+    # Ngày cấp trước 01/7/2024 thì không thể là Căn cước 2024 (kể cả khi tiêu đề OCR đoán vậy).
+    if card_type == "CAN_CUOC_2024" and type_source != "chosen":
+        issue = _iso_date(fields.get("issue_date"))
+        if issue is not None and issue < CAN_CUOC_2024_START:
+            card_type, type_source = "CCCD_2021", "issue_date"
+            fields, hint_notes = _build_fields(card_type, lines, images, qr_values, threshold)
+    warnings += hint_notes
 
     # Ngân sách đã cạn (kể cả khi giai đoạn cuối chạy quá phần được cấp) thì phải báo kiểm tra tay.
     out_of_time = bool(failed or budget.exhausted or budget.expired)

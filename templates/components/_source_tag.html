@@ -1,2 +1,2 @@
-{# Nhãn nguồn dữ liệu trên màn hình đối chiếu. Tham số: source (QR | OCR | MANUAL). #}
-<span class="pa-source">{% if source == "QR" %}QR{% elif source == "OCR" %}OCR{% else %}Nhập tay{% endif %}</span>
+{# Nhãn nguồn dữ liệu trên màn hình đối chiếu. Tham số: source (QR | OCR | HINT | MANUAL). Gợi ý là giá trị hệ thống đề xuất (nơi cấp cố định theo mẫu thẻ, hạn tính theo quy định), kiểu trung tính như các nhãn khác. #}
+<span class="pa-source">{% if source == "QR" %}QR{% elif source == "OCR" %}OCR{% elif source == "HINT" %}Gợi ý{% else %}Nhập tay{% endif %}</span>

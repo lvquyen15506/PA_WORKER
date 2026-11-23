@@ -197,7 +197,7 @@ def test_truong_doc_khong_duoc_hr_go_la_nhap_tay():
     session = make_session(hr, "15")
     post_review(login_client(hr), session, **truth_data("15"))
     for row in IdentityFieldSource.objects.all():
-        if row.source == "OCR":
+        if row.source in ("OCR", "HINT"):  # máy đọc/gợi ý, HR giữ nguyên
             assert not row.edited_by_user
         else:
             assert row.source == "MANUAL"

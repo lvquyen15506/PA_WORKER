@@ -86,7 +86,7 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 | `Gender` | `MALE` Nam · `FEMALE` Nữ |
 | `IdDocType` | `CCCD_2021` CCCD gắn chip (mẫu 2021) · `CAN_CUOC_2024` Thẻ Căn cước (từ 01/7/2024) · `CCCD_2016` CCCD mã vạch (mẫu 2016) |
 | `ConsentMethod` | `PAPER` Ký giấy · `ELECTRONIC` Xác nhận điện tử |
-| `FieldSource` | `QR` QR · `OCR` OCR · `MANUAL` Nhập tay |
+| `FieldSource` | `QR` QR · `OCR` OCR · `HINT` Gợi ý (nơi cấp cố định theo mẫu thẻ, quốc tịch, hạn tính theo mốc tuổi 25/40/60; luôn tô vàng, `apps/intake/hints.py`) · `MANUAL` Nhập tay |
 | `ResignReason` | `SELF` Tự nghỉ · `CONTRACT_END` Hết hợp đồng · `TERMINATED` Chấm dứt hợp đồng · `OTHER` Khác |
 | `ContractType` | `PROBATION` Thử việc · `FIXED_TERM` Xác định thời hạn · `INDEFINITE` Không xác định thời hạn |
 | `EmploymentChangeType` | `ONBOARD` Tiếp nhận vào làm · `TRANSFER` Điều chuyển · `POSITION_CHANGE` Đổi chức danh · `SHIFT_CHANGE` Đổi ca · `STATUS_CHANGE` Đổi trạng thái làm việc · `IMPORT` Nhập từ Excel |

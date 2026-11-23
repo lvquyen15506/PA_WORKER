@@ -8,6 +8,7 @@ Giá trị chuẩn hóa là chuỗi: ngày dạng ISO `yyyy-mm-dd`, giới tính
 
 import datetime
 import re
+import unicodedata
 
 from apps.core.choices import Gender
 
@@ -41,6 +42,48 @@ DATE_FORMATS = {
 }
 
 _MAX_TEXT = 255
+
+
+TEXT_FIELDS_FROM_QR = (
+    "full_name",
+    "permanent_address",
+    "hometown",
+    "birth_registration_place",
+    "issue_place",
+)
+_ALLOWED_PUNCT = set(" ,./-()")
+
+
+def is_vietnamese_text(value):
+    """Chỉ gồm chữ Latin (kể cả chữ có dấu tiếng Việt), số, khoảng trắng và , . - / ( ).
+    Ký tự CJK hoặc ký tự lạ (dấu hiệu đọc sai bảng mã) thì sai. Rỗng cũng sai."""
+    text = unicodedata.normalize("NFC", value or "")
+    if not text.strip():
+        return False
+    for ch in text:
+        if ch in _ALLOWED_PUNCT or ("0" <= ch <= "9"):
+            continue
+        if ch.isalpha() and unicodedata.name(ch, "").startswith("LATIN"):
+            continue
+        return False
+    return True
+
+
+def plausible_qr_text(text):
+    """Chuỗi QR nguyên bản có "trông" đúng không: ngoài ASCII (dấu `|` ngăn cách, chữ số) chỉ có
+    chữ Latin. Dùng để chọn kết quả giải mã hợp lệ đầu tiên (qr_reader)."""
+    for ch in unicodedata.normalize("NFC", text or ""):
+        if ord(ch) < 128:
+            continue
+        if ch.isalpha() and unicodedata.name(ch, "").startswith("LATIN"):
+            continue
+        return False
+    return True
+
+
+def valid_full_name(value):
+    """Họ tên đúng: chữ Việt, ít nhất 2 từ."""
+    return is_vietnamese_text(value) and len(value.split()) >= 2
 
 
 def _digits(raw):
@@ -122,7 +165,13 @@ CARD_FIELDS = {
     "CCCD_2016": _LEGACY_LAYOUT,
     "CAN_CUOC_2024": {
         "front": ["id_number", "full_name", "date_of_birth", "gender", "nationality"],
-        "back": ["permanent_address", "birth_registration_place", "issue_date", "expiry_date"],
+        "back": [
+            "permanent_address",
+            "birth_registration_place",
+            "issue_date",
+            "issue_place",
+            "expiry_date",
+        ],
     },
 }
 # Chưa biết mẫu thẻ: chỉ coi các trường lõi là phải có.
@@ -145,6 +194,26 @@ OCR_LABELS = {
     "issue_place": [("noi", "cap")],
     "expiry_date": [("co", "gia", "tri", "den"), ("ngay", "het", "han")],
 }
+
+
+# Nhãn bổ sung theo mẫu thẻ (ngoài OCR_LABELS dùng chung). Nhãn dài thắng nhãn ngắn trên cùng một
+# dòng: "Ngày, tháng, năm hết hạn" (Căn cước 2024) không bị nhận nhầm là "Ngày cấp".
+OCR_LABELS_BY_CARD = {
+    "CAN_CUOC_2024": {
+        "expiry_date": [("ngay", "thang", "nam", "het", "han")],
+        "permanent_address": [("noi", "cu", "tru")],
+    },
+    "CCCD_2021": {"expiry_date": [("co", "gia", "tri", "den")]},
+    "CCCD_2016": {"expiry_date": [("co", "gia", "tri", "den")]},
+}
+
+
+def labels_for(card_type):
+    """{trường: danh sách nhãn} cho một mẫu thẻ (chưa biết mẫu thì chỉ nhãn dùng chung)."""
+    merged = {name: list(labels) for name, labels in OCR_LABELS.items()}
+    for name, extra in OCR_LABELS_BY_CARD.get(card_type, {}).items():
+        merged[name] = [*extra, *[lb for lb in merged.get(name, []) if lb not in extra]]
+    return merged
 
 
 def normalize(name, raw, date_format="ddmmyyyy"):

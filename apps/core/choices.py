@@ -69,6 +69,7 @@ class ConsentMethod(models.TextChoices):
 class FieldSource(models.TextChoices):
     QR = "QR", "QR"
     OCR = "OCR", "OCR"
+    HINT = "HINT", "Gợi ý"  # nơi cấp, quốc tịch, hạn thẻ tính theo quy định; luôn phải kiểm tra
     MANUAL = "MANUAL", "Nhập tay"
 
 

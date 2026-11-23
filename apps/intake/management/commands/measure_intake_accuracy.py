@@ -128,6 +128,12 @@ class Command(BaseCommand):
             "bộ tách trường **khớp cấu hình**, **chưa chứng minh khớp thẻ thật** (câu 20 của "
             "`docs/lam-ro-yeu-cau.md`). Cấu trúc QR của thẻ thật vẫn là giả định cần kiểm chứng "
             "khi triển khai.",
+            "- Bộ thẻ có tên nhiều dấu (ví dụ `NGUYỄN THỊ HƯƠNG QUỲNH`, `ĐẶNG VĂN ƯỚC`), QR mã "
+            "hóa UTF-8 có và không có chỉ thị ECI, ngày cấp đúng mẫu thẻ (CCCD 2021 cấp trước "
+            "01/7/2024, Căn cước 2024 từ 01/7/2024) và hạn thẻ đúng mốc tuổi 25/40/60, nên gợi ý "
+            '"Có giá trị đến" không xuất hiện khi OCR đọc được. Trường nguồn "Gợi ý" (nơi cấp, '
+            "quốc tịch, hạn tính theo quy định) chỉ xuất hiện khi OCR không đọc được và luôn "
+            "tô vàng.",
             "- Độ chính xác OCR trên ảnh sạch này **cao hơn nhiều so với ảnh chụp thật**; "
             "đừng dùng con số này để cam kết với khách hàng. "
             "Cần đo lại trên ảnh chụp thực tế khi có thể.",

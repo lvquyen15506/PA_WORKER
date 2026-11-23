@@ -19,6 +19,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from apps.core.choices import Gender, IdDocType
 
 from .fields import DATE_FIELDS, DATE_FORMATS, FIELD_NAMES, SKIP
+from .hints import compute_expiry
 
 WATERMARK = "MẪU – KHÔNG CÓ GIÁ TRỊ"
 FONT_DIRS = ("/usr/share/fonts/truetype/dejavu", "C:/Windows/Fonts")
@@ -33,6 +34,14 @@ FAMILY = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Vũ", "Đặng", "B�
 MIDDLE = ["Văn", "Thị", "Minh", "Quốc", "Hữu", "Ngọc", "Thanh", "Đức", "Anh", "Gia"]
 GIVEN = ["Mẫu", "Thử", "Giả", "Kiểm", "Demo", "Nghiệm", "Lập", "Tạo", "Dựng", "Mô"]
 PLACES = ["Thôn Mẫu", "Xã Thử Nghiệm", "Huyện Giả Lập", "Phường Demo", "Quận Kiểm Tra"]
+# Tên hư cấu nhiều dấu (ê, ơ, ư, ỳ, ạ, Đ...) để thử QR mã hóa UTF-8; gán cho các thẻ có QR.
+SPECIAL_NAMES = {
+    1: "Nguyễn Thị Hương Quỳnh",
+    2: "Đặng Văn Ước",
+    3: "Trương Hoàng Vĩnh Phước",
+    7: "Lê Thị Ánh Nguyệt",
+    8: "Bùi Quốc Hưng",
+}
 
 # Thứ tự và chất lượng 15 thẻ: (mẫu thẻ, chất lượng ảnh). Ảnh kém chỉ ở thẻ không có QR hoặc chỉ
 # giảm độ phân giải, để QR vẫn đọc được và kịch bản 3 (đúng 100% trường QR) đo được.
@@ -82,6 +91,7 @@ _SIDES = {
             ("Nơi cư trú", "permanent_address"),
             ("Nơi đăng ký khai sinh", "birth_registration_place"),
             ("Ngày cấp", "issue_date"),
+            ("Nơi cấp", "issue_place"),
             ("Ngày hết hạn", "expiry_date"),
         ],
         "qr_side": "back",
@@ -123,14 +133,29 @@ def font_path(names=FONT_REGULAR):
     raise RuntimeError("Không tìm thấy phông DejaVu/Arial có dấu tiếng Việt.")
 
 
-def _make_values(rng, number, doc_type):
-    """Dữ liệu hư cấu đã chuẩn hóa (ngày ISO, giới tính MALE/FEMALE)."""
+def _issue_range(doc_type):
+    """Năm/tháng cấp hợp lý theo mẫu thẻ: CCCD 2021 cấp trước 01/7/2024, CCCD 2016 cấp 2016–2020,
+    Căn cước 2024 cấp từ 01/7/2024 (câu 20)."""
+    if doc_type == IdDocType.CAN_CUOC_2024.value:
+        return (2024, 7), (2025, 12)
+    if doc_type == IdDocType.CCCD_2016.value:
+        return (2016, 1), (2020, 12)
+    return (2021, 1), (2024, 6)
+
+
+def _make_values(rng, number, doc_type, name=None):
+    """Dữ liệu hư cấu đã chuẩn hóa (ngày ISO, giới tính MALE/FEMALE). `name`: họ tên có sẵn
+    (tên nhiều dấu tiếng Việt, để thử QR UTF-8); không có thì ghép ngẫu nhiên."""
     gender = rng.choice([Gender.MALE.value, Gender.FEMALE.value])
     middle = "Văn" if gender == Gender.MALE.value else "Thị"
-    name = f"{rng.choice(FAMILY)} {middle} {rng.choice(GIVEN)}"
-    birth = datetime.date(rng.randint(1985, 2004), rng.randint(1, 12), rng.randint(1, 28))
-    issue = datetime.date(rng.randint(2021, 2025), rng.randint(1, 12), rng.randint(1, 28))
-    expiry = datetime.date(issue.year + rng.choice([10, 15]), issue.month, issue.day)
+    name = name or f"{rng.choice(FAMILY)} {middle} {rng.choice(GIVEN)}"
+    (y0, m0), (y1, m1) = _issue_range(doc_type)
+    months = rng.randint(y0 * 12 + m0 - 1, y1 * 12 + m1 - 1)
+    issue = datetime.date(months // 12, months % 12 + 1, rng.randint(1, 28))
+    birth = datetime.date(
+        rng.randint(1975, issue.year - 16), rng.randint(1, 12), rng.randint(1, 28)
+    )
+    expiry = compute_expiry(birth, issue)  # đúng quy định nên thẻ giả khớp gợi ý của hệ thống
     place = f"{rng.choice(PLACES)} {number}"
     return {
         "id_number": f"999{number:09d}",
@@ -177,16 +202,18 @@ def build_qr_payload(values, qr_format):
     return qr_format.separator.join(parts), present
 
 
-def _qr_image(payload):
+def _qr_image(payload, eci=False):
+    """Ảnh QR mã hóa UTF-8. `eci=True` thêm chỉ thị ECI (UTF-8) ở đầu dữ liệu; không có ECI thì
+    bộ đọc phải tự đoán bảng mã (nguồn lỗi chữ Nhật/Trung khi zbar đoán Shift-JIS)."""
     buffer = io.BytesIO()
-    segno.make(payload, error="m", encoding="utf-8").save(
+    segno.make(payload, error="m", encoding="utf-8", eci=eci).save(
         buffer, kind="png", scale=QR_SCALE, border=3
     )
     buffer.seek(0)
     return Image.open(buffer).convert("L")
 
 
-def _draw_side(doc_type, side, values, qr_payload):
+def _draw_side(doc_type, side, values, qr_payload, eci=False):
     image = Image.new("RGB", (CARD_W, CARD_H), "white")
     draw = ImageDraw.Draw(image)
     bold, regular, small = _font(FONT_BOLD, 38), _font(FONT_REGULAR, 31), _font(FONT_REGULAR, 26)
@@ -199,7 +226,7 @@ def _draw_side(doc_type, side, values, qr_payload):
         draw.text((60, y), f"{label}: {_display(name, values[name])}", font=regular, fill="black")
         y += 58
     if qr_payload and layout["qr_side"] == side:
-        qr = _qr_image(qr_payload)
+        qr = _qr_image(qr_payload, eci)
         image.paste(qr, (CARD_W - qr.width - 50, 170))
     draw.text((60, CARD_H - 70), WATERMARK, font=small, fill=(150, 150, 150))
     return image
@@ -224,8 +251,9 @@ def generate_cards(out_dir, qr_formats, seed=2026, offset=0):
     cards = []
     for index, (doc_type, quality) in enumerate(PLAN, start=1):
         # offset: dịch số CCCD giả (999 + 9 chữ số) để mỗi lần chạy nghiệm thu có số không trùng.
-        values = _make_values(rng, index + offset, doc_type)
+        values = _make_values(rng, index + offset, doc_type, SPECIAL_NAMES.get(index))
         layout = _SIDES[doc_type]
+        eci = index % 2 == 0  # thẻ chẵn có chỉ thị ECI, thẻ lẻ thì không
         qr_payload, qr_fields = None, []
         if layout["qr_side"]:
             qr_payload, qr_fields = build_qr_payload(values, qr_formats[doc_type])
@@ -233,7 +261,7 @@ def generate_cards(out_dir, qr_formats, seed=2026, offset=0):
         files = {}
         for side, suffix in (("front", "truoc"), ("back", "sau")):
             name = f"{index:02d}-{doc_type.lower()}-{suffix}.png"
-            image = _degrade(_draw_side(doc_type, side, values, qr_payload), quality)
+            image = _degrade(_draw_side(doc_type, side, values, qr_payload, eci), quality)
             image.save(os.path.join(out_dir, name))
             files[side] = name
         cards.append(
@@ -246,6 +274,7 @@ def generate_cards(out_dir, qr_formats, seed=2026, offset=0):
                 "printed": printed,
                 "qr_fields": qr_fields,
                 "has_qr": bool(layout["qr_side"]),
+                "qr_eci": bool(layout["qr_side"]) and eci,
                 "qr_side": layout["qr_side"],
             }
         )

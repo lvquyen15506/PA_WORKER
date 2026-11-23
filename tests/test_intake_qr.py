@@ -159,10 +159,69 @@ def test_chuoi_rong():
 
 
 @pytest.mark.django_db
-def test_choose_format_cau_hinh_mac_dinh_giong_nhau_chon_mau_dung_truoc():
+def test_choose_format_hai_cau_hinh_giong_nhau_chon_theo_ngay_cap():
+    # Đổi theo quy tắc mới: trước đây chọn mẫu đứng trước (Căn cước 2024), nên thẻ cấp 2021 bị
+    # nhận sai. SAMPLE cấp 20/01/2021 thì không thể là Căn cước 2024.
     qr_format, result = choose_format(SAMPLE)
-    assert qr_format.id_doc_type == "CAN_CUOC_2024"  # theo thứ tự mã mẫu thẻ
-    assert result.ok
+    assert qr_format.id_doc_type == "CCCD_2021" and result.ok
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("issue", "expected"),
+    [
+        ("30062024", "CCCD_2021"),  # ngày cuối trước mốc
+        ("01072024", "CAN_CUOC_2024"),  # đúng ngày bắt đầu
+        ("15032025", "CAN_CUOC_2024"),
+        ("20012021", "CCCD_2021"),
+    ],
+)
+def test_choose_format_ranh_gioi_ngay_cap_01_07_2024(issue, expected):
+    raw = f"999000000001|999123456|NGUYỄN VĂN MẪU|05011995|Nam|Số 1 Đường Mẫu|{issue}"
+    assert choose_format(raw)[0].id_doc_type == expected
+
+
+@pytest.mark.django_db
+def test_choose_format_khong_co_ngay_cap_giu_thu_tu_ma_mau_the():
+    raw = "999000000001|999123456|NGUYỄN VĂN MẪU|05011995|Nam|Số 1 Đường Mẫu|"
+    assert choose_format(raw)[0].id_doc_type == "CAN_CUOC_2024"
+
+
+@pytest.mark.django_db
+def test_choose_format_mau_hr_chon_van_duoc_giu_ke_ca_ngay_cap_som():
+    qr_format, _ = choose_format(SAMPLE, doc_type="CAN_CUOC_2024")
+    assert qr_format.id_doc_type == "CAN_CUOC_2024"
+
+
+# ----- Kiểm tra hợp lệ chữ trong QR (CJK, ký tự lạ, họ tên ≥ 2 từ) -----
+@pytest.mark.parametrize(
+    "name",
+    ["日本語 氏名", "ﾄ雪ｺｷng Vﾄハ ﾆｯ盻嫩", "Nguyễn Văn Ａ", "NGUYEN ☺ VAN", "Nguyễn"],
+)
+def test_ho_ten_cjk_la_hoac_mot_tu_bi_loai_khoi_ket_qua(name):
+    raw = f"999000000001|999123456|{name}|05011995|Nam|Số 1 Đường Mẫu|20012021"
+    result = parse_qr(raw, fmt())
+    assert result.ok and "full_name" not in result.values
+    assert result.rejected == ["full_name"]
+    assert result.values["id_number"] == "999000000001"  # các trường hợp lệ khác vẫn giữ
+
+
+def test_dia_chi_co_ky_tu_la_bi_loai_nhung_dia_chi_viet_hop_le_duoc_nhan():
+    bad = parse_qr(SAMPLE.replace("Số 1 Đường Mẫu", "住所 1"), fmt())
+    assert "permanent_address" not in bad.values and "permanent_address" in bad.rejected
+    for good in (
+        "Số 1 Đường Mẫu, Phường Thử Nghiệm",
+        "12/3 Ngõ 4-5, Xã Ước Lệ",
+        "Thôn Đặng (Tổ 2)",
+    ):
+        ok = parse_qr(SAMPLE.replace("Số 1 Đường Mẫu", good), fmt())
+        assert ok.values["permanent_address"] == good and not ok.rejected
+
+
+@pytest.mark.parametrize("name", ["Nguyễn Thị Hương Quỳnh", "Đặng Văn Ước", "LÊ THỊ ÁNH NGUYỆT"])
+def test_ho_ten_nhieu_dau_hop_le(name):
+    raw = f"999000000001|999123456|{name}|05011995|Nam|Số 1 Đường Mẫu|20012021"
+    assert parse_qr(raw, fmt()).values["full_name"] == name
 
 
 @pytest.mark.django_db
