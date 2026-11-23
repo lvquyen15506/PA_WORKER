@@ -114,7 +114,10 @@ Mã NV là bắt buộc khi có phần B vì thông tin làm việc chỉ tồn 
 | --- | --- |
 | Không phải tệp `.xlsx` thật (kiểm tra chữ ký tệp) | "Tệp phải là file Excel .xlsx. Hãy tải file mẫu và nhập lại." |
 | Quá 10 MB hoặc quá 1.000 dòng | "Tệp vượt giới hạn 10 MB hoặc 1.000 dòng. Hãy chia thành nhiều tệp nhỏ hơn." |
-| Thiếu sheet `Hồ sơ` hoặc tiêu đề cột không khớp mẫu | "Tiêu đề cột không khớp file mẫu (cột X). Hãy dùng file mẫu mới nhất." |
+| Thiếu sheet `Hồ sơ` hoặc tiêu đề cột không khớp mẫu | "Tiêu đề cột không khớp file mẫu (cột X). Hãy dùng file mẫu mới nhất." (thiếu sheet: "Không thấy sheet “Hồ sơ”. Hãy dùng file mẫu mới nhất.") |
+| Zip hỏng, nội dung không đọc được, hoặc nghi zip bomb: tổng dung lượng giải nén > 100 MB, hoặc tỉ lệ nén > 100 lần (kiểm tra danh sách mục trong zip và đếm lại dung lượng thật khi giải nén **trước khi** openpyxl mở tệp; mục nhỏ dưới 1 MiB không xét tỉ lệ) | "Tệp Excel không hợp lệ." |
+
+Đã đo ở Phase 7 (`docs/hieu-nang.md`): nhập 1.000 dòng mất khoảng 13 giây (chỉ phần A) và 24 giây (có phần B và đợt làm việc), dưới ngưỡng 90 giây nên giữ giới hạn 1.000 dòng.
 
 ## 4. Màn hình kết quả
 

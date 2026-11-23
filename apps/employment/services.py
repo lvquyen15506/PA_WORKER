@@ -22,7 +22,7 @@ from apps.core.choices import (
     VerificationStatus,
     WorkStatus,
 )
-from apps.core.codes import next_code
+from apps.core.codes import bump_sequence, next_code
 from apps.core.models import DocumentType
 from apps.core.storage import private_storage
 from apps.workers import rules
@@ -251,6 +251,124 @@ def onboard(
             ),
             request=request,
         )
+    return employment
+
+
+# --- Nhập từ Excel (câu 27, 48; excel-mau.md mục 3.1) -------------------------------------------
+def import_employment(
+    user,
+    worker,
+    *,
+    employee_code,
+    received_date,
+    start_date,
+    position,
+    work_status,
+    section=None,
+    team=None,
+    shift=None,
+    resign_date=None,
+    resign_reason="",
+    client_company=None,
+    assignment_start=None,
+    request=None,
+):
+    """Thông tin làm việc của công nhân hiện hữu nhập từ file Excel (phần B), chạy trong giao dịch
+    của dòng đang nhập. Chỉ Admin, Quản lý nhân sự. Hồ sơ vẫn ở Nháp và phải qua duyệt.
+
+    - Nhận mã NV cũ (không trùng); chỉ đẩy bộ đếm khi mã khớp định dạng đang cấu hình (câu 27).
+    - Tạo Employment + một dòng EmploymentHistory loại IMPORT (không sinh mã mới).
+    - Có công ty khách thì tạo đợt qua `add_assignment` (một đường duy nhất, mọi kiểm tra như
+      thường); Đã nghỉ việc thì đợt đóng sẵn vào ngày nghỉ. Không tạo lương.
+    """
+    if user.role.code not in rules.MANAGERS:
+        raise PermissionDenied
+    errors = {}
+    if Employment.objects.filter(worker=worker).exists():
+        raise EmploymentError(message="Hồ sơ này đã có thông tin làm việc.")
+    if Worker.objects.filter(employee_code=employee_code).exclude(pk=worker.pk).exists():
+        errors["employee_code"] = f"Mã nhân viên {employee_code} đã được dùng."
+    if received_date and start_date and received_date > start_date:
+        errors["received_date"] = "Ngày tiếp nhận không được sau ngày vào làm."
+    _check_structure(section, team, position, shift, None, worker, None, errors)
+    if errors:
+        raise EmploymentError(errors)
+
+    resigned = work_status == WorkStatus.RESIGNED
+    Worker.objects.filter(pk=worker.pk).update(employee_code=employee_code)
+    worker.employee_code = employee_code
+    bump_sequence(CodeType.EMPLOYEE, employee_code)
+    # Đã nghỉ việc: tạo ở trạng thái đang làm để thêm đợt, rồi đặt Đã nghỉ việc ngay bên dưới.
+    employment = Employment.objects.create(
+        worker=worker,
+        received_date=received_date,
+        start_date=start_date,
+        section=section,
+        team=team,
+        position=position,
+        shift=shift,
+        work_status=WorkStatus.ACTIVE if resigned else work_status,
+    )
+    EmploymentHistory.objects.create(
+        worker=worker,
+        change_type=EmploymentChangeType.IMPORT,
+        effective_date=start_date,
+        reason=f"Nhập từ Excel, hồ sơ {worker.worker_code}",
+        to_section=section,
+        to_team=team,
+        to_position=position,
+        to_shift=shift,
+        to_work_status=work_status,
+        created_by=user,
+    )
+    if client_company is not None:
+        from .assignments import add_assignment
+
+        add_assignment(
+            user,
+            worker,
+            client_company=client_company,
+            position=position,
+            start_date=assignment_start,
+            end_date=resign_date if resigned else None,
+            request=request,
+        )
+    if resigned:
+        employment.work_status = WorkStatus.RESIGNED
+        employment.resign_date = resign_date
+        employment.resign_reason = resign_reason
+        employment.save(update_fields=["work_status", "resign_date", "resign_reason", "updated_at"])
+    worker.touch()
+    log(
+        AuditAction.UPDATE,
+        user=user,
+        obj=worker,
+        changes={"employee_code": (None, employee_code)},
+        note="Nhập mã nhân viên cũ từ Excel",
+        request=request,
+    )
+    log(
+        AuditAction.CREATE,
+        user=user,
+        obj=employment,
+        changes={
+            name: (None, _name(value))
+            for name, value in {
+                "received_date": received_date,
+                "start_date": start_date,
+                "section": section,
+                "team": team,
+                "position": position,
+                "shift": shift,
+                "work_status": work_status,
+                "resign_date": resign_date if resigned else None,
+                "resign_reason": resign_reason if resigned else "",
+            }.items()
+            if value not in (None, "")
+        },
+        note=f"Nhập thông tin làm việc từ Excel, mã nhân viên {employee_code}",
+        request=request,
+    )
     return employment
 
 

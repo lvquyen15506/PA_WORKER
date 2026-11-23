@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Nhập hồ sơ từ file Excel{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Nhập hồ sơ từ file Excel" breadcrumbs=crumbs %}
+
+{% if result %}
+  {% if result.file_error %}
+    {% include "components/_alert.html" with kind="danger" text=result.file_error %}
+  {% else %}
+    {% include "components/_alert.html" with kind=result.imported|yesno:"success,warning" text=result.summary %}
+    {% if result.imported %}
+      {% include "components/_alert.html" with kind="info" text="Các hồ sơ vừa nhập ở trạng thái Nháp và cần một tài khoản khác duyệt." %}
+      <p><a href="/ho-so/?trang_thai_ho_so=DRAFT&amp;tao_tu={{ today|urlencode:'' }}">Xem các hồ sơ vừa nhập</a></p>
+    {% endif %}
+    {% if error_rows %}
+    <div class="pa-form-section">
+      <h3 class="pa-card-title">Dòng bị bỏ qua ({{ result.error_rows }} dòng)</h3>
+      {% include "components/_table.html" with columns=columns rows=error_rows %}
+    </div>
+    {% endif %}
+    {% if warning_rows %}
+    <div class="pa-form-section">
+      <h3 class="pa-card-title">Cảnh báo ({{ warning_rows|length }})</h3>
+      <p class="pa-small pa-muted">Cảnh báo không chặn: các dòng này vẫn được nhập.</p>
+      {% include "components/_table.html" with columns=columns rows=warning_rows %}
+    </div>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+<div class="pa-form-section">
+  <h3 class="pa-card-title">Chọn tệp để nhập</h3>
+  <ol class="pa-small">
+    <li><a href="/ho-so/nhap-excel/file-mau/">Tải file Excel mẫu</a> và điền dữ liệu vào sheet “Hồ sơ”.</li>
+    <li>Chọn tệp đã điền rồi bấm “Nhập hồ sơ”. Dòng đúng được nhập, dòng sai được báo rõ lý do.</li>
+    <li>Hồ sơ nhập vào ở trạng thái Nháp; cần một tài khoản khác duyệt từng hồ sơ.</li>
+  </ol>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "components/_form_field.html" with field=form.file %}
+    <div class="pa-form-actions">
+      <a class="btn btn-outline-secondary" href="/ho-so/them/">Hủy</a>
+      <button class="btn btn-primary" type="submit">Nhập hồ sơ</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
