@@ -6,7 +6,7 @@ from django import forms
 
 from apps.core.choices import ContractType, ResignReason, WorkStatus
 from apps.core.formfields import REASON_HINT, active_or_current, date_field, is_unbound
-from apps.core.models import Position, Section, Shift, Team
+from apps.core.models import ClientCompany, Position, Section, Shift, Team
 from apps.documents.forms import FILE_HINT
 from apps.documents.validators import MAX_SIZE, validate_upload
 from apps.workers.models import Worker
@@ -253,3 +253,104 @@ class ContractForm(forms.Form):
         }
         data["uploaded"] = self.cleaned_data.get("file")
         return data
+
+
+# --- Đợt làm việc và lương (v1.1) ----------------------------------------------------------------
+class AssignmentForm(forms.Form):
+    client_company = forms.ModelChoiceField(
+        label="Công ty khách hàng",
+        queryset=ClientCompany.objects.none(),
+        empty_label="— Chọn —",
+        error_messages={"required": "Chọn công ty khách hàng."},
+    )
+    position = forms.ModelChoiceField(
+        label="Vị trí",
+        queryset=Position.objects.none(),
+        empty_label="— Chọn —",
+        error_messages={"required": "Chọn vị trí."},
+    )
+    start_date = date_field("Ngày bắt đầu", required=True)
+    end_date = date_field(
+        "Ngày kết thúc", help_text="Để trống nếu đợt chưa kết thúc. Là ngày làm cuối cùng."
+    )
+    previous_end_date = date_field(
+        "Ngày kết thúc của đợt hiện tại",
+        help_text="Chỉ nhập khi công nhân đang có đợt làm việc chưa kết thúc: đợt đó được kết thúc "
+        "vào ngày này khi lưu đợt mới.",
+    )
+    note = forms.CharField(
+        label="Ghi chú",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 2}),
+        help_text=REASON_HINT,
+    )
+
+    def __init__(self, *args, instance=None, **kwargs):
+        if instance is not None and is_unbound(args, kwargs):
+            kwargs.setdefault(
+                "initial",
+                {
+                    "client_company": instance.client_company_id,
+                    "position": instance.position_id,
+                    "start_date": instance.start_date,
+                    "end_date": instance.end_date,
+                    "note": instance.note,
+                },
+            )
+        super().__init__(*args, **kwargs)
+        self.fields["client_company"].queryset = active_or_current(
+            ClientCompany.objects.order_by("name", "location"),
+            instance.client_company if instance else None,
+        )
+        self.fields["position"].queryset = active_or_current(
+            Position.objects.order_by("name"), instance.position if instance else None
+        )
+        if instance is not None:  # chỉ khi thêm mới mới có đợt cũ cần kết thúc
+            del self.fields["previous_end_date"]
+
+    def service_data(self):
+        return {k: v for k, v in self.cleaned_data.items()}
+
+
+class SalaryForm(forms.Form):
+    monthly_salary = forms.IntegerField(
+        label="Lương tháng (đồng)",
+        min_value=1,
+        error_messages={
+            "required": "Nhập lương tháng.",
+            "invalid": "Nhập số nguyên, không có dấu chấm hay chữ.",
+            "min_value": "Lương tháng phải lớn hơn 0.",
+        },
+    )
+    client_unit_price = forms.IntegerField(
+        label="Đơn giá tháng tính cho công ty khách (đồng)",
+        required=False,
+        min_value=1,
+        help_text="Không bắt buộc.",
+        error_messages={
+            "invalid": "Nhập số nguyên, không có dấu chấm hay chữ.",
+            "min_value": "Đơn giá tháng phải lớn hơn 0.",
+        },
+    )
+    effective_date = date_field("Ngày áp dụng", required=True)
+    reason = forms.CharField(
+        label="Lý do thay đổi",
+        widget=forms.Textarea(attrs={"rows": 2}),
+        help_text=REASON_HINT,
+        error_messages={"required": "Nhập lý do thay đổi."},
+    )
+
+    def __init__(self, *args, latest=None, **kwargs):
+        if latest is not None and is_unbound(args, kwargs):
+            # Đổi một khoản thì khoản kia giữ giá trị cũ: điền sẵn từ dòng gần nhất của đợt.
+            kwargs.setdefault(
+                "initial",
+                {
+                    "monthly_salary": latest.monthly_salary,
+                    "client_unit_price": latest.client_unit_price,
+                },
+            )
+        super().__init__(*args, **kwargs)
+
+    def service_data(self):
+        return dict(self.cleaned_data)

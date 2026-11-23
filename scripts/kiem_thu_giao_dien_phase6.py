@@ -414,10 +414,187 @@ def part_employment(browser, s, size):
     ctx.close()
 
 
+# ===== v1.1: đợt làm việc, lương, cảnh báo 12 tháng, lọc danh sách ===============================
+def active_worker_without_assignment():
+    """Công nhân Đang làm việc, Đã xác minh, chưa có đợt nào; trả pk."""
+    return int(
+        db(
+            "from apps.workers.models import Worker;"
+            "w=Worker.objects.filter(verification_status='VERIFIED',employment__work_status='ACTIVE',"
+            "work_assignments__isnull=True).order_by('-pk').first();print(w.pk)"
+        )
+    )
+
+
+def part_v11(browser, s, size):
+    import datetime
+
+    today = datetime.date.today()
+    fmt = "%d/%m/%Y"
+    pk = active_worker_without_assignment()
+    ten = f"Công ty Khách UI {RUN_ID}-{s}"
+    db(
+        "from apps.core.models import ClientCompany as C;"
+        f"C.objects.get_or_create(name='{ten}',location='Bình Dương');"
+        f"C.objects.get_or_create(name='{ten.upper()}',location='Đồng Nai')"
+    )
+    ctx, page = new_page(browser, size)
+    login(page, "quanly")
+    goto(page, f"/ho-so/{pk}/?tab=lam-viec")
+    check(
+        f"[{s}] Quản lý: tab có nút Thêm đợt làm việc",
+        page.locator("a.btn:has-text('Thêm đợt làm việc')").count() == 1,
+    )
+    # đợt 1: bắt đầu 420 ngày trước, kết thúc 201 ngày trước, công ty ở Bình Dương
+    goto(page, f"/ho-so/{pk}/dot-lam-viec/them/")
+    pw.shot(OUT, page, s, "30-form-dot-lam-viec")
+    submit(page, "Lưu đợt làm việc")
+    check(
+        f"[{s}] Quản lý: thiếu công ty, vị trí, ngày bắt đầu bị báo lỗi",
+        "Chọn công ty khách hàng." in page.content() and "Nhập ngày bắt đầu." in page.content(),
+    )
+    page.select_option("select[name=client_company]", label=f"{ten} – Bình Dương")
+    page.select_option("select[name=position]", index=1)
+    page.fill("input[name=start_date]", (today - datetime.timedelta(days=420)).strftime(fmt))
+    page.fill("input[name=end_date]", (today - datetime.timedelta(days=201)).strftime(fmt))
+    page.fill("input[name=note]", "") if page.locator("input[name=note]").count() else None
+    submit(page, "Lưu đợt làm việc")
+    check(f"[{s}] Quản lý: thêm đợt 1 thành công", "Đã thêm đợt làm việc." in page.content())
+
+    # đợt chồng lấn bị chặn
+    goto(page, f"/ho-so/{pk}/dot-lam-viec/them/")
+    page.select_option("select[name=client_company]", label=f"{ten.upper()} – Đồng Nai")
+    page.select_option("select[name=position]", index=1)
+    page.fill("input[name=start_date]", (today - datetime.timedelta(days=250)).strftime(fmt))
+    submit(page, "Lưu đợt làm việc")
+    check(f"[{s}] Quản lý: đợt chồng lấn ngày bị báo lỗi", "bị chồng lấn ngày" in page.content())
+    pw.shot(OUT, page, s, "31-dot-chong-lan")
+
+    # đợt 2: liền nhau (ngày sau), cùng tên công ty khác địa điểm và khác chữ hoa
+    page.fill("input[name=start_date]", (today - datetime.timedelta(days=200)).strftime(fmt))
+    submit(page, "Lưu đợt làm việc")
+    check(
+        f"[{s}] Quản lý: thêm đợt 2 (cùng tên, khác địa điểm) thành công",
+        "Đã thêm đợt làm việc." in page.content(),
+    )
+    check(
+        f"[{s}] Quản lý: cảnh báo sắp đủ 12 tháng tính từ đầu chuỗi và nhãn Sắp hết hạn",
+        "đủ thời hạn vào" in page.content()
+        and (today - datetime.timedelta(days=420)).strftime(fmt) in page.content()
+        and page.locator(".pa-badge:has-text('Sắp hết hạn')").count() >= 1,
+    )
+    check(f"[{s}] Quản lý: tab đợt/lương không cuộn ngang", no_h_scroll(page))
+    pw.shot(OUT, page, s, "32-tab-dot-lam-viec")
+
+    # lương: hai lần
+    a2 = db(
+        "from apps.employment.models import WorkAssignment as W;"
+        f"print(W.objects.filter(worker_id={pk}).order_by('-start_date').first().pk)"
+    )
+    url = f"/dot-lam-viec/{a2}/luong/them/"
+    goto(page, url)
+    pw.shot(OUT, page, s, "33-form-luong")
+    submit(page, "Ghi nhận thay đổi lương")
+    check(
+        f"[{s}] Quản lý: thiếu lương, ngày, lý do bị báo lỗi",
+        "Nhập lương tháng." in page.content() and "Nhập lý do thay đổi." in page.content(),
+    )
+    page.fill("input[name=monthly_salary]", "8500000")
+    page.fill("input[name=client_unit_price]", "11000000")
+    page.fill("input[name=effective_date]", (today - datetime.timedelta(days=500)).strftime(fmt))
+    page.fill("textarea[name=reason]", "Thiết lập ban đầu")
+    submit(page, "Ghi nhận thay đổi lương")
+    check(
+        f"[{s}] Quản lý: ngày áp dụng ngoài khoảng đợt bị báo lỗi",
+        "nằm trong đợt làm việc" in page.content(),
+    )
+    page.fill("input[name=effective_date]", (today - datetime.timedelta(days=200)).strftime(fmt))
+    submit(page, "Ghi nhận thay đổi lương")
+    check(f"[{s}] Quản lý: ghi nhận lương lần 1", "Đã ghi nhận thay đổi lương." in page.content())
+    goto(page, url)
+    check(
+        f"[{s}] Quản lý: form lương điền sẵn khoản cũ",
+        page.input_value("input[name=monthly_salary]") == "8500000"
+        and page.input_value("input[name=client_unit_price]") == "11000000",
+    )
+    page.fill("input[name=monthly_salary]", "9200000")
+    page.fill("input[name=effective_date]", (today - datetime.timedelta(days=30)).strftime(fmt))
+    page.fill("textarea[name=reason]", "Tăng lương theo bậc")
+    submit(page, "Ghi nhận thay đổi lương")
+    check(f"[{s}] Quản lý: ghi nhận lương lần 2", "Đã ghi nhận thay đổi lương." in page.content())
+    check(
+        f"[{s}] Quản lý: lịch sử lương có 2 dòng, lương hiện tại 9.200.000",
+        page.locator("td:has-text('8.500.000 đ')").count() == 1
+        and page.locator("td:has-text('9.200.000 đ')").count() == 1
+        and page.content().count("9.200.000 đ") >= 2,  # bảng lịch sử + khối Lương hiện tại
+    )
+    pw.shot(OUT, page, s, "34-lich-su-luong")
+    ctx.close()
+
+    # HR: thấy lương, không có nút ghi nhận lương, 403 khi gọi thẳng; vẫn thêm được đợt
+    ctx, page = new_page(browser, size)
+    login(page, "hr")
+    goto(page, f"/ho-so/{pk}/?tab=lam-viec")
+    check(
+        f"[{s}] HR: thấy lương, không có nút Ghi nhận thay đổi lương, có nút Thêm đợt làm việc",
+        "9.200.000 đ" in page.content()
+        and page.locator("a.btn:has-text('Ghi nhận thay đổi lương')").count() == 0
+        and page.locator("a.btn:has-text('Thêm đợt làm việc')").count() == 1,
+    )
+    check(f"[{s}] HR: gọi thẳng URL ghi nhận lương bị 403", goto(page, url) == 403)
+    ctx.close()
+
+    ctx, page = new_page(browser, size)
+    login(page, "viewer")
+    goto(page, f"/ho-so/{pk}/?tab=lam-viec")
+    check(
+        f"[{s}] Viewer: thấy lương và đơn giá, không có nút, không thấy ghi chú/lý do",
+        "9.200.000 đ" in page.content()
+        and "11.000.000 đ" in page.content()
+        and page.locator("a.btn:has-text('Thêm')").count() == 0
+        and "Tăng lương theo bậc" not in page.content(),
+    )
+    check(
+        f"[{s}] Viewer: gọi thẳng URL lương và thêm đợt bị 403",
+        goto(page, url) == 403 and goto(page, f"/ho-so/{pk}/dot-lam-viec/them/") == 403,
+    )
+    ctx.close()
+
+    # danh sách: cột Công ty khách, lọc theo công ty, lọc đợt sắp đủ 12 tháng, chưa có bộ phận
+    ctx, page = new_page(browser, size)
+    login(page, "hr")
+    goto(page, "/ho-so/")
+    check(
+        f"[{s}] HR: danh sách có cột Công ty khách, không còn cột Bộ phận, vẫn 12 cột",
+        page.locator("thead th").count() == 12
+        and page.locator("thead th:text-is('Công ty khách')").count() == 1
+        and page.locator("thead th:text-is('Bộ phận')").count() == 0,
+    )
+    page.select_option("select[name=cong_ty_khach]", label=f"{ten.upper()} – Đồng Nai")
+    submit(page, "Lọc")
+    check(
+        f"[{s}] HR: lọc theo công ty khách thấy công nhân vừa thêm đợt",
+        page.locator("td", has_text=ten.upper()).count() >= 1,
+    )
+    pw.shot(OUT, page, s, "35-loc-cong-ty-khach")
+    goto(page, "/ho-so/?dot_sap_du_han=1")
+    check(
+        f"[{s}] HR: lọc đợt sắp đủ 12 tháng thấy công nhân vừa thêm",
+        page.locator("td", has_text=ten.upper()).count() >= 1,
+    )
+    page.select_option("select[name=bo_phan]", "chua-co")
+    submit(page, "Lọc")
+    check(f"[{s}] HR: lọc Chưa có bộ phận chạy được", page.locator(".alert-danger").count() == 0)
+    check(f"[{s}] HR: danh sách không cuộn ngang", no_h_scroll(page))
+    pw.shot(OUT, page, s, "36-danh-sach-1366" if s == "1366x768" else "36-danh-sach-390")
+    ctx.close()
+
+
 PARTS = {
     "cai-dat": part_settings,
     "tuyen-dung": part_recruitment,
     "lam-viec": part_employment,
+    "v11": part_v11,
 }
 
 

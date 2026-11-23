@@ -3,6 +3,7 @@
   {% for label, url, shown in work_links %}{% if shown %}<a class="btn btn-outline-secondary" href="{{ url }}">{{ label }}</a>{% endif %}{% endfor %}
 </div>
 {% endif %}
+{% if assignment_warning %}{% include "components/_alert.html" with kind="warning" text=assignment_warning %}{% endif %}
 {% if employment_items %}
   {% include "components/_form_section.html" with title="Thông tin hiện tại" items=employment_items %}
 {% else %}
@@ -11,6 +12,30 @@
   {% include "components/_empty_state.html" with text="Chưa có thông tin làm việc. Thông tin này được tạo khi tiếp nhận vào làm (ở tab Tuyển dụng & CV, khi lần ứng tuyển Đạt và hồ sơ Đã xác minh)." %}
 </section>
 {% endif %}
+{% if assignment_current_items %}
+  {% include "components/_form_section.html" with title="Đợt làm việc hiện tại" items=assignment_current_items %}
+{% else %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Đợt làm việc hiện tại</h2>
+  {% include "components/_empty_state.html" with text="Chưa có đợt làm việc nào đang diễn ra tại công ty khách hàng." %}
+</section>
+{% endif %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Lịch sử đợt làm việc</h2>
+  {% include "components/_table.html" with columns=assignment_columns rows=assignment_rows empty_text="Chưa có đợt làm việc nào." %}
+</section>
+{% if salary_items %}
+  {% include "components/_form_section.html" with title="Lương hiện tại" items=salary_items %}
+{% else %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Lương hiện tại</h2>
+  {% include "components/_empty_state.html" with text="Chưa ghi nhận lương cho đợt làm việc hiện tại." %}
+</section>
+{% endif %}
+<section class="pa-form-section">
+  <h2 class="pa-card-title">Lịch sử lương</h2>
+  {% include "components/_table.html" with columns=salary_columns rows=salary_rows empty_text="Chưa có dòng lương nào. Lương ghi theo từng đợt làm việc." %}
+</section>
 <section class="pa-form-section">
   <h2 class="pa-card-title">Lịch sử điều chuyển</h2>
   {% include "components/_table.html" with columns=history_columns rows=history_rows empty_text="Chưa có lịch sử điều chuyển." %}

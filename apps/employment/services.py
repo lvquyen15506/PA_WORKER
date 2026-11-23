@@ -45,8 +45,13 @@ def _check_editable(user, worker):
         raise PermissionDenied
 
 
-def _lock_worker(worker):
-    return Worker.objects.select_for_update().get(pk=worker.pk)
+def _lock_worker(worker, user):
+    """Khóa dòng hồ sơ rồi kiểm tra lại quyền trên bản ghi mới đọc (đối tượng truyền vào có thể
+    đã cũ: hồ sơ vừa chuyển Lưu trữ hoặc Bị từ chối ở một phiên khác)."""
+    locked = Worker.objects.select_for_update().get(pk=worker.pk)
+    if not rules.can_edit_work_tabs(user, locked):
+        raise PermissionDenied
+    return locked
 
 
 def _text(value):
@@ -120,7 +125,7 @@ def onboard(
     _check_editable(user, worker)
     errors = {}
     with transaction.atomic():
-        locked = _lock_worker(worker)
+        locked = _lock_worker(worker, user)
         application = type(application).objects.select_for_update().get(pk=application.pk)
         # Kiểm tra lại sau khi khóa: hai người bấm cùng lúc chỉ một lần thành công.
         if application.worker_id != locked.pk:
@@ -261,7 +266,7 @@ def change_employment(
     _check_editable(user, worker)
     errors = {}
     with transaction.atomic():
-        locked = _lock_worker(worker)
+        locked = _lock_worker(worker, user)
         employment = Employment.objects.select_for_update().filter(worker=locked).first()
         if employment is None:
             raise EmploymentError(
@@ -420,7 +425,7 @@ def _contract_document(user, worker, uploaded, request):
 def add_contract(user, worker, *, uploaded=None, request=None, **data):
     _check_editable(user, worker)
     with transaction.atomic():
-        locked = _lock_worker(worker)
+        locked = _lock_worker(worker, user)
         if not Employment.objects.filter(worker=locked).exists():
             raise EmploymentError(
                 message="Hồ sơ chưa có thông tin làm việc nên chưa thêm hợp đồng."
@@ -447,7 +452,7 @@ def update_contract(user, contract, *, uploaded=None, request=None, **data):
     worker = contract.worker
     _check_editable(user, worker)
     with transaction.atomic():
-        locked = _lock_worker(worker)
+        locked = _lock_worker(worker, user)
         contract = Contract.objects.select_for_update().get(pk=contract.pk)
         values = _contract_values(current=contract, **data)
         changes = {

@@ -10,11 +10,15 @@ import re
 
 from django import forms
 from django.db.models import F, OuterRef, Q, Subquery
+from django.forms.models import ModelChoiceIterator
+from django.utils import timezone
 
 from apps.core.choices import RecruitmentStatus, VerificationStatus, WorkStatus
 from apps.core.crypto import compute_id_hash
-from apps.core.models import Department, EducationLevel, Position, Section
+from apps.core.models import ClientCompany, Department, EducationLevel, Position, Section
 from apps.core.text import compute_name_search
+from apps.employment.assignments import current_q
+from apps.employment.models import WorkAssignment
 from apps.recruitment.models import Application, Education
 
 from . import indicators
@@ -56,6 +60,28 @@ def _date(label):
     )
 
 
+class _SectionIterator(ModelChoiceIterator):
+    """Ô chọn bộ phận có thêm lựa chọn "Chưa có bộ phận" (câu 48) ngay sau "Tất cả"."""
+
+    def __iter__(self):
+        yield ("", self.field.empty_label)
+        yield (SectionFilterField.NONE, "Chưa có bộ phận")
+        for obj in self.queryset:
+            yield self.choice(obj)
+
+
+class SectionFilterField(forms.ModelChoiceField):
+    NONE = "chua-co"
+    iterator = _SectionIterator
+
+    def to_python(self, value):
+        return self.NONE if value == self.NONE else super().to_python(value)
+
+    def validate(self, value):
+        if value != self.NONE:
+            super().validate(value)
+
+
 class WorkerFilterForm(forms.Form):
     q = forms.CharField(
         label="Tìm kiếm",
@@ -65,8 +91,14 @@ class WorkerFilterForm(forms.Form):
     phong_ban = forms.ModelChoiceField(
         label="Phòng ban", required=False, queryset=Department.objects.none(), empty_label="Tất cả"
     )
-    bo_phan = forms.ModelChoiceField(
+    bo_phan = SectionFilterField(
         label="Bộ phận", required=False, queryset=Section.objects.none(), empty_label="Tất cả"
+    )
+    cong_ty_khach = forms.ModelChoiceField(  # theo đợt làm việc đang diễn ra (v1.1, câu 45)
+        label="Công ty khách",
+        required=False,
+        queryset=ClientCompany.objects.none(),
+        empty_label="Tất cả",
     )
     chuc_danh = forms.ModelChoiceField(
         label="Chức danh", required=False, queryset=Position.objects.none(), empty_label="Tất cả"
@@ -91,6 +123,9 @@ class WorkerFilterForm(forms.Form):
     hop_dong_sap_het_han = forms.ChoiceField(
         label="Hợp đồng sắp hết hạn", required=False, choices=YES
     )
+    dot_sap_du_han = forms.ChoiceField(
+        label="Đợt làm việc sắp đủ 12 tháng", required=False, choices=YES
+    )
     tiep_nhan_tu = _date("Tiếp nhận từ ngày")
     tiep_nhan_den = _date("Tiếp nhận đến ngày")
     sap_xep = forms.ChoiceField(
@@ -103,6 +138,7 @@ class WorkerFilterForm(forms.Form):
         self.fields["bo_phan"].queryset = Section.objects.select_related("department").order_by(
             "department__sort_order", "sort_order", "name"
         )
+        self.fields["cong_ty_khach"].queryset = ClientCompany.objects.order_by("name", "location")
         self.fields["chuc_danh"].queryset = Position.objects.order_by("name")
         self.fields["trinh_do"].queryset = EducationLevel.objects.order_by("rank")
 
@@ -130,15 +166,28 @@ def _search_q(text, user):
 
 def build_queryset(user, cleaned):
     """Queryset hồ sơ theo bộ lọc đã kiểm tra (cleaned_data của WorkerFilterForm)."""
-    qs = Worker.objects.select_related("employment__section", "employment__position")
+    qs = Worker.objects.select_related("employment__position")
 
     search = _search_q(cleaned.get("q"), user)
     if search is not None:
         qs = qs.filter(search)
     if cleaned.get("phong_ban"):
         qs = qs.filter(employment__section__department=cleaned["phong_ban"])
-    if cleaned.get("bo_phan"):
+    if (
+        cleaned.get("bo_phan") == SectionFilterField.NONE
+    ):  # đã có thông tin làm việc, chưa có bộ phận
+        qs = qs.filter(employment__isnull=False, employment__section__isnull=True)
+    elif cleaned.get("bo_phan"):
         qs = qs.filter(employment__section=cleaned["bo_phan"])
+    if cleaned.get("cong_ty_khach"):
+        today = timezone.localdate()
+        qs = qs.filter(
+            pk__in=WorkAssignment.objects.filter(
+                current_q(today), client_company=cleaned["cong_ty_khach"]
+            ).values("worker_id")
+        )
+    if cleaned.get("dot_sap_du_han"):
+        qs = indicators.assignment_due_soon(qs)
     if cleaned.get("chuc_danh"):
         qs = qs.filter(employment__position=cleaned["chuc_danh"])
     if cleaned.get("trang_thai_ho_so"):

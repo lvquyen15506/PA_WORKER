@@ -6,8 +6,8 @@ import re
 import pytest
 
 from apps.core.choices import VerificationStatus as VS
-from apps.core.models import Department, EducationLevel, Position, Section
-from apps.employment.models import Employment
+from apps.core.models import ClientCompany, Department, EducationLevel, Position, Section
+from apps.employment.models import Employment, WorkAssignment
 from apps.recruitment.models import Education
 from apps.workers.models import IdentityDocument, Worker
 from tests.factories import (
@@ -71,6 +71,7 @@ def catalog():
 
 # ===== Cột =====================================================================================
 def test_cot_dung_thu_tu_theo_muc_iv_7():
+    # Đổi theo phiếu v1.1 (câu 48): cột "Bộ phận" của mục IV.7 thay bằng "Công ty khách".
     named("Hàng Đầu")
     content = page()
     headers = re.findall(r"<th[^>]*>(.*?)</th>", content)
@@ -81,7 +82,7 @@ def test_cot_dung_thu_tu_theo_muc_iv_7():
         "Ngày sinh",
         "Giới tính",
         "SĐT",
-        "Bộ phận",
+        "Công ty khách",
         "Chức danh",
         "Ngày vào làm",
         "TT hồ sơ",  # viết tắt theo phác thảo đã duyệt để 12 cột vừa khung 1366 px
@@ -95,6 +96,13 @@ def test_hang_hien_du_lieu_ngay_dd_mm_yyyy_o_trong_la_gach(catalog):
     employ(
         w, section=catalog["sec_a"], position=catalog["pos_1"], start=D(2026, 2, 3), code="CN-00777"
     )
+    WorkAssignment.objects.create(  # cột "Công ty khách" lấy từ đợt đang diễn ra (câu 48)
+        worker=w,
+        client_company=ClientCompany.objects.create(name="Công ty Khách Mẫu", location="Tỉnh Mẫu"),
+        position=catalog["pos_1"],
+        start_date=D(2026, 2, 3),
+        created_by=w.created_by,
+    )
     candidate = named("Ứng Viên Chưa Vào Làm")
     content = page()
     row = re.search(r"<tr>(?:(?!</tr>).)*Dòng Đủ Dữ Liệu.*?</tr>", content, re.S).group(0)
@@ -103,7 +111,7 @@ def test_hang_hien_du_lieu_ngay_dd_mm_yyyy_o_trong_la_gach(catalog):
         "07/03/1990",
         "Nam",
         "0911000999",
-        "Bộ phận A1",
+        "Công ty Khách Mẫu – Tỉnh Mẫu",
         "Thợ hàn",
         "03/02/2026",
     ):

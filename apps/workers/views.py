@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import Http404, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.formats import date_format
 from django.views.decorators.http import require_GET, require_POST
 
@@ -31,7 +32,10 @@ from apps.core.text import mask_id_number
 from apps.documents import services as document_services
 from apps.documents.forms import VerifyForm
 from apps.documents.models import WorkerDocument
+from apps.employment import assignments as assignment_services
 from apps.employment import services as employment_services
+from apps.employment.assignments import current_q
+from apps.employment.models import WorkAssignment
 from apps.workers import indicators, rules, workflow
 
 from . import history_labels, services
@@ -67,7 +71,8 @@ LIST_COLUMNS = [
     {"key": "date_of_birth", "label": "Ngày sinh", "kind": "date"},
     {"key": "gender", "label": "Giới tính", "kind": "text"},
     {"key": "phone", "label": "SĐT", "kind": "text", "nowrap": True},
-    {"key": "section", "label": "Bộ phận", "kind": "text"},
+    # v1.1 (câu 48): cột "Bộ phận" của yêu cầu v1.0 thay bằng "Công ty khách" (đợt đang diễn ra).
+    {"key": "client", "label": "Công ty khách", "kind": "text"},
     {"key": "position", "label": "Chức danh", "kind": "text"},
     {"key": "start_date", "label": "Ngày vào làm", "kind": "date"},
     # Tên viết tắt theo phác thảo đã duyệt (phac-thao-trang.md 2.3): 12 cột mới vừa khung 1366 px.
@@ -137,6 +142,14 @@ def worker_list(request):
     page = Paginator(build_queryset(request.user, cleaned), PAGE_SIZE).get_page(params.get("trang"))
 
     rows = []
+    clients = {
+        a.worker_id: a.client_company
+        for a in WorkAssignment.objects.filter(
+            current_q(timezone.localdate()), worker_id__in=[w.pk for w in page]
+        )
+        .select_related("client_company")
+        .order_by("start_date", "id")
+    }
     for number, worker in enumerate(page, start=page.start_index()):
         employment = getattr(worker, "employment", None)
         actions = [_link("bi-eye", "Xem", worker_url(worker))]
@@ -150,7 +163,7 @@ def worker_list(request):
                 "date_of_birth": worker.date_of_birth,
                 "gender": _label(Gender, worker.gender),
                 "phone": worker.phone,
-                "section": employment.section.name if employment and employment.section else None,
+                "client": str(clients[worker.pk]) if worker.pk in clients else None,
                 "position": employment.position.name if employment else None,
                 "start_date": employment.start_date if employment else None,
                 "status": worker.verification_status,
@@ -655,6 +668,136 @@ def _recruitment_tab(request, worker, employment, identity, staff, role):
     }
 
 
+def _assignment_context(request, worker, employment, staff, can_edit):
+    """Đợt làm việc và lịch sử lương (v1.1). Mọi vai trò xem được lương và đơn giá (câu 42); ghi
+    chú của đợt và lý do đổi lương là trường cá nhân nên chỉ hiện cho nhân viên (A, Q, H)."""
+    today = timezone.localdate()
+    can_salary = assignment_services.can_add_salary(request.user, worker)
+    assignments = list(worker.work_assignments.select_related("client_company", "position"))
+    due = indicators.assignment_due_info(worker_ids=[worker.pk]).get(worker.pk)
+    current = next(
+        (
+            a
+            for a in assignments
+            if a.start_date <= today and (a.end_date is None or a.end_date >= today)
+        ),
+        None,
+    )
+    columns = [
+        {"key": "client", "label": "Công ty khách", "kind": "text"},
+        {"key": "location", "label": "Địa điểm", "kind": "text"},
+        {"key": "position", "label": "Vị trí", "kind": "text"},
+        {"key": "start_date", "label": "Từ ngày", "kind": "date"},
+        {"key": "end_date", "label": "Đến ngày", "kind": "date"},
+    ]
+    if staff:
+        columns.append({"key": "note", "label": "Ghi chú", "kind": "text"})
+    columns.append({"key": "warning", "label": "Cảnh báo", "kind": "badge"})
+    if can_edit:
+        columns.append({"key": "actions", "label": "Thao tác", "kind": "actions"})
+    rows = []
+    for a in assignments:
+        actions = []
+        if can_edit:
+            actions.append(_link("bi-pencil", "Sửa đợt làm việc", f"/dot-lam-viec/{a.pk}/sua/"))
+        if can_salary:
+            actions.append(
+                {
+                    "kind": "menu",
+                    "label": "Thêm",
+                    "items": [
+                        {
+                            "label": "Ghi nhận thay đổi lương",
+                            "url": f"/dot-lam-viec/{a.pk}/luong/them/",
+                        }
+                    ],
+                }
+            )
+        rows.append(
+            {
+                "client": a.client_company.name,
+                "location": a.client_company.location,
+                "position": a.position.name,
+                "start_date": a.start_date,
+                "end_date": a.end_date,
+                "note": a.note,
+                "warning": badges.EXPIRING if due and due[2].pk == a.pk else "",
+                "actions": actions,
+            }
+        )
+    current_items = None
+    if current is not None:
+        current_items = [
+            ("Công ty khách", current.client_company.name),
+            ("Địa điểm", current.client_company.location),
+            ("Vị trí", current.position.name),
+            ("Từ ngày", _fmt_date(current.start_date)),
+            ("Đến ngày", _fmt_date(current.end_date) or "Chưa kết thúc"),
+        ]
+    salary_rows = []
+    salaries = (
+        worker.salary_history.select_related("assignment__client_company", "created_by")
+        .order_by("-effective_date", "-id")
+        .all()
+    )
+    for s in salaries:
+        salary_rows.append(
+            {
+                "assignment": f"{s.assignment.client_company.name} (từ "
+                f"{s.assignment.start_date:%d/%m/%Y})",
+                "effective_date": s.effective_date,
+                "monthly_salary": _money(s.monthly_salary),
+                "client_unit_price": _money(s.client_unit_price),
+                "reason": s.reason,
+                "created_by": s.created_by.full_name,
+                "created_at": s.created_at,
+            }
+        )
+    salary_columns = [
+        {"key": "assignment", "label": "Đợt làm việc", "kind": "text"},
+        {"key": "effective_date", "label": "Ngày áp dụng", "kind": "date"},
+        {"key": "monthly_salary", "label": "Lương tháng", "kind": "num"},
+        {"key": "client_unit_price", "label": "Đơn giá tháng", "kind": "num"},
+    ]
+    if staff:
+        salary_columns.append({"key": "reason", "label": "Lý do", "kind": "text"})
+    salary_columns += [
+        {"key": "created_by", "label": "Người sửa", "kind": "text"},
+        {"key": "created_at", "label": "Ngày ghi", "kind": "date"},
+    ]
+    now_salary = assignment_services.current_salary(current, today) if current else None
+    salary_items = None
+    if now_salary is not None:
+        salary_items = [
+            ("Lương tháng", _money(now_salary.monthly_salary)),
+            ("Đơn giá tháng (tính cho công ty khách)", _money(now_salary.client_unit_price)),
+            ("Áp dụng từ", _fmt_date(now_salary.effective_date)),
+            ("Đợt làm việc", f"{current.client_company.name}, từ {_fmt_date(current.start_date)}"),
+        ]
+    links = []
+    if can_edit and employment is not None:
+        links.append(("Thêm đợt làm việc", f"/ho-so/{worker.pk}/dot-lam-viec/them/", True))
+    target = current or (assignments[0] if assignments else None)
+    if can_salary and target is not None:
+        links.append(("Ghi nhận thay đổi lương", f"/dot-lam-viec/{target.pk}/luong/them/", True))
+    return {
+        "work_links": links,
+        "assignment_columns": columns,
+        "assignment_rows": rows,
+        "assignment_current_items": current_items,
+        "assignment_warning": (
+            f"Đợt làm việc tại {due[2].client_company.name} (liền nhau từ "
+            f"{due[1]:%d/%m/%Y}) đủ thời hạn vào {due[0]:%d/%m/%Y}."
+            if due
+            else ""
+        ),
+        "salary_items": salary_items,
+        "salary_columns": salary_columns,
+        "salary_rows": salary_rows,
+        "salary_modal_id": "",
+    }
+
+
 def _employment_tab(request, worker, employment, identity, staff, role):
     items = None
     if employment is not None:
@@ -749,12 +892,15 @@ def _employment_tab(request, worker, employment, identity, staff, role):
         if can_edit:
             row["actions"].append(_link("bi-pencil", "Sửa hợp đồng", f"/hop-dong/{c.pk}/sua/"))
         contracts.append(row)
+    assignment_context = _assignment_context(request, worker, employment, staff, can_edit)
     return {
         "can_edit_work": can_edit,
         "work_links": [
             ("Ghi nhận thay đổi", f"/ho-so/{worker.pk}/lam-viec/thay-doi/", employment is not None),
             ("Thêm hợp đồng", f"/ho-so/{worker.pk}/hop-dong/them/", employment is not None),
+            *assignment_context.pop("work_links"),
         ],
+        **assignment_context,
         "employment_items": items,
         "history_columns": [
             {"key": "effective_date", "label": "Ngày hiệu lực", "kind": "date"},

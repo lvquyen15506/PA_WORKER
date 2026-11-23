@@ -12,9 +12,9 @@ from apps.workers import rules
 from apps.workers.models import Worker
 from apps.workers.rules import ALL_STAFF
 
-from . import services
-from .forms import ChangeForm, ContractForm, OnboardForm
-from .models import Contract, Employment
+from . import assignments, services
+from .forms import AssignmentForm, ChangeForm, ContractForm, OnboardForm, SalaryForm
+from .models import Contract, Employment, WorkAssignment
 
 STAFF = tuple(ALL_STAFF)
 TAB_URL = "/ho-so/{}/?tab=lam-viec"
@@ -122,6 +122,99 @@ def change(request, pk):
 
 
 # --- Hợp đồng ----------------------------------------------------------------------------------
+# --- Đợt làm việc và lương (v1.1) ---------------------------------------------------------------
+@role_required(*STAFF)
+def assignment_add(request, pk):
+    worker = get_object_or_404(Worker, pk=pk)
+    if not rules.can_edit_work_tabs(request.user, worker):
+        raise PermissionDenied
+    back = TAB_URL.format(worker.pk)
+    form = AssignmentForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            assignments.add_assignment(request.user, worker, request=request, **form.service_data())
+        except assignments.AssignmentError as exc:
+            _apply_errors(form, exc)
+        else:
+            messages.success(request, "Đã thêm đợt làm việc.")
+            return redirect(back)
+    return _page(
+        request,
+        form,
+        title="Thêm đợt làm việc",
+        crumbs=_crumbs(worker, "Thêm đợt làm việc"),
+        cancel_url=back,
+        submit_label="Lưu đợt làm việc",
+        intro="Mỗi lúc một công nhân chỉ làm cho một công ty khách hàng; các đợt không chồng lấn "
+        "ngày và được giữ lại làm lịch sử.",
+    )
+
+
+@role_required(*STAFF)
+def assignment_edit(request, pk):
+    assignment = get_object_or_404(
+        WorkAssignment.objects.select_related("worker", "client_company", "position"), pk=pk
+    )
+    worker = assignment.worker
+    if not rules.can_edit_work_tabs(request.user, worker):
+        raise PermissionDenied
+    back = TAB_URL.format(worker.pk)
+    form = AssignmentForm(request.POST or None, instance=assignment)
+    if request.method == "POST" and form.is_valid():
+        try:
+            changed = assignments.update_assignment(
+                request.user, assignment, request=request, **form.service_data()
+            )
+        except assignments.AssignmentError as exc:
+            _apply_errors(form, exc)
+        else:
+            messages.success(
+                request, "Đã lưu đợt làm việc." if changed else "Không có thay đổi nào để lưu."
+            )
+            return redirect(back)
+    return _page(
+        request,
+        form,
+        title="Sửa đợt làm việc",
+        crumbs=_crumbs(worker, "Sửa đợt làm việc"),
+        cancel_url=back,
+        submit_label="Lưu đợt làm việc",
+        intro="Đợt làm việc không xóa được; nhập nhầm thì sửa (giá trị cũ được ghi vào nhật ký).",
+    )
+
+
+@role_required(*STAFF)
+def salary_add(request, pk):
+    assignment = get_object_or_404(
+        WorkAssignment.objects.select_related("worker", "client_company"), pk=pk
+    )
+    worker = assignment.worker
+    if not assignments.can_add_salary(request.user, worker):
+        raise PermissionDenied  # chỉ Admin và Quản lý nhân sự (câu 42)
+    back = TAB_URL.format(worker.pk)
+    latest = assignment.salary_history.order_by("-effective_date", "-id").first()
+    form = SalaryForm(request.POST or None, latest=latest)
+    if request.method == "POST" and form.is_valid():
+        try:
+            assignments.add_salary(request.user, assignment, request=request, **form.service_data())
+        except assignments.AssignmentError as exc:
+            _apply_errors(form, exc)
+        else:
+            messages.success(request, "Đã ghi nhận thay đổi lương.")
+            return redirect(back)
+    return _page(
+        request,
+        form,
+        title="Ghi nhận thay đổi lương",
+        crumbs=_crumbs(worker, "Ghi nhận thay đổi lương"),
+        cancel_url=back,
+        submit_label="Ghi nhận thay đổi lương",
+        intro=f"Đợt làm việc tại {assignment.client_company}, từ "
+        f"{assignment.start_date:%d/%m/%Y}. Mỗi lần ghi nhận thêm một dòng lịch sử, không sửa hay "
+        "xóa dòng cũ; ghi nhầm thì thêm dòng mới để sửa.",
+    )
+
+
 @role_required(*STAFF)
 def contract_add(request, pk):
     worker = get_object_or_404(Worker, pk=pk)
