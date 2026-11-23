@@ -102,17 +102,7 @@ def _require_edit(user, worker):
 def recruitment_list(request):
     form = RecruitmentFilterForm(request.GET)
     form.is_valid()
-    qs = Application.objects.select_related("worker", "position", "source")
-    statuses = form.statuses()
-    if statuses:
-        qs = qs.filter(status__in=statuses)
-    for field, lookup in (("vi_tri", "position"), ("nguon", "source")):
-        if form.cleaned_data.get(field):
-            qs = qs.filter(**{lookup: form.cleaned_data[field]})
-    if form.cleaned_data.get("tu_ngay"):
-        qs = qs.filter(applied_date__gte=form.cleaned_data["tu_ngay"])
-    if form.cleaned_data.get("den_ngay"):
-        qs = qs.filter(applied_date__lte=form.cleaned_data["den_ngay"])
+    qs = form.filter_queryset(Application.objects.select_related("worker", "position", "source"))
     page = Paginator(qs.order_by("-applied_date", "-id"), PAGE_SIZE).get_page(
         request.GET.get("trang")
     )

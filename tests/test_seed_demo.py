@@ -105,7 +105,23 @@ def test_500_ho_so_cccd_gia_bat_dau_999_ma_hoa_va_bam_dung(seeded):
         for enc, addr in cur.fetchall():
             assert enc.startswith("gAAAA") and addr.startswith("gAAAA")
     assert all(not w.anonymized_at for w in Worker.objects.all())
-    assert WorkerDocument.objects.count() == 0  # Phase 2 không tạo tệp
+    # Phase 7 (đổi từ "không tạo tệp"): seed tạo tài liệu mẫu để "Hoàn thiện" > 0 (kịch bản 11).
+    assert WorkerDocument.objects.count() > 0
+
+
+def test_tai_lieu_mau_la_tep_gia_ton_tai_tren_dia_va_co_ho_so_hoan_thien(seeded):
+    from apps.workers import indicators
+
+    documents = list(WorkerDocument.objects.select_related("worker"))
+    assert all(d.mime_type == "image/png" and d.original_name.startswith("mau-") for d in documents)
+    assert all(
+        d.stored_file and d.stored_file.storage.exists(d.stored_file.name) for d in documents
+    )
+    assert len({d.stored_file.name for d in documents}) == len(documents)  # mỗi tài liệu một tệp
+    complete = indicators.complete(Worker.objects.all()).count()
+    missing = indicators.missing_documents(Worker.objects.all()).count()
+    assert complete > 0
+    assert 0 < missing < 500  # có cả hồ sơ đủ lẫn thiếu giấy tờ
 
 
 def test_ma_ho_so_ma_nhan_vien_va_bo_dem(seeded):

@@ -13,14 +13,17 @@ Chạy TAY (không chạy lúc khởi động container, để mật khẩu tạ
 """
 
 import datetime
+import io
 import random
 from contextlib import contextmanager
 from decimal import Decimal
 
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 from faker import Faker
+from PIL import Image, ImageDraw
 
 from apps.accounts import services as account_services
 from apps.accounts.models import Role, User
@@ -29,6 +32,7 @@ from apps.core.choices import (
     AuditAction,
     ConsentMethod,
     ContractType,
+    DocumentVerificationStatus,
     EmploymentChangeType,
     Gender,
     IdDocType,
@@ -43,6 +47,7 @@ from apps.core.models import (
     ApplicationSource,
     ClientCompany,
     Department,
+    DocumentType,
     EducationLevel,
     Position,
     Section,
@@ -50,6 +55,7 @@ from apps.core.models import (
     Team,
 )
 from apps.core.text import compute_name_search
+from apps.documents.models import WorkerDocument
 from apps.employment.models import (
     Contract,
     Employment,
@@ -171,6 +177,24 @@ def keep_dates(*models):
     finally:
         for field, auto_now, auto_now_add in saved:
             field.auto_now, field.auto_now_add = auto_now, auto_now_add
+
+
+# Loại tài liệu hệ thống (mỗi loại một nhóm bắt buộc) -> phần tên tệp giả.
+SEED_DOCUMENTS = {
+    "CCCD_FRONT": "mat-truoc",
+    "CCCD_BACK": "mat-sau",
+    "PORTRAIT": "chan-dung",
+    "CV": "cv",
+}
+
+
+def placeholder_png():
+    """Ảnh PNG nhỏ ghi "MAU - KHONG CO GIA TRI" (ASCII để không cần phông tiếng Việt)."""
+    image = Image.new("RGB", (240, 150), "white")
+    ImageDraw.Draw(image).text((20, 65), "MAU - KHONG CO GIA TRI", fill="black")
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def at(day, hour, minute=0):
@@ -569,6 +593,7 @@ class Command(BaseCommand):
         Education.objects.bulk_create(rows["education"], batch_size=200)
         WorkExperience.objects.bulk_create(rows["experience"], batch_size=200)
         Certificate.objects.bulk_create(rows["certificates"], batch_size=200)
+        self.documents(plans, users)
 
         # 3. Làm việc, lịch sử, hợp đồng
         employments, history, contracts = [], [], []
@@ -590,6 +615,47 @@ class Command(BaseCommand):
         salaries = [row for a in assignments for row in a.salary_plan]
         with keep_dates(SalaryHistory):
             SalaryHistory.objects.bulk_create(salaries, batch_size=200)
+
+    def documents(self, plans, users):
+        """Tài liệu mẫu (tệp ảnh giả "MẪU", không phải giấy tờ thật) để chỉ số "Hoàn thiện" và
+        "Thiếu giấy tờ" có số liệu: ~70% hồ sơ đủ 4 nhóm bắt buộc, còn lại thiếu một phần."""
+        types = {
+            t.system_code: t
+            for t in DocumentType.objects.filter(system_code__in=SEED_DOCUMENTS.keys())
+        }
+        if len(types) < len(SEED_DOCUMENTS):  # danh mục bị sửa mất loại hệ thống: bỏ qua
+            return
+        image = placeholder_png()
+        rows = []
+        for p in plans:
+            rng = random.Random(f"{SEED}-doc-{p['index']}")
+            drafts = p["sc"] in ("DRAFT", "ARCH_ABANDONED")
+            if not drafts and rng.random() < 0.7:
+                codes = list(SEED_DOCUMENTS)
+            else:
+                codes = rng.sample(list(SEED_DOCUMENTS), rng.randint(0, 3))
+            checked = p["chain"][-1][0] in (
+                VerificationStatus.VERIFIED,
+                VerificationStatus.ARCHIVED,
+            )
+            for code in codes:
+                doc = WorkerDocument(
+                    worker=p["worker"],
+                    document_type=types[code],
+                    stored_file=ContentFile(image, name=f"mau-{code.lower()}.png"),
+                    original_name=f"mau-{SEED_DOCUMENTS[code]}.png",
+                    mime_type="image/png",
+                    size_bytes=len(image),
+                    uploaded_by=p["creator"],
+                    uploaded_at=at(p["created"], 8, 0),
+                )
+                if checked:
+                    doc.verification_status = DocumentVerificationStatus.MATCHED
+                    doc.verified_by = users["quanly"]
+                    doc.verified_at = at(p["created"], 9, 0)
+                rows.append(doc)
+        with keep_dates(WorkerDocument):
+            WorkerDocument.objects.bulk_create(rows, batch_size=200)
 
     def children(self, p, rows, today, catalog, users):
         rng, person, worker = p["rng"], p["person"], p["worker"]

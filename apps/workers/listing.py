@@ -7,6 +7,7 @@ thường, không biết hồ sơ có tồn tại hay không.
 """
 
 import re
+from datetime import datetime, time, timedelta
 
 from django import forms
 from django.db.models import F, OuterRef, Q, Subquery
@@ -27,6 +28,9 @@ from .rules import ALL_STAFF, role_code
 
 PAGE_SIZE = 20
 DATE_FORMAT = "%d/%m/%Y"
+WORKING = f"{WorkStatus.PROBATION},{WorkStatus.ACTIVE}"  # thẻ Dashboard "Đang làm việc"
+# Ô lọc chỉ dành cho liên kết thẻ Dashboard: chỉ hiện trên thanh lọc khi có giá trị.
+DASHBOARD_ONLY = ("tao_tu", "tao_den", "nghi_tu", "nghi_den", "cccd_sap_het_han")
 ALL = [("", "Tất cả")]
 YES = [("", "Tất cả"), ("1", "Có")]
 
@@ -82,7 +86,27 @@ class SectionFilterField(forms.ModelChoiceField):
             super().validate(value)
 
 
+class StatusListField(forms.CharField):
+    """Một mã hoặc danh sách mã cách nhau bằng dấu phẩy (liên kết thẻ Dashboard, ví dụ
+    `PROBATION,ACTIVE`). Mã không hợp lệ bị bỏ; `clean` trả về list các mã hợp lệ (có thể rỗng).
+
+    Kết quả rỗng khi người dùng nhập toàn mã sai: bộ lọc coi như không lọc, giống ô chọn cũ."""
+
+    def __init__(self, *, choices, extra_choices=(), **kwargs):
+        self.valid = {value for value, _ in choices if value}
+        # extra_choices: lựa chọn gộp (ví dụ "Thử việc + Đang làm việc") chỉ để ô chọn hiện đúng.
+        options = [("", "Tất cả")] + list(choices) + list(extra_choices)
+        kwargs.setdefault("widget", forms.Select(choices=options))
+        super().__init__(**kwargs)
+
+    def clean(self, value):
+        raw = (super().clean(value) or "").split(",")
+        return [code for code in (item.strip() for item in raw) if code in self.valid]
+
+
 class WorkerFilterForm(forms.Form):
+    NOT_ARCHIVED = "chua-luu-tru"  # mọi hồ sơ trừ Lưu trữ (thẻ "Tổng số hồ sơ", Thiếu giấy tờ)
+
     q = forms.CharField(
         label="Tìm kiếm",
         required=False,
@@ -110,10 +134,15 @@ class WorkerFilterForm(forms.Form):
         empty_label="Tất cả",
     )
     trang_thai_ho_so = forms.ChoiceField(
-        label="Trạng thái hồ sơ", required=False, choices=ALL + VerificationStatus.choices
+        label="Trạng thái hồ sơ",
+        required=False,
+        choices=ALL + VerificationStatus.choices + [(NOT_ARCHIVED, "Chưa Lưu trữ")],
     )
-    trang_thai_lam_viec = forms.ChoiceField(
-        label="Trạng thái làm việc", required=False, choices=ALL + WorkStatus.choices
+    trang_thai_lam_viec = StatusListField(
+        label="Trạng thái làm việc",
+        required=False,
+        choices=WorkStatus.choices,
+        extra_choices=[(WORKING, "Thử việc + Đang làm việc")],
     )
     trang_thai_tuyen_dung = forms.ChoiceField(
         label="Trạng thái tuyển dụng", required=False, choices=ALL + RecruitmentStatus.choices
@@ -126,14 +155,22 @@ class WorkerFilterForm(forms.Form):
     dot_sap_du_han = forms.ChoiceField(
         label="Đợt làm việc sắp đủ 12 tháng", required=False, choices=YES
     )
+    cccd_sap_het_han = forms.ChoiceField(label="CCCD sắp hết hạn", required=False, choices=YES)
     tiep_nhan_tu = _date("Tiếp nhận từ ngày")
     tiep_nhan_den = _date("Tiếp nhận đến ngày")
+    tao_tu = _date("Tạo hồ sơ từ ngày")
+    tao_den = _date("Tạo hồ sơ đến ngày")
+    nghi_tu = _date("Nghỉ việc từ ngày")
+    nghi_den = _date("Nghỉ việc đến ngày")
     sap_xep = forms.ChoiceField(
         label="Sắp xếp", required=False, choices=[(k, v[0]) for k, v in SORTS.items()]
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for name in DASHBOARD_ONLY:
+            if not self.data.get(name):
+                del self.fields[name]
         self.fields["phong_ban"].queryset = Department.objects.order_by("sort_order", "name")
         self.fields["bo_phan"].queryset = Section.objects.select_related("department").order_by(
             "department__sort_order", "sort_order", "name"
@@ -164,6 +201,11 @@ def _search_q(text, user):
     return condition
 
 
+def _day_start(day):
+    """Đầu ngày (00:00 giờ Việt Nam) của một ngày, dạng datetime có múi giờ."""
+    return timezone.make_aware(datetime.combine(day, time.min))
+
+
 def build_queryset(user, cleaned):
     """Queryset hồ sơ theo bộ lọc đã kiểm tra (cleaned_data của WorkerFilterForm)."""
     qs = Worker.objects.select_related("employment__position")
@@ -190,10 +232,22 @@ def build_queryset(user, cleaned):
         qs = indicators.assignment_due_soon(qs)
     if cleaned.get("chuc_danh"):
         qs = qs.filter(employment__position=cleaned["chuc_danh"])
-    if cleaned.get("trang_thai_ho_so"):
+    if cleaned.get("trang_thai_ho_so") == WorkerFilterForm.NOT_ARCHIVED:
+        qs = qs.exclude(verification_status=VerificationStatus.ARCHIVED)
+    elif cleaned.get("trang_thai_ho_so"):
         qs = qs.filter(verification_status=cleaned["trang_thai_ho_so"])
-    if cleaned.get("trang_thai_lam_viec"):
-        qs = qs.filter(employment__work_status=cleaned["trang_thai_lam_viec"])
+    if cleaned.get("trang_thai_lam_viec"):  # danh sách mã đã lọc hợp lệ
+        qs = qs.filter(employment__work_status__in=cleaned["trang_thai_lam_viec"])
+    if cleaned.get("tao_tu"):  # theo ngày giờ Việt Nam, so khoảng để dùng được chỉ mục
+        qs = qs.filter(created_at__gte=_day_start(cleaned["tao_tu"]))
+    if cleaned.get("tao_den"):
+        qs = qs.filter(created_at__lt=_day_start(cleaned["tao_den"] + timedelta(days=1)))
+    if cleaned.get("nghi_tu"):
+        qs = qs.filter(employment__resign_date__gte=cleaned["nghi_tu"])
+    if cleaned.get("nghi_den"):
+        qs = qs.filter(employment__resign_date__lte=cleaned["nghi_den"])
+    if cleaned.get("cccd_sap_het_han"):
+        qs = indicators.id_expiring(qs)
     if cleaned.get("tiep_nhan_tu"):
         qs = qs.filter(employment__received_date__gte=cleaned["tiep_nhan_tu"])
     if cleaned.get("tiep_nhan_den"):

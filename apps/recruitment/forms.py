@@ -216,3 +216,18 @@ class RecruitmentFilterForm(forms.Form):
     def statuses(self):
         raw = (self.cleaned_data.get("trang_thai") or "").split(",")
         return [s for s in (x.strip() for x in raw) if s in RecruitmentStatus.values]
+
+    def filter_queryset(self, qs):
+        """Áp bộ lọc đã kiểm tra lên queryset `Application` (dùng cho /tuyen-dung/ và thẻ Dashboard
+        "Đang tuyển dụng", để số trên thẻ luôn bằng số dòng của trang đích)."""
+        statuses = self.statuses()
+        if statuses:
+            qs = qs.filter(status__in=statuses)
+        for field, lookup in (("vi_tri", "position"), ("nguon", "source")):
+            if self.cleaned_data.get(field):
+                qs = qs.filter(**{lookup: self.cleaned_data[field]})
+        if self.cleaned_data.get("tu_ngay"):
+            qs = qs.filter(applied_date__gte=self.cleaned_data["tu_ngay"])
+        if self.cleaned_data.get("den_ngay"):
+            qs = qs.filter(applied_date__lte=self.cleaned_data["den_ngay"])
+        return qs
