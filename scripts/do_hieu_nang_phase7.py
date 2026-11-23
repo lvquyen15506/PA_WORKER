@@ -233,6 +233,12 @@ def write_report(results, imports):
                 f"| {rows} | {'có' if with_work else 'không'} | {seconds:.1f} | HTTP {status}; "
                 f"{json.dumps(counts, ensure_ascii=False)} |"
             )
+        worst = max(item[2] for item in imports)
+        lines += [
+            "",
+            f"**Kết luận:** lần chậm nhất {worst:.1f} giây "
+            + ("(≤ 90 giây) nên giữ giới hạn 1.000 dòng." if worst <= 90 else "(> 90 giây) nên hạ giới hạn dòng."),
+        ]
         lines.append("")
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
