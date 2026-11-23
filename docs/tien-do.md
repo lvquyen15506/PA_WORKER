@@ -40,10 +40,17 @@
 
 ## Việc còn tồn
 
-- **v1.1:** Khách xác nhận bản gốc hợp đồng lao động, bản cam kết, bảng lương được lưu ngoài phần mềm theo quy định (câu 47).
-- **v1.1:** Hỏi khách có cần nhập lương hàng loạt từ Excel không (hiện file mẫu không có cột lương, câu 48).
-- **v1.1:** Khách xác nhận các quyết định [Nội bộ]/[Giả định] ở câu 48 và cuối mục F của `docs/lam-ro-yeu-cau.md` (Bộ phận không bắt buộc, cột "Công ty khách" thay cột "Bộ phận" so với `docs/yeu-cau.md` mục IV.7, mức lương mong muốn mở cho Viewer, cách cộng dồn 12 tháng).
-- **v1.1:** Người phụ trách tự chép `docs/yeu-cau-thay-doi-v1.1.pdf` vào repo (các tài liệu tham chiếu tới file này).
+Dọn ở Phase 8 (24/11/2026). **Mọi điểm cần khách hàng xác nhận** (mục E, F, câu 49, các quyết định [Nội bộ] của Phase 4, 7) và **giới hạn đã biết** đã gom vào `docs/ban-giao.md` mục 3, 4; dưới đây chỉ còn việc của nhóm phát triển và ghi chú môi trường.
+
+- **Người nhận bàn giao** (`docs/ban-giao.md` mục 5): chép `docs/yeu-cau-thay-doi-v1.1.pdf` vào repo; chụp các ảnh "[ẢNH CẦN CHỤP]" trong `docs/huong-dan-cai-dat.md`; thử thẻ Căn cước 2024 và CCCD 2016 thật (đã thử 1 thẻ CCCD 2021 thật ngày 23/11/2026, QR đúng; chỉnh ở `/cai-dat/ocr-qr/`, không lưu dữ liệu thẻ thật); đo thời gian thủ công (`docs/khoa-luan/so-sanh-thoi-gian.md` mục 2); pháp chế điền số điều (`docs/khoa-luan/doi-chieu-phap-luat.md`).
+- **Thời gian cài kịch bản 1** đo trên máy phát triển (mạng nhanh); đo lại trên máy khách khi cài thật.
+- **Môi trường dev** (`docs/chay-dev.md`): dev chạy `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build`; nghiệm thu và cài thật chỉ `docker compose up -d --build`. Container chạy bằng `app`: tạo tệp mới trong mã nguồn mount (makemigrations…) dùng `docker compose exec -u root web …`; sửa `static/` thì dựng lại kèm `-V`. Khi web chạy bản image (không mount), chạy ruff trên mã thật bằng `docker compose run --rm --no-deps --entrypoint ruff -v "$(pwd -W):/app" web check .` (Git Bash).
+- Bộ test khoảng 2.500 test, chạy khoảng 3,5 phút (phần lớn do test `seed_demo` và test sao lưu dùng giao dịch thật).
+- `seed_demo`: ~1.500 tệp tài liệu giả "MẪU"; chưa gán người quản lý trực tiếp; số điện thoại giả ngẫu nhiên có thể trùng số thật (chỉ dữ liệu mẫu).
+- **Ghi nhận ngoài quy tắc "chỉ Edit"** (CLAUDE.md quy tắc 6), đều không làm mất nội dung: Phase 6 nối đoạn test vào cuối tệp do Phase 6 tạo; Phase 7 nối một dòng vào cuối `docs/hieu-nang.md` bằng `printf >>`; Phase 8 ghi lại cả tệp `docker-compose.yml` bằng Write (từ bản vừa đọc, kèm các thay đổi đã duyệt) và nối 2 dòng vào cuối `.dockerignore` bằng `printf >>`.
+
+Lịch sử việc tồn trước Phase 8 (giữ để tra cứu):
+
 - **Phase 6 (việc tồn; (a), (b), (c) đã xong ở Phase 7):** (a) Dashboard và báo cáo ở Phase 7 cần dùng `indicators.assignment_due_info`/`assignment_due_soon` và `assignments.current_q` đã có; báo cáo/biểu đồ theo phòng ban có nhóm "Chưa có bộ phận"; chạy lại kịch bản 10 với thẻ Dashboard; (b) nhập Excel (Phase 7) phải tạo `WorkAssignment` qua `assignments.add_assignment` (không tạo thẳng), cột B12 "Công ty khách", B13 "Ngày bắt đầu đợt", bộ phận B3 không bắt buộc; (c) `/ho-so/` có 16 ô lọc, kiểm tra lại bố cục thanh lọc khi thêm báo cáo; (d) lương chưa có trong file xuất Excel (đúng quyết định); (e) `recruitment.services.was_onboarded` bảo vệ lần ứng tuyển Đạt theo thời điểm tiếp nhận nên có thể giữ Đạt cả lần cũ khác không phải nguồn (chặt hơn một chút, chủ ý); (f) vài file thử nghiệm mới được thêm bằng lệnh shell (nối đoạn test vào cuối file, sửa chú thích dòng kẻ) ngoài quy tắc "chỉ Edit": chỉ trên file do Phase 6 tạo, không đụng nội dung cũ.
 
 - Khách hàng xác nhận mục E của `docs/lam-ro-yeu-cau.md` (5 điểm ưu tiên cao: hủy = ẩn danh hóa, tự Lưu trữ, chặn dưới 15 tuổi, duyệt hồ sơ nhập Excel, ẩn danh hóa theo yêu cầu).
@@ -55,7 +62,7 @@
 - **Phase 5 đã duyệt, các điểm cần lưu ý:** (a) cấu trúc QR của CCCD vẫn là giả định (câu 20): bộ ảnh giả sinh theo đúng cấu hình nên 100% QR chưa chứng minh khớp thẻ thật, cần thử thẻ thật tại chỗ khách và đo lại OCR trên ảnh chụp thật (bảng ở `docs/do-chinh-xac-nhan-dien.md` là ảnh sạch, cao hơn thực tế); (b) API OCR ngoài mới có cài đặt và nhật ký, chưa có nhà cung cấp; (c) tab Chi tiết hồ sơ chưa hiện nhãn nguồn QR/OCR từng trường (dữ liệu đã có ở `IdentityFieldSource`); (d) ô Đã kiểm tra phải tích lại sau khi form báo lỗi; (e) Tesseract đọc ảnh chụp nghiêng/lóa chưa được thử, nút Xoay ảnh chỉ xoay 90°; (f) `.doc` thật chưa thử ngoài tệp LibreOffice tạo.
 - Môi trường dev: sau khi sửa tệp trong `static/` phải chạy `collectstatic` rồi `docker compose restart web` (whitenoise lưu sẵn kích thước tệp, không restart thì phục vụ tệp bị cụt và JS lỗi cú pháp). `/ui-kit/` truy cập bằng URL, chưa có liên kết trong menu.
 - **Phase 7 – Ẩn danh hóa (ĐÃ XONG, `docs/thiet-ke/models.md` mục 3.4 và 4.7 đã cập nhật):** thay `StatusChange.reason` do người dùng gõ bằng "(đã ẩn danh)" (ngoại lệ có kiểm soát của bảng chỉ thêm, chỉ trong `anonymize()`); lý do hệ thống tự điền giữ nguyên. Cập nhật `docs/thiet-ke/models.md` mục 4.7 (hiện ghi `StatusChange` giữ nguyên toàn bộ).
-- Phase 4: kiểm tra tay trình xem PDF của Chrome/Edge với header `Content-Security-Policy: sandbox` ở `/tai-lieu/<id>/xem/`; nếu bị chặn thì đổi CSP riêng cho PDF.
+- (ĐÃ XONG ở Phase 8: Edge và Chrome hiển thị PDF thật dưới `sandbox`, ảnh `docs/screenshots/phase-8/06-*`.) Phase 4: kiểm tra tay trình xem PDF của Chrome/Edge với header `Content-Security-Policy: sandbox` ở `/tai-lieu/<id>/xem/`; nếu bị chặn thì đổi CSP riêng cho PDF.
 - Cột bảng của Tuyển dụng (Phase 6) là phỏng đoán; cột và bộ lọc của Nhật ký đã chốt ở Phase 7 (`phac-thao-trang.md`). Cột Duyệt hồ sơ và Danh sách công nhân đã chốt ở Phase 4.
 - Phase 4: tab "Tuyển dụng & CV" và "Quá trình làm việc" chỉ hiển thị; thêm/sửa dòng ứng tuyển, học vấn, chứng chỉ, kinh nghiệm, điều chuyển, hợp đồng làm ở Phase 6. Chưa có `/nhat-ky/` nên nhật ký được đối chiếu bằng `manage.py shell` và tab Lịch sử.
 - Phase 4 cần khách xác nhận cùng mục E: chặn Lưu trữ khi Thử việc/Đang làm việc áp dụng cho mọi đường chuyển (không chỉ từ Đã xác minh); sửa hồ sơ Đã xác minh buộc giữ đủ trường gửi duyệt.

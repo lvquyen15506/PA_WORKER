@@ -34,8 +34,8 @@
 ĐẠT  admin 1366x768 /nhat-ky/ → 200
 ĐẠT  admin 1366x768 /nhat-ky/: không cuộn ngang
 ĐẠT  nhật ký: ngày sai hiện lỗi
-ĐẠT  admin 1366x768 /nhat-ky/165/ → 200
-ĐẠT  admin 1366x768 /nhat-ky/165/: không cuộn ngang
+ĐẠT  admin 1366x768 /nhat-ky/215/ → 200
+ĐẠT  admin 1366x768 /nhat-ky/215/: không cuộn ngang
 ĐẠT  admin 1366x768 /cai-dat/cho-huy/ → 200
 ĐẠT  admin 1366x768 /cai-dat/cho-huy/: không cuộn ngang
 ĐẠT  admin 1366x768 /cai-dat/bien-ban-huy/ → 200
@@ -120,8 +120,8 @@
 ĐẠT  admin 390x844 /nhat-ky/ → 200
 ĐẠT  admin 390x844 /nhat-ky/: không cuộn ngang
 ĐẠT  nhật ký: ngày sai hiện lỗi
-ĐẠT  admin 390x844 /nhat-ky/167/ → 200
-ĐẠT  admin 390x844 /nhat-ky/167/: không cuộn ngang
+ĐẠT  admin 390x844 /nhat-ky/217/ → 200
+ĐẠT  admin 390x844 /nhat-ky/217/: không cuộn ngang
 ĐẠT  admin 390x844 /cai-dat/cho-huy/ → 200
 ĐẠT  admin 390x844 /cai-dat/cho-huy/: không cuộn ngang
 ĐẠT  admin 390x844 /cai-dat/bien-ban-huy/ → 200

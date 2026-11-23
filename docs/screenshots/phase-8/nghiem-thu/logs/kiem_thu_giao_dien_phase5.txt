@@ -85,6 +85,6 @@
 ĐẠT  [390x844] HR: đoạn bôi đen vào ô Kỹ năng
 ĐẠT  [390x844] HR: bấm gợi ý SĐT điền vào ô SĐT
 ĐẠT  [390x844] HR: thiếu họ tên bị báo lỗi, phiên còn nguyên
-ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/nhap-cccd/d76a6e83-d540-4fc9-a376-ccc03dfd82cf/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/d76a6e83-d540-4fc9-a376-ccc03dfd82cf/', 'htmx:sendAbort, [object HTMLDivElement]')]
 
-Tổng: 88 bước, đạt 88, lỗi 0
+Tổng: 88 bước, đạt 87, lỗi 1

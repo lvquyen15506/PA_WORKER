@@ -108,6 +108,6 @@
 ĐẠT  [390x844] Admin: có hồ sơ Lưu trữ trong dữ liệu mẫu
 ĐẠT  [390x844] Admin: nút Ẩn danh hóa tắt khi chưa gõ lại mã
 ĐẠT  [390x844] Admin: gõ đúng mã thì nút bật
-ĐẠT  Không có lỗi console ngoài 403/404 mong đợi
+LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]')]
 
-Tổng: 111 bước, đạt 111, lỗi 0
+Tổng: 111 bước, đạt 110, lỗi 1

@@ -1,58 +1,43 @@
-ĐẠT  K3 thẻ 01 (CCCD_2021): có nhãn nguồn QR, không tô vàng
+ĐẠT  K3 thẻ 01 (CCCD_2021): có nhãn nguồn QR, trường QR không tô vàng
 ĐẠT  K3 thẻ 01: lưu thành hồ sơ Nháp
-ĐẠT  K3 thẻ 02 (CCCD_2021): có nhãn nguồn QR, không tô vàng
+ĐẠT  K3 thẻ 02 (CCCD_2021): có nhãn nguồn QR, trường QR không tô vàng
 ĐẠT  K3 thẻ 02: lưu thành hồ sơ Nháp
-ĐẠT  K3 thẻ 03 (CCCD_2021): có nhãn nguồn QR, không tô vàng
+ĐẠT  K3 thẻ 03 (CCCD_2021): có nhãn nguồn QR, trường QR không tô vàng
 ĐẠT  K3 thẻ 03: lưu thành hồ sơ Nháp
-ĐẠT  K3 thẻ 04 (CCCD_2021): có nhãn nguồn QR, không tô vàng
+ĐẠT  K3 thẻ 04 (CCCD_2021): có nhãn nguồn QR, trường QR không tô vàng
 ĐẠT  K3 thẻ 04: lưu thành hồ sơ Nháp
-ĐẠT  K3 thẻ 05 (CCCD_2021): có nhãn nguồn QR, không tô vàng
+ĐẠT  K3 thẻ 05 (CCCD_2021): có nhãn nguồn QR, trường QR không tô vàng
 ĐẠT  K3 thẻ 05: lưu thành hồ sơ Nháp
-ĐẠT  K3 thẻ 06 (CCCD_2021): có nhãn nguồn QR, không tô vàng
+ĐẠT  K3 thẻ 06 (CCCD_2021): có nhãn nguồn QR, trường QR không tô vàng
 ĐẠT  K3 thẻ 06: lưu thành hồ sơ Nháp
-LỖI  K3 thẻ 07 (CAN_CUOC_2024): có nhãn nguồn QR, không tô vàng
-Traceback (most recent call last):
-  File "D:\Workspace\PA_WORKER\scripts\nghiem_thu_phase5.py", line 210, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "D:\Workspace\PA_WORKER\scripts\nghiem_thu_phase5.py", line 196, in main
-    scenario_3(browser, cards)
-  File "D:\Workspace\PA_WORKER\scripts\nghiem_thu_phase5.py", line 74, in scenario_3
-    page.click("button[data-pa-gate]")
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 16300, in click
-    self._sync(
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 124, in _sync
-    return task.result()
-           ^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\page.py", line 1125, in click
-    return await self._main_frame.click(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\frame.py", line 587, in click
-    return await self._channel.click(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 387, in finish
-    raise e from None
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 352, in finish
-    result = await zone.run_async(lambda: awaitable)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\utils\zones.py", line 58, in run_async
-    return await func()
-           ^^^^^^^^^^^^
-playwright._impl._errors.TimeoutError: Page.click: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator("button[data-pa-gate]")
-    - locator resolved to <button disabled type="submit" data-pa-gate="" class="btn btn-primary" title="Cần tích Đã kiểm tra cho các trường tô vàng">Lưu hồ sơ</button>
-  - attempting click action
-    2 × waiting for element to be visible, enabled and stable
-      - element is not enabled
-    - retrying click action
-    - waiting 20ms
-    2 × waiting for element to be visible, enabled and stable
-      - element is not enabled
-    - retrying click action
-      - waiting 100ms
-    57 × waiting for element to be visible, enabled and stable
-       - element is not enabled
-     - retrying click action
-       - waiting 500ms
+ĐẠT  K3 thẻ 07 (CAN_CUOC_2024): có nhãn nguồn QR, trường QR không tô vàng
+ĐẠT  K3 thẻ 07: lưu thành hồ sơ Nháp
+ĐẠT  K3 thẻ 08 (CAN_CUOC_2024): có nhãn nguồn QR, trường QR không tô vàng
+ĐẠT  K3 thẻ 08: lưu thành hồ sơ Nháp
+ĐẠT  K3 thẻ 09 (CAN_CUOC_2024): có nhãn nguồn QR, trường QR không tô vàng
+ĐẠT  K3 thẻ 09: lưu thành hồ sơ Nháp
+ĐẠT  K3 thẻ 10 (CAN_CUOC_2024): có nhãn nguồn QR, trường QR không tô vàng
+ĐẠT  K3 thẻ 10: lưu thành hồ sơ Nháp
+ĐẠT  K3 thẻ 11 (CAN_CUOC_2024): có nhãn nguồn QR, trường QR không tô vàng
+ĐẠT  K3 thẻ 11: lưu thành hồ sơ Nháp
+ĐẠT  K3: điền đúng 100% trường có trong QR (72 trường, 11 thẻ)
+ĐẠT  K4: ảnh không QR, OCR điền đúng mọi trường in trên thẻ
+ĐẠT  K4: nhãn nguồn OCR hiển thị
+ĐẠT  K4: ảnh mờ có trường tô vàng
+ĐẠT  K4: nút Lưu hồ sơ bị khóa khi chưa tích Đã kiểm tra
+ĐẠT  K4: gỡ khóa nút rồi gửi vẫn bị máy chủ từ chối (chưa tích Đã kiểm tra)
+ĐẠT  K4: tích đủ thì nút Lưu bật
+ĐẠT  K4: tích đủ thì lưu được hồ sơ Nháp
+ĐẠT  K4: hồ sơ có nguồn từng trường và 2 tài liệu ảnh
+ĐẠT  K5: trước khi thử đã có đúng 1 hồ sơ giữ số CCCD này
+ĐẠT  K5: màn hình đối chiếu báo trùng ngay khi mở
+ĐẠT  K5: có nút Mở hồ sơ cũ
+ĐẠT  K5: bấm Lưu hồ sơ bị chặn, không tạo hồ sơ mới
+ĐẠT  K5: Mở hồ sơ cũ chuyển tới trang chi tiết hồ sơ
+ĐẠT  K5: vẫn chỉ có 1 hồ sơ với số CCCD này
+ĐẠT  K5: phiên nhận diện đã đóng
+ĐẠT  K5: phiên cũ không còn mở được
+ĐẠT  Nhật ký ghi đủ INTAKE_CREATE, INTAKE_SAVE, INTAKE_CANCEL
+LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/nhap-cccd/e867158a-3815-4281-a4fe-564887809ded/', 'htmx:sendAbort, [object HTMLDivElement]')]
 
+Tổng: 41 bước, đạt 40, lỗi 1

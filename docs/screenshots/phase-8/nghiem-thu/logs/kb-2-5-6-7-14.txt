@@ -6,32 +6,37 @@
 ĐẠT  [2] Gọi thẳng đường dẫn tải tệp bị từ chối (403)
 ĐẠT  [2] Gọi thẳng đường dẫn xem tệp bị từ chối (403)
 ĐẠT  [2] Viewer POST sửa/gửi duyệt bị 403
-Traceback (most recent call last):
-  File "D:\Workspace\PA_WORKER\scripts\nghiem_thu_phase4.py", line 212, in <module>
-    hr.wait_for_selector("#duplicate-check .alert", timeout=5000)
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\sync_api\_generated.py", line 21403, in wait_for_selector
-    self._sync(
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\_sync_base.py", line 124, in _sync
-    return task.result()
-           ^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\page.py", line 464, in wait_for_selector
-    return await self._main_frame.wait_for_selector(
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\frame.py", line 418, in wait_for_selector
-    result = await self._channel.waitForSelector(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 398, in _mapped
-    return mapper(await awaitable)
-                  ^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 387, in finish
-    raise e from None
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\channel_owner.py", line 352, in finish
-    result = await zone.run_async(lambda: awaitable)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\playwright\_impl\utils\zones.py", line 58, in run_async
-    return await func()
-           ^^^^^^^^^^^^
-playwright._impl._errors.TimeoutError: Page.wait_for_selector: Timeout 5000ms exceeded.
-Call log:
-  - waiting for locator("#duplicate-check .alert") to be visible
+ĐẠT  [5] Rời ô CCCD: báo trùng
+ĐẠT  [5] Bấm Lưu: bị chặn, vẫn ở form
+ĐẠT  [5] Không tạo hồ sơ mới
+ĐẠT  [5] Mở hồ sơ cũ thấy đúng hồ sơ đang giữ số đó
+ĐẠT  [6] HR gửi duyệt: Chờ duyệt
+ĐẠT  [6] Hồ sơ có trong hàng đợi Duyệt hồ sơ
+ĐẠT  [6] Dòng không có ghi chú 'không duyệt được' (người duyệt là người khác)
+ĐẠT  [6] Quản lý trả lại: Cần bổ sung
+ĐẠT  [6] HR thấy nội dung cần bổ sung
+ĐẠT  [6] HR bổ sung rồi gửi duyệt lại: Chờ duyệt
+ĐẠT  [6] Quản lý duyệt: Đã xác minh
+ĐẠT  [6] Tab Lịch sử có đủ 5 dòng thời gian
+ĐẠT  [6] Dòng thời gian có lý do trả lại
+ĐẠT  [6] StatusChange đúng từng bước
+ĐẠT  [6] Nhật ký có STATUS_CHANGE, UPLOAD_FILE, CREATE
+ĐẠT  [7] HR gửi duyệt hồ sơ mình nhập
+ĐẠT  [7] HR không thấy nút Duyệt hồ sơ
+ĐẠT  [7] HR gọi thẳng /duyet/ bị chặn (403)
+ĐẠT  [7] HR gọi thẳng /tra-lai/ bị chặn (403)
+ĐẠT  [7] Trạng thái vẫn Chờ duyệt
+ĐẠT  [7] Quản lý tự gửi duyệt hồ sơ mình tạo
+ĐẠT  [7] Quản lý không thấy nút Duyệt hồ sơ của chính mình
+ĐẠT  [7] Quản lý gọi thẳng /duyet/ bị chặn (403)
+ĐẠT  [7] Hàng đợi ghi chú 'Bạn không duyệt được hồ sơ này' đúng dòng của mình
+ĐẠT  [14] Sau khi sửa họ tên: về Chờ duyệt
+ĐẠT  [14] Có thông báo hồ sơ về Chờ duyệt
+ĐẠT  [14] HR thấy lý do 'Sửa trường định danh: họ tên' ở dòng thời gian
+ĐẠT  [14] HR không thấy chi tiết trước/sau (câu 11)
+ĐẠT  [14] Quản lý thấy giá trị cũ và mới trong chi tiết
+ĐẠT  [14] AuditLog không chứa họ tên (chỉ AuditPersonalValue mã hóa)
+ĐẠT  [14] AuditPersonalValue có dòng giá trị cũ/mới của họ tên
+LỖI  Không có lỗi console ngoài 403/404 mong đợi – [('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:sendAbort, [object HTMLDivElement]'), ('http://localhost:8000/ho-so/them/nhap-tay/', 'htmx:afterRequest, [object HTMLDivElement]')]
 
+Tổng: 40 bước, đạt 39, lỗi 1

@@ -3,14 +3,14 @@
 ĐẠT  Sao luu.bat chạy thành công
 ĐẠT  File sao lưu có ngày giờ trong tên
 ĐẠT  Sao lưu nhắc cất khóa riêng
-   sao lưu pa-worker-20261124-020123.pawbk: 4.2 MB, 4 giây
+   sao lưu pa-worker-20261124-022602.pawbk: 4.9 MB, 3 giây
 ĐẠT  File bị sửa 1 byte: bị từ chối
 ĐẠT  Khóa sai: phục hồi bị từ chối với thông báo tiếng Việt
 ĐẠT  Khóa sai: dữ liệu đang có giữ nguyên
 ĐẠT  docker compose down -v: xóa volume CSDL và tệp
 ĐẠT  Dựng lại: bản cài sạch không có hồ sơ, không có tệp
 ĐẠT  Phuc hoi.bat chạy thành công
-   phục hồi: 19 giây
+   phục hồi: 18 giây
 ĐẠT  Số dòng mọi bảng khớp trước khi sao lưu
 ĐẠT  Nhật ký: thêm đúng 1 dòng Phục hồi
 ĐẠT  Mọi tệp khớp sha256
