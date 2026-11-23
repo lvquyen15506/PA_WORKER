@@ -1055,7 +1055,7 @@ def history_detail(request, pk):
     for entry in entries:
         base = {
             "at": entry.created_at,
-            "who": entry.user.full_name if entry.user else entry.actor_label,
+            "who": audit_presenters.actor_name(entry),
             "action": entry.get_action_display(),
         }
         changes = audit_presenters.change_rows(entry)  # dùng chung với trang /nhat-ky/<id>/

@@ -42,6 +42,37 @@ def change_rows(entry):
     return rows
 
 
+def actor_name(entry):
+    """Người thực hiện: họ tên, thiếu thì tên tài khoản; dòng của hệ thống hiện "Hệ thống"."""
+    if entry.user:
+        return entry.user.full_name or entry.user.username
+    return entry.actor_label
+
+
+# Dòng đổi trạng thái ghi TRƯỚC Phase 7 còn lý do do người dùng gõ ở `note` (từ Phase 7 lý do đó ở
+# AuditPersonalValue). Bảng nhật ký chỉ thêm và có trigger chặn sửa nên không xóa được tại CSDL:
+# với hồ sơ đã ẩn danh hóa, các dòng cũ đó được che khi hiển thị. Cài mới không có dòng kiểu cũ.
+_OLD_REASON_ACTIONS = {"STATUS_CHANGE", "REOPEN"}
+_SYSTEM_REASON_PREFIX = "Sửa trường định danh:"
+
+
+def display_note(entry):
+    """Ghi chú để hiển thị (che lý do người gõ ở dòng cũ của hồ sơ đã ẩn danh hóa)."""
+    note = entry.note
+    worker = entry.worker
+    if (
+        note
+        and worker is not None
+        and worker.anonymized_at is not None
+        and entry.action in _OLD_REASON_ACTIONS
+        and entry.user_id is not None
+        and "status_reason" not in (entry.changes or {})
+        and not note.startswith(_SYSTEM_REASON_PREFIX)
+    ):
+        return ANONYMIZED
+    return note
+
+
 def field_labels(entry):
     """Tên các trường thay đổi (tiếng Việt), không kèm giá trị: cho cột "Trường thay đổi"."""
     return [history_labels.field_label(name, entry.object_type) for name in (entry.changes or {})]

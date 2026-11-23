@@ -63,7 +63,7 @@ def filtered(form):
 
 
 def _who(entry):
-    return entry.user.full_name if entry.user else entry.actor_label
+    return presenters.actor_name(entry)
 
 
 def _target(entry):
@@ -132,7 +132,7 @@ def audit_detail(request, pk):
         ("Mã hồ sơ", worker.worker_code if worker else None),
         ("Mã nhân viên", worker.employee_code if worker else None),
         ("Địa chỉ IP", entry.ip_address),
-        ("Ghi chú", entry.note or None),
+        ("Ghi chú", presenters.display_note(entry) or None),
     ]
     return render(
         request,

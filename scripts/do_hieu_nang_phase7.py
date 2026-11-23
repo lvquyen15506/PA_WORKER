@@ -73,11 +73,13 @@ def measure(label, path):
 
 def multipart(name, filename, content):
     boundary = uuid.uuid4().hex
+    disposition = "Content-Disposition: form-data"
+    xlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     parts = [
-        f'--{boundary}\r\nContent-Disposition: form-data; name="csrfmiddlewaretoken"\r\n\r\n{csrf()}\r\n'.encode(),
+        (f'--{boundary}\r\n{disposition}; name="csrfmiddlewaretoken"\r\n\r\n{csrf()}\r\n').encode(),
         (
-            f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"; filename="{filename}"\r\n'
-            "Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\r\n\r\n"
+            f'--{boundary}\r\n{disposition}; name="{name}"; filename="{filename}"\r\n'
+            f"Content-Type: {xlsx}\r\n\r\n"
         ).encode()
         + content
         + b"\r\n",
@@ -131,7 +133,9 @@ def measure_import(rows, with_work):
     fetch("/ho-so/nhap-excel/")
     body, content_type = multipart("file", "nhap.xlsx", content)
     seconds, status, html = fetch(
-        "/ho-so/nhap-excel/", body, {"Content-Type": content_type, "Referer": BASE + "/ho-so/nhap-excel/"}
+        "/ho-so/nhap-excel/",
+        body,
+        {"Content-Type": content_type, "Referer": BASE + "/ho-so/nhap-excel/"},
     )
     text = html.decode("utf-8", "replace")
     match = re.search(r"Đã đọc (\d+) dòng\. Nhập thành công (\d+) hồ sơ\. (\d+) dòng lỗi", text)
@@ -151,7 +155,10 @@ def main():
         ("Tìm theo số CCCD 12 chữ số", "/ho-so/?q=999000000123"),
         ("Tìm theo SĐT", "/ho-so/?q=0912"),
         ("Lọc chưa Lưu trữ", "/ho-so/?trang_thai_ho_so=chua-luu-tru"),
-        ("Lọc Thiếu giấy tờ (kịch bản 11)", "/ho-so/?thieu_giay_to=1&trang_thai_ho_so=chua-luu-tru"),
+        (
+            "Lọc Thiếu giấy tờ (kịch bản 11)",
+            "/ho-so/?thieu_giay_to=1&trang_thai_ho_so=chua-luu-tru",
+        ),
         ("Lọc Hoàn thiện", "/ho-so/?hoan_thien=1"),
         ("Lọc đang làm việc", "/ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE"),
         ("Lọc hợp đồng sắp hết hạn (kịch bản 10)", "/ho-so/?hop_dong_sap_het_han=1"),
@@ -162,7 +169,10 @@ def main():
         ("Lọc trình độ", f"/ho-so/?trinh_do={level}"),
         ("Lọc trạng thái tuyển dụng", "/ho-so/?trang_thai_tuyen_dung=NEW"),
         ("Xuất Excel danh sách (kịch bản 13)", "/ho-so/xuat-excel/"),
-        ("Xuất Excel danh sách đang lọc", "/ho-so/xuat-excel/?trang_thai_lam_viec=PROBATION%2CACTIVE"),
+        (
+            "Xuất Excel danh sách đang lọc",
+            "/ho-so/xuat-excel/?trang_thai_lam_viec=PROBATION%2CACTIVE",
+        ),
         ("Tuyển dụng", "/tuyen-dung/"),
         ("Duyệt hồ sơ", "/duyet-ho-so/"),
         ("Nhật ký", "/nhat-ky/"),
@@ -205,9 +215,10 @@ def write_report(results, imports):
     lines = [
         "# Hiệu năng – Phase 7",
         "",
-        f"Đo ngày {time.strftime('%d/%m/%Y')} bằng `scripts/do_hieu_nang_phase7.py` qua HTTP (như người "
-        "dùng thật) trên bản cài sạch Docker Compose (`docker compose -f docker-compose.yml`, "
-        "Gunicorn 3 worker, PostgreSQL 16) với `seed_demo` 500 hồ sơ, tài khoản Admin. Mỗi trang "
+        f"Đo ngày {time.strftime('%d/%m/%Y')} bằng `scripts/do_hieu_nang_phase7.py` qua HTTP "
+        "(như người dùng thật) trên bản cài sạch Docker Compose "
+        "(`docker compose -f docker-compose.yml`, Gunicorn 3 worker, PostgreSQL 16) với "
+        "`seed_demo` 500 hồ sơ, tài khoản Admin. Mỗi trang "
         f"đo {RUNS} lần sau 1 lần làm nóng; bảng ghi trung vị và lớn nhất. Yêu cầu "
         "(`docs/yeu-cau.md` mục VII): mở danh sách, lọc, tìm kiếm **dưới 2 giây**.",
         "",
@@ -222,8 +233,8 @@ def write_report(results, imports):
         lines += [
             "## Nhập Excel",
             "",
-            "Giới hạn dòng mỗi lần nhập được chốt theo kết quả đo; quá 90 giây thì phải hạ giới hạn "
-            "(không tăng timeout Gunicorn, hiện 120 giây).",
+            "Giới hạn dòng mỗi lần nhập được chốt theo kết quả đo; quá 90 giây thì phải hạ "
+            "giới hạn (không tăng timeout Gunicorn, hiện 120 giây).",
             "",
             "| Số dòng | Có phần B (mã NV, đợt làm việc) | Thời gian (giây) | Kết quả đọc |",
             "| --- | --- | --- | --- |",
@@ -237,7 +248,11 @@ def write_report(results, imports):
         lines += [
             "",
             f"**Kết luận:** lần chậm nhất {worst:.1f} giây "
-            + ("(≤ 90 giây) nên giữ giới hạn 1.000 dòng." if worst <= 90 else "(> 90 giây) nên hạ giới hạn dòng."),
+            + (
+                "(≤ 90 giây) nên giữ giới hạn 1.000 dòng."
+                if worst <= 90
+                else "(> 90 giây) nên hạ giới hạn dòng."
+            ),
         ]
         lines.append("")
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")

@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.validators import validate_email
-from django.db import IntegrityError, transaction
+from django.db import DataError, IntegrityError, transaction
 from django.utils import timezone
 from openpyxl import load_workbook
 
@@ -32,7 +32,7 @@ from apps.core.validators import check_age
 from apps.employment.assignments import AssignmentError
 from apps.employment.services import EmploymentError, import_employment
 from apps.workers.duplicates import find_by_id_number, find_similar
-from apps.workers.models import Worker
+from apps.workers.models import EmergencyContact, IdentityDocument, Worker
 from apps.workers.rules import MANAGERS
 from apps.workers.services import WorkerDataError, create_worker
 from apps.workers.validation import clean_id_number
@@ -57,6 +57,20 @@ MSG_PHONE = "Số điện thoại phải gồm 10 chữ số, bắt đầu bằn
 MSG_WORK_ROLE = "Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc."
 EMPLOYEE_CODE = re.compile(r"[A-Za-z0-9-]{1,20}")
 DASHES = str.maketrans({"-": "–", "—": "–", "‑": "–"})  # gạch nối các loại -> gạch ngang en
+
+# Độ dài tối đa các cột chữ lấy thẳng từ model, để dòng quá dài báo lỗi dòng thay vì làm lỗi CSDL.
+MAX_LENGTHS = {
+    "nationality": Worker._meta.get_field("nationality").max_length,
+    "email": Worker._meta.get_field("email").max_length,
+    "current_address": Worker._meta.get_field("current_address").max_length,
+    "issue_place": IdentityDocument._meta.get_field("issue_place").max_length,
+    "hometown": IdentityDocument._meta.get_field("hometown").max_length,
+    "birth_registration_place": IdentityDocument._meta.get_field(
+        "birth_registration_place"
+    ).max_length,
+    "contact_name": EmergencyContact._meta.get_field("full_name").max_length,
+    "contact_relationship": EmergencyContact._meta.get_field("relationship").max_length,
+}
 
 GENDERS = {normalize_key(label): value for value, label in Gender.choices}
 ID_TYPES = {normalize_key(label): value for value, label in IdDocType.choices}
@@ -275,6 +289,9 @@ class Importer:
         phone = text["phone"]
         if not re.fullmatch(r"0\d{9}", phone):
             row.error("phone", MSG_PHONE)
+        for key, limit in MAX_LENGTHS.items():
+            if len(text[key]) > limit:
+                row.error(key, f"{label(key)} tối đa {limit} ký tự.")
 
         birth = self.date(row, v, "date_of_birth")
         today = self.today
@@ -597,6 +614,8 @@ class Importer:
             row.error("employee_code", MSG_WORK_ROLE)
         except IntegrityError:
             row.error("full_name", "Không lưu được dòng này vì dữ liệu trùng với hồ sơ khác.")
+        except (DataError, ValidationError):  # ô quá dài hoặc giá trị CSDL không nhận: bỏ qua dòng
+            row.error("full_name", "Không lưu được dòng này vì có ô quá dài hoặc không hợp lệ.")
         if row.errors:
             return False
         if row.work is not None:
@@ -616,25 +635,28 @@ def import_workbook(user, data, *, request=None):
         return result
     importer = Importer(user, request=request)
     result.read = len(rows)
-    for number, cells in rows:
-        row = importer.check(number, cells)
-        if not row.errors:
-            importer.similar_warnings(row)
-            importer.write(row)
-        result.errors.extend(row.errors)
-        if not row.errors:
-            result.imported += 1
-            result.warnings.extend(row.warnings)
-    log(
-        AuditAction.IMPORT,
-        user=user,
-        object_type="excel_import",
-        object_id="nhap-excel",
-        object_repr="Nhập hồ sơ từ Excel",
-        note=(
-            f"Đọc {result.read} dòng; nhập {result.imported}; lỗi {result.error_rows}; "
-            f"cảnh báo {len(result.warnings)}"
-        ),
-        request=request,
-    )
+    try:
+        for number, cells in rows:
+            row = importer.check(number, cells)
+            if not row.errors:
+                importer.similar_warnings(row)
+                importer.write(row)
+            result.errors.extend(row.errors)
+            if not row.errors:
+                result.imported += 1
+                result.warnings.extend(row.warnings)
+    finally:
+        # Lỗi bất ngờ giữa chừng vẫn để lại một dòng nhật ký cho các hồ sơ đã nhập (đã commit).
+        log(
+            AuditAction.IMPORT,
+            user=user,
+            object_type="excel_import",
+            object_id="nhap-excel",
+            object_repr="Nhập hồ sơ từ Excel",
+            note=(
+                f"Đọc {result.read} dòng; nhập {result.imported}; lỗi {result.error_rows}; "
+                f"cảnh báo {len(result.warnings)}"
+            ),
+            request=request,
+        )
     return result

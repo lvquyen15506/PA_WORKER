@@ -1,5 +1,6 @@
-"""Kiểm thử giao diện Phase 7 bằng Playwright: Dashboard, Báo cáo (9 loại, in), Nhật ký, Chờ hủy, Biên
-bản hủy, Nhập Excel, danh sách có nút xuất, /ui-kit/ (biểu đồ nhiều chuỗi, cột ngang, bảng có ô chọn).
+"""Kiểm thử giao diện Phase 7 bằng Playwright: Dashboard, Báo cáo (9 loại, in), Nhật ký, Chờ hủy,
+Biên bản hủy, Nhập Excel, danh sách có nút xuất, /ui-kit/ (biểu đồ nhiều chuỗi, cột ngang, bảng
+có ô chọn).
 Chụp 1366x768 và 390x844 vào docs/screenshots/phase-7/, mỗi trang kiểm tra: mã trạng thái theo vai
 trò, không cuộn ngang, đọc lỗi console; thử form với dữ liệu sai.
     py -3.12 scripts/kiem_thu_giao_dien_phase7.py
@@ -50,14 +51,23 @@ def part_admin(browser, size_name, size):
     ctx, page = new_page(browser, size)
     login(page, "admin")
     visit(page, size_name, "admin", "/", 200, "kt-dashboard")
-    check("admin: Dashboard có 9 thẻ và 6 biểu đồ", page.locator("a.pa-stat").count() == 9 and page.locator("canvas").count() == 6)
+    check(
+        "admin: Dashboard có 9 thẻ và 6 biểu đồ",
+        page.locator("a.pa-stat").count() == 9 and page.locator("canvas").count() == 6,
+    )
     for code in REPORTS:
         visit(page, size_name, "admin", f"/bao-cao/?loai={code}", 200, f"kt-bao-cao-{code}")
-        check(f"admin: báo cáo {code} có biểu đồ hoặc thông báo không có số liệu", page.locator("canvas").count() == 1 or "Không có số liệu" in page.content())
+        check(
+            f"admin: báo cáo {code} có biểu đồ hoặc thông báo không có số liệu",
+            page.locator("canvas").count() == 1 or "Không có số liệu" in page.content(),
+        )
     visit(page, size_name, "admin", "/bao-cao/in/?loai=nhom-tuoi", 200, "kt-bao-cao-in")
     # Form báo cáo sai: ngày đảo ngược
     goto(page, "/bao-cao/?loai=ho-so-moi&tu_ngay=01/12/2026&den_ngay=01/01/2026")
-    check("báo cáo: khoảng ngày sai hiện lỗi tiếng Việt, trang không sập", "Đến ngày phải sau hoặc bằng từ ngày." in page.content())
+    check(
+        "báo cáo: khoảng ngày sai hiện lỗi tiếng Việt, trang không sập",
+        "Đến ngày phải sau hoặc bằng từ ngày." in page.content(),
+    )
     pw.shot(OUT, page, size_name, "kt-bao-cao-loi-ngay")
     visit(page, size_name, "admin", "/nhat-ky/", 200, "kt-nhat-ky")
     goto(page, "/nhat-ky/?tu_ngay=2026-01-01")
@@ -77,22 +87,67 @@ def part_admin(browser, size_name, size):
     page.set_input_files("input[type=file]", str(bad))
     page.click("button:has-text('Nhập hồ sơ')")
     page.wait_for_load_state("networkidle")
-    check("nhập Excel: tệp giả .xlsx bị từ chối bằng tiếng Việt", "Tệp phải là file Excel .xlsx." in page.content())
+    check(
+        "nhập Excel: tệp giả .xlsx bị từ chối bằng tiếng Việt",
+        "Tệp phải là file Excel .xlsx." in page.content(),
+    )
     pw.shot(OUT, page, size_name, "kt-nhap-excel-loi-tep")
     visit(page, size_name, "admin", "/ho-so/", 200, "kt-ho-so-nut-xuat")
-    check("admin: danh sách có Xuất Excel và Xuất kèm số CCCD", page.locator("text=Xuất Excel").count() >= 1 and page.locator("text=Xuất kèm số CCCD").count() >= 1)
-    visit(page, size_name, "admin", "/ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE&tao_tu=01%2F01%2F2020&cccd_sap_het_han=1", 200, "kt-ho-so-loc-moi")
-    check("admin: ô lọc riêng của Dashboard hiện khi có giá trị", page.locator("input[name=tao_tu]").count() == 1 and page.locator("select[name=cccd_sap_het_han]").count() == 1)
+    check(
+        "admin: danh sách có Xuất Excel và Xuất kèm số CCCD",
+        page.locator("text=Xuất Excel").count() >= 1
+        and page.locator("text=Xuất kèm số CCCD").count() >= 1,
+    )
+    visit(
+        page,
+        size_name,
+        "admin",
+        "/ho-so/?trang_thai_lam_viec=PROBATION%2CACTIVE&tao_tu=01%2F01%2F2020&cccd_sap_het_han=1",
+        200,
+        "kt-ho-so-loc-moi",
+    )
+    check(
+        "admin: ô lọc riêng của Dashboard hiện khi có giá trị",
+        page.locator("input[name=tao_tu]").count() == 1
+        and page.locator("select[name=cccd_sap_het_han]").count() == 1,
+    )
     visit(page, size_name, "admin", "/ui-kit/", 200, "kt-ui-kit")
-    check("ui-kit: có biểu đồ nhiều chuỗi, cột ngang và bảng ô chọn", page.locator("canvas[data-pa-chart=chart-group]").count() == 1 and page.locator("canvas[data-pa-chart=chart-horizontal]").count() == 1 and page.locator("input[form=form-demo-chon]").count() >= 3)
+    check(
+        "ui-kit: có biểu đồ nhiều chuỗi, cột ngang và bảng ô chọn",
+        page.locator("canvas[data-pa-chart=chart-group]").count() == 1
+        and page.locator("canvas[data-pa-chart=chart-horizontal]").count() == 1
+        and page.locator("input[form=form-demo-chon]").count() >= 3,
+    )
     ctx.close()
 
 
 def part_other_roles(browser, size_name, size):
     matrix = {
-        "quanly": {"/": 200, "/bao-cao/": 200, "/nhat-ky/": 200, "/cai-dat/cho-huy/": 403, "/ho-so/nhap-excel/": 200, "/bao-cao/in/": 200},
-        "hr": {"/": 200, "/bao-cao/": 200, "/nhat-ky/": 403, "/cai-dat/bien-ban-huy/": 403, "/ho-so/nhap-excel/": 200, "/bao-cao/xuat-excel/": 200},
-        "viewer": {"/": 200, "/bao-cao/": 200, "/nhat-ky/": 403, "/ho-so/nhap-excel/": 403, "/bao-cao/in/": 403, "/bao-cao/xuat-excel/": 403, "/ho-so/xuat-excel/": 403},
+        "quanly": {
+            "/": 200,
+            "/bao-cao/": 200,
+            "/nhat-ky/": 200,
+            "/cai-dat/cho-huy/": 403,
+            "/ho-so/nhap-excel/": 200,
+            "/bao-cao/in/": 200,
+        },
+        "hr": {
+            "/": 200,
+            "/bao-cao/": 200,
+            "/nhat-ky/": 403,
+            "/cai-dat/bien-ban-huy/": 403,
+            "/ho-so/nhap-excel/": 200,
+            "/bao-cao/xuat-excel/": 200,
+        },
+        "viewer": {
+            "/": 200,
+            "/bao-cao/": 200,
+            "/nhat-ky/": 403,
+            "/ho-so/nhap-excel/": 403,
+            "/bao-cao/in/": 403,
+            "/bao-cao/xuat-excel/": 403,
+            "/ho-so/xuat-excel/": 403,
+        },
     }
     for role, pages in matrix.items():
         ctx, page = new_page(browser, size)
@@ -105,12 +160,22 @@ def part_other_roles(browser, size_name, size):
         if role == "viewer":
             goto(page, "/bao-cao/")
             pw.shot(OUT, page, size_name, "kt-viewer-bao-cao")
-            check("viewer: báo cáo không có nút In/Xuất Excel", page.locator("text=Xuất Excel").count() == 0 and page.locator("a:text-is('In')").count() == 0)
+            check(
+                "viewer: báo cáo không có nút In/Xuất Excel",
+                page.locator("text=Xuất Excel").count() == 0
+                and page.locator("a:text-is('In')").count() == 0,
+            )
             goto(page, "/ho-so/")
-            check("viewer: danh sách không có nút xuất", page.locator("text=Xuất Excel").count() == 0)
+            check(
+                "viewer: danh sách không có nút xuất", page.locator("text=Xuất Excel").count() == 0
+            )
         if role == "hr":
             goto(page, "/ho-so/")
-            check("hr: có Xuất Excel nhưng không có Xuất kèm số CCCD", page.locator("text=Xuất Excel").count() >= 1 and page.locator("text=Xuất kèm số CCCD").count() == 0)
+            check(
+                "hr: có Xuất Excel nhưng không có Xuất kèm số CCCD",
+                page.locator("text=Xuất Excel").count() >= 1
+                and page.locator("text=Xuất kèm số CCCD").count() == 0,
+            )
         ctx.close()
 
 

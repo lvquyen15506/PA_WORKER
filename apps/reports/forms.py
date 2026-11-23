@@ -62,12 +62,14 @@ class ReportFilterForm(forms.Form):
     def context(self):
         """Tham số đã chuẩn hóa để dựng báo cáo (giá trị lỗi/để trống thì dùng mặc định)."""
         default_start, default_end = stats.last_12_months(timezone.localdate())
-        valid = not self.errors
         data = self.cleaned_data if self.is_bound else {}
-        start = (data.get("tu_ngay") if valid else None) or default_start
-        end = (data.get("den_ngay") if valid else None) or default_end
+        # Ngày sai (từng ô hoặc đảo ngược) thì dùng khoảng mặc định; phòng ban và loại báo cáo hợp
+        # lệ vẫn được giữ để số liệu khớp với ô chọn đang hiện.
+        dates_ok = not ({"tu_ngay", "den_ngay"} & set(self.errors))
+        start = (data.get("tu_ngay") if dates_ok else None) or default_start
+        end = (data.get("den_ngay") if dates_ok else None) or default_end
         code = data.get("loai") or reports.REPORTS[0].code
-        department = (data.get("phong_ban") if valid else None) or None
+        department = data.get("phong_ban") or None
         if department == DepartmentFilterField.NONE:
             department = stats.NO_SECTION
         return reports.ReportContext(code=code, start=start, end=end, department=department)

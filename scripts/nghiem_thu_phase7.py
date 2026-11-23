@@ -3,7 +3,8 @@ X), ẩn danh hóa từ danh sách chờ hủy sinh biên bản đúng (câu 2),
 cáo theo công ty khách khớp danh sách đích.
     py -3.12 scripts/nghiem_thu_phase7.py
 Cần web ở http://localhost:8000, 4 tài khoản admin, quanly, hr, viewer dùng chung mật khẩu trong
-PA_TEST_PASSWORD và đã chạy seed_demo. Đối chiếu AuditLog, AuditPersonalValue bằng `manage.py shell`.
+PA_TEST_PASSWORD và đã chạy seed_demo. Đối chiếu AuditLog, AuditPersonalValue bằng
+`manage.py shell`.
 Ảnh chụp vào docs/screenshots/phase-7/nghiem-thu/. Cần openpyxl cho Python 3.12 trên máy chạy.
 """
 
@@ -83,17 +84,28 @@ def scenario_10(browser):
     goto(page, "/")
     after, href = card_values(page)["Hợp đồng sắp hết hạn"]
     shot(page, "kb10-1-dashboard")
-    check("KB10: hợp đồng hết hạn sau 20 ngày làm thẻ “Hợp đồng sắp hết hạn” tăng 1", after == before + 1, f"{before}->{after}")
+    check(
+        "KB10: hợp đồng hết hạn sau 20 ngày làm thẻ “Hợp đồng sắp hết hạn” tăng 1",
+        after == before + 1,
+        f"{before}->{after}",
+    )
     page.click("a.pa-stat:has-text('Hợp đồng sắp hết hạn')")
     page.wait_for_load_state("networkidle")
-    check("KB10: số dòng danh sách bằng số trên thẻ", total(page) == after, f"{total(page)} vs {after}")
+    check(
+        "KB10: số dòng danh sách bằng số trên thẻ",
+        total(page) == after,
+        f"{total(page)} vs {after}",
+    )
     shot(page, "kb10-2-danh-sach-loc")
     goto(page, f"{href}&q={code}")  # danh sách có nhiều trang: tìm đúng mã để thấy công nhân đó
-    check("KB10: danh sách đã lọc có công nhân vừa thêm hợp đồng", code in page.content() and total(page) == 1)
+    check(
+        "KB10: danh sách đã lọc có công nhân vừa thêm hợp đồng",
+        code in page.content() and total(page) == 1,
+    )
     ctx.close()
 
 
-# --- Kịch bản 11: bấm thẻ Thiếu giấy tờ (và mọi thẻ) -> số dòng bằng số trên thẻ -------------------
+# --- Kịch bản 11: bấm thẻ Thiếu giấy tờ (và mọi thẻ) -> số dòng bằng số trên thẻ -----------------
 def scenario_11(browser):
     for username in ("hr", "viewer", "admin"):
         ctx, page = new_page(browser, SIZE)
@@ -103,7 +115,10 @@ def scenario_11(browser):
         check(f"KB11 ({username}): có đủ 9 thẻ", len(cards) == 9, str(list(cards)))
         if username == "hr":
             shot(page, "kb11-1-dashboard-9-the")
-            check("KB11: thẻ Hoàn thiện lớn hơn 0 trên dữ liệu mẫu có tài liệu", cards["Hoàn thiện"][0] > 0)
+            check(
+                "KB11: thẻ Hoàn thiện lớn hơn 0 trên dữ liệu mẫu có tài liệu",
+                cards["Hoàn thiện"][0] > 0,
+            )
             check("KB11: thẻ Thiếu giấy tờ lớn hơn 0", cards["Thiếu giấy tờ"][0] > 0)
             page.click("a.pa-stat:has-text('Thiếu giấy tờ')")
             page.wait_for_load_state("networkidle")
@@ -145,7 +160,10 @@ def scenario_12(browser):
     box.press("Enter")
     page.wait_for_load_state("networkidle")
     elapsed = time.perf_counter() - started
-    check("KB12: tìm “nguyen van an” (không dấu) ra hồ sơ “Nguyễn Văn An”", "Nguyễn Văn An" in page.content())
+    check(
+        "KB12: tìm “nguyen van an” (không dấu) ra hồ sơ “Nguyễn Văn An”",
+        "Nguyễn Văn An" in page.content(),
+    )
     check(f"KB12: tìm kiếm dưới {LIMIT:.0f} giây ({elapsed:.2f}s)", elapsed < LIMIT)
     shot(page, "kb12-tim-khong-dau")
     ctx.close()
@@ -157,7 +175,10 @@ def scenario_13(browser):
     ctx, page = new_page(browser, SIZE)
     login(page, "hr")
     status, seconds = timed_goto(page, base)
-    check(f"KB13: mở danh sách đang lọc dưới {LIMIT:.0f} giây ({seconds:.2f}s)", status == 200 and seconds < LIMIT)
+    check(
+        f"KB13: mở danh sách đang lọc dưới {LIMIT:.0f} giây ({seconds:.2f}s)",
+        status == 200 and seconds < LIMIT,
+    )
     on_screen = total(page)
     first_names = [
         page.locator("tbody tr").nth(i).locator("td").nth(2).inner_text().strip() for i in range(3)
@@ -166,10 +187,20 @@ def scenario_13(browser):
     with page.expect_download() as download:
         page.click("a:has-text('Xuất Excel')")
     rows = xlsx_rows(download.value, "ds-hr.xlsx")
-    check("KB13: số dòng file Excel bằng số dòng trên màn hình", len(rows) - 1 == on_screen, f"{len(rows) - 1} vs {on_screen}")
-    check("KB13: nội dung 3 dòng đầu khớp màn hình (cùng thứ tự)", [r[2] for r in rows[1:4]] == first_names)
+    check(
+        "KB13: số dòng file Excel bằng số dòng trên màn hình",
+        len(rows) - 1 == on_screen,
+        f"{len(rows) - 1} vs {on_screen}",
+    )
+    check(
+        "KB13: nội dung 3 dòng đầu khớp màn hình (cùng thứ tự)",
+        [r[2] for r in rows[1:4]] == first_names,
+    )
     check("KB13: HR nhận số CCCD đã che", all("•" in (r[12] or "") for r in rows[1:]))
-    check("KB13: HR không có nút xuất kèm số CCCD đầy đủ", page.locator("text=Xuất kèm số CCCD").count() == 0)
+    check(
+        "KB13: HR không có nút xuất kèm số CCCD đầy đủ",
+        page.locator("text=Xuất kèm số CCCD").count() == 0,
+    )
     check("KB13: xuất Excel ghi nhật ký EXPORT", pw.audit_count("EXPORT") == before + 1)
     ctx.close()
 
@@ -183,7 +214,10 @@ def scenario_13(browser):
         page.click("#modal-export-full [data-pa-submit]")
     rows = xlsx_rows(download.value, "ds-ql.xlsx")
     full = [r[12] for r in rows[1:] if r[12]]
-    check("KB13: Quản lý chọn xuất kèm số CCCD thì file có số đầy đủ", bool(full) and all(re.fullmatch(r"\d{12}", v) for v in full))
+    check(
+        "KB13: Quản lý chọn xuất kèm số CCCD thì file có số đầy đủ",
+        bool(full) and all(re.fullmatch(r"\d{12}", v) for v in full),
+    )
     note = db(
         "from apps.audit.models import AuditLog as A;"
         "print(A.objects.filter(action='EXPORT').order_by('-id').first().note)"
@@ -195,10 +229,16 @@ def scenario_13(browser):
     login(page, "viewer")
     goto(page, base)
     check("KB13: Viewer không có nút Xuất Excel", page.locator("text=Xuất Excel").count() == 0)
-    check("KB13: Viewer gọi thẳng URL xuất bị từ chối (403)", goto(page, "/ho-so/xuat-excel/") == 403)
+    check(
+        "KB13: Viewer gọi thẳng URL xuất bị từ chối (403)", goto(page, "/ho-so/xuat-excel/") == 403
+    )
     goto(page, "/bao-cao/")
-    check("KB13: Viewer không có nút In/Xuất ở báo cáo", page.locator("text=Xuất Excel").count() == 0)
-    check("KB13: Viewer gọi thẳng URL in báo cáo bị từ chối (403)", goto(page, "/bao-cao/in/") == 403)
+    check(
+        "KB13: Viewer không có nút In/Xuất ở báo cáo", page.locator("text=Xuất Excel").count() == 0
+    )
+    check(
+        "KB13: Viewer gọi thẳng URL in báo cáo bị từ chối (403)", goto(page, "/bao-cao/in/") == 403
+    )
     ctx.close()
 
 
@@ -248,7 +288,10 @@ def scenario_16(browser):
     sample = TMP / "mau.xlsx"
     download.value.save_as(str(sample))
     book = load_workbook(sample)
-    check("KB16: file mẫu có 3 sheet và 34 cột", book.sheetnames == ["Hồ sơ", "Hướng dẫn", "Danh mục"] and len(book["Hồ sơ"][1]) == 34)
+    check(
+        "KB16: file mẫu có 3 sheet và 34 cột",
+        book.sheetnames == ["Hồ sơ", "Hướng dẫn", "Danh mục"] and len(book["Hồ sơ"][1]) == 34,
+    )
     before = int(db("from apps.workers.models import Worker;print(Worker.objects.count())"))
     rows = [import_row(i) for i in range(10)]
     rows[2]["phone"] = "12345"  # dòng 4
@@ -258,10 +301,28 @@ def scenario_16(browser):
     upload(page, TMP / "kb16.xlsx")
     body = page.inner_text("body")
     shot(page, "kb16-ket-qua-nhap")
-    check("KB16: tóm tắt đúng “nhập thành công 7 hồ sơ, 3 dòng lỗi”", "Đã đọc 10 dòng. Nhập thành công 7 hồ sơ. 3 dòng lỗi." in body, body[:300])
-    check("KB16: báo rõ dòng 4, 7, 10 và lý do", all(x in body for x in ("Số điện thoại phải gồm 10 chữ số", "Số CCCD phải gồm 12 chữ số", "Người dưới 15 tuổi")))
+    check(
+        "KB16: tóm tắt đúng “nhập thành công 7 hồ sơ, 3 dòng lỗi”",
+        "Đã đọc 10 dòng. Nhập thành công 7 hồ sơ. 3 dòng lỗi." in body,
+        body[:300],
+    )
+    check(
+        "KB16: báo rõ dòng 4, 7, 10 và lý do",
+        all(
+            x in body
+            for x in (
+                "Số điện thoại phải gồm 10 chữ số",
+                "Số CCCD phải gồm 12 chữ số",
+                "Người dưới 15 tuổi",
+            )
+        ),
+    )
     errors = page.locator("tbody tr").all_inner_texts()
-    check("KB16: bảng lỗi có đúng 3 dòng 4, 7, 10", [e.split()[0] for e in errors] == ["4", "7", "10"], str(errors))
+    check(
+        "KB16: bảng lỗi có đúng 3 dòng 4, 7, 10",
+        [e.split()[0] for e in errors] == ["4", "7", "10"],
+        str(errors),
+    )
     after = int(db("from apps.workers.models import Worker;print(Worker.objects.count())"))
     check("KB16: dòng đúng được nhập (7 hồ sơ mới ở trạng thái Nháp)", after - before == 7)
     drafts = db(
@@ -295,7 +356,10 @@ def scenario_16(browser):
     goto(page, "/ho-so/nhap-excel/")
     upload(page, TMP / "kb16b.xlsx")
     body = page.inner_text("body")
-    check("KB16 (v1.1): HR nhập dòng có thông tin làm việc bị báo lỗi dòng đó", "Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc." in body)
+    check(
+        "KB16 (v1.1): HR nhập dòng có thông tin làm việc bị báo lỗi dòng đó",
+        "Chỉ Admin hoặc Quản lý nhân sự được nhập thông tin làm việc." in body,
+    )
     ctx.close()
 
     ctx, page = new_page(browser, SIZE)
@@ -304,19 +368,28 @@ def scenario_16(browser):
     build_import(TMP / "kb16c.xlsx", [import_row(51, **work)])
     upload(page, TMP / "kb16c.xlsx")
     body = page.inner_text("body")
-    check("KB16 (v1.1): Quản lý nhập dòng có phần B thành công", "Nhập thành công 1 hồ sơ. 0 dòng lỗi." in body, body[:300])
+    check(
+        "KB16 (v1.1): Quản lý nhập dòng có phần B thành công",
+        "Nhập thành công 1 hồ sơ. 0 dòng lỗi." in body,
+        body[:300],
+    )
     shot(page, "kb16-quan-ly-phan-b")
     result = db(
         "from apps.workers.models import Worker;"
         f"w=Worker.objects.get(employee_code='NT7-{RUN}');"
         "a=w.work_assignments.get();"
-        "print(w.verification_status, a.start_date.isoformat(), a.client_company.name, a.end_date is None, w.salary_history.count() if hasattr(w,'salary_history') else 0)"
+        "print(w.verification_status, a.start_date.isoformat(), a.client_company.name, "
+        "a.end_date is None, a.salary_history.count())"
     )
-    check("KB16 (v1.1): hồ sơ Nháp có mã NV cũ, đợt làm việc mở từ 01/03/2023, không có lương", result.startswith("DRAFT 2023-03-01") and result.endswith("True 0"), result)
+    check(
+        "KB16 (v1.1): hồ sơ Nháp có mã NV cũ, đợt làm việc mở từ 01/03/2023, không có lương",
+        result.startswith("DRAFT 2023-03-01") and result.endswith("True 0"),
+        result,
+    )
     ctx.close()
 
 
-# --- Ẩn danh hóa từ danh sách chờ hủy sinh biên bản đúng (câu 2) ------------------------------------
+# --- Ẩn danh hóa từ danh sách chờ hủy sinh biên bản đúng (câu 2) ---------------------------------
 def scenario_cho_huy(browser):
     # Dữ liệu thử: lùi ngày chuyển Lưu trữ 4 năm của 3 hồ sơ có căn cứ tính từ ngày Lưu trữ (bảng
     # StatusChange chỉ-thêm nên dùng SQL thô, chỉ trên CSDL thử nghiệm) và chưa quá hạn.
@@ -324,8 +397,9 @@ def scenario_cho_huy(browser):
         "from django.db import connection;from apps.workers.models import Worker;"
         "from apps.workers import retention as r;"
         "done={w.pk for w,_ in r.expired_entries()};"
-        "ws=[w for w in Worker.objects.filter(verification_status='ARCHIVED',employee_code__isnull=True,"
-        "anonymized_at__isnull=True).order_by('-pk') if w.pk not in done and "
+        "ws=[w for w in Worker.objects.filter(verification_status='ARCHIVED',"
+        "employee_code__isnull=True,anonymized_at__isnull=True).order_by('-pk') "
+        "if w.pk not in done and "
         "r.retention_info(w).basis in ('REJECTED','ABANDONED','CANDIDATE_OTHER')][:3];"
         "ids=[w.pk for w in ws];"
         "c=connection.cursor();"
@@ -341,13 +415,20 @@ def scenario_cho_huy(browser):
     login(page, "admin")
     goto(page, "/cai-dat/cho-huy/")
     shot(page, "cho-huy-1-danh-sach")
-    codes = [page.locator("tbody tr").nth(i).locator("td a").first.inner_text() for i in range(page.locator("tbody tr").count())]
+    codes = [
+        page.locator("tbody tr").nth(i).locator("td a").first.inner_text()
+        for i in range(page.locator("tbody tr").count())
+    ]
     waiting_before = total(page)
     pick = db(
         "from apps.workers.models import Worker;"
         f"print(','.join(Worker.objects.filter(pk__in={pks}).order_by('pk').values_list('worker_code',flat=True)))"
     ).split(",")
-    check("Chờ hủy: danh sách có các hồ sơ quá hạn lưu trữ", all(c in codes for c in pick), f"{pick} / {codes}")
+    check(
+        "Chờ hủy: danh sách có các hồ sơ quá hạn lưu trữ",
+        all(c in codes for c in pick),
+        f"{pick} / {codes}",
+    )
     for code in pick[:2]:
         page.locator("tr", has_text=code).locator("input[name=workers]").check()
     page.click("button:has-text('Hủy hồ sơ đã chọn')")
@@ -357,23 +438,47 @@ def scenario_cho_huy(browser):
     page.wait_for_load_state("networkidle")
     body = page.inner_text("body")
     shot(page, "cho-huy-3-bien-ban")
-    check("Chờ hủy: sau khi xác nhận sang trang biên bản", re.search(r"Biên bản hủy BBH-\d{4}-\d{3}", body) is not None, body[:200])
-    check("Chờ hủy: biên bản liệt kê đúng 2 hồ sơ đã chọn, loại Hết hạn lưu trữ", all(c in body for c in pick[:2]) and "Hết hạn lưu trữ" in body and pick[2] not in body.split("Hồ sơ đã hủy")[-1])
-    done = db(
-        "from apps.workers.models import Worker, AnonymizationItem as I;from apps.audit.models import AuditLog as A, AuditPersonalValue as P;"
-        f"ws=list(Worker.objects.filter(worker_code__in={pick[:2]}));"
-        "print(sum(w.anonymized_at is not None for w in ws), I.objects.filter(worker__in=ws).count(), "
-        "A.objects.filter(action='ANONYMIZE',worker__in=ws).count(), P.objects.filter(worker__in=ws).count())"
+    check(
+        "Chờ hủy: sau khi xác nhận sang trang biên bản",
+        re.search(r"Biên bản hủy BBH-\d{4}-\d{3}", body) is not None,
+        body[:200],
     )
-    check("Chờ hủy: 2 hồ sơ đã ẩn danh, 2 dòng biên bản, 2 dòng nhật ký ANONYMIZE, không còn giá trị cá nhân trong nhật ký", done == "2 2 2 0", done)
+    check(
+        "Chờ hủy: biên bản liệt kê đúng 2 hồ sơ đã chọn, loại Hết hạn lưu trữ",
+        all(c in body for c in pick[:2])
+        and "Hết hạn lưu trữ" in body
+        and pick[2] not in body.split("Hồ sơ đã hủy")[-1],
+    )
+    done = db(
+        "from apps.workers.models import Worker, AnonymizationItem as I;"
+        "from apps.audit.models import AuditLog as A, AuditPersonalValue as P;"
+        f"ws=list(Worker.objects.filter(worker_code__in={pick[:2]}));"
+        "print(sum(w.anonymized_at is not None for w in ws), "
+        "I.objects.filter(worker__in=ws).count(), "
+        "A.objects.filter(action='ANONYMIZE',worker__in=ws).count(), "
+        "P.objects.filter(worker__in=ws).count())"
+    )
+    check(
+        "Chờ hủy: 2 hồ sơ đã ẩn danh, 2 dòng biên bản, 2 dòng nhật ký ANONYMIZE, "
+        "không còn giá trị cá nhân trong nhật ký",
+        done == "2 2 2 0",
+        done,
+    )
     reasons = db(
         "from apps.workers.models import StatusChange as S;"
         f"qs=S.objects.filter(worker__worker_code__in={pick[:2]},reason_by_user=True);"
         "print(qs.count(), qs.exclude(reason='(đã ẩn danh)').count())"
     )
-    check("Chờ hủy: mọi lý do do người gõ ở dòng thời gian trạng thái là “(đã ẩn danh)”", reasons.endswith(" 0"), f"{reasons} (trước: {typed} lý do người gõ của 3 hồ sơ)")
+    check(
+        "Chờ hủy: mọi lý do do người gõ ở dòng thời gian trạng thái là “(đã ẩn danh)”",
+        reasons.endswith(" 0"),
+        f"{reasons} (trước: {typed} lý do người gõ của 3 hồ sơ)",
+    )
     goto(page, "/cai-dat/cho-huy/")
-    check("Chờ hủy: hồ sơ đã hủy rời khỏi danh sách chờ hủy", total(page) == waiting_before - 2 or "Không có hồ sơ nào" in page.content())
+    check(
+        "Chờ hủy: hồ sơ đã hủy rời khỏi danh sách chờ hủy",
+        total(page) == waiting_before - 2 or "Không có hồ sơ nào" in page.content(),
+    )
     before_print = pw.audit_count("PRINT")
     goto(page, "/cai-dat/bien-ban-huy/")
     shot(page, "bien-ban-1-danh-sach")
@@ -386,23 +491,35 @@ def scenario_cho_huy(browser):
     ctx.close()
 
 
-# --- Khối 12 tháng và báo cáo công ty khách khớp danh sách đích -------------------------------------
+# --- Khối 12 tháng và báo cáo công ty khách khớp danh sách đích -----------------------------------
 def scenario_v11(browser):
     ctx, page = new_page(browser, SIZE)
     login(page, "viewer")
     goto(page, "/")
     heading = page.locator("h3.pa-card-title", has_text="Đợt làm việc sắp đủ").inner_text()
     count = int(re.search(r"\((\d+)\)", heading).group(1))
-    check("v1.1: Dashboard có khối “Đợt làm việc sắp đủ 12 tháng”", count >= 0 and "12 tháng" in heading, heading)
+    check(
+        "v1.1: Dashboard có khối “Đợt làm việc sắp đủ 12 tháng”",
+        count >= 0 and "12 tháng" in heading,
+        heading,
+    )
     goto(page, "/ho-so/?dot_sap_du_han=1")
-    check("v1.1: số trong khối bằng số dòng của /ho-so/?dot_sap_du_han=1", total(page) == count, f"{total(page)} vs {count}")
-    check("v1.1: không có thẻ thứ 10 (vẫn 9 thẻ)", len(card_values(page)) == 0)  # trang danh sách không có thẻ
+    check(
+        "v1.1: số trong khối bằng số dòng của /ho-so/?dot_sap_du_han=1",
+        total(page) == count,
+        f"{total(page)} vs {count}",
+    )
+    check(
+        "v1.1: không có thẻ thứ 10 (vẫn 9 thẻ)", len(card_values(page)) == 0
+    )  # trang danh sách không có thẻ
     goto(page, "/")
     check("v1.1: Dashboard vẫn đúng 9 thẻ", len(card_values(page)) == 9)
 
     for code in ("cong-ty-khach", "phong-ban", "chuc-danh", "trinh-do"):
         goto(page, f"/bao-cao/?loai={code}")
-        links = [(a.inner_text().strip(), a.get_attribute("href")) for a in page.locator("tbody a").all()]
+        links = [
+            (a.inner_text().strip(), a.get_attribute("href")) for a in page.locator("tbody a").all()
+        ]
         if code == "cong-ty-khach":
             shot(page, "v11-bao-cao-cong-ty-khach")
         check(f"Báo cáo {code}: có số liệu bấm được", len(links) > 0)
@@ -411,20 +528,50 @@ def scenario_v11(browser):
             goto(page, href)
             if total(page) != int(text):
                 mismatch.append((text, href, total(page)))
-        check(f"Báo cáo {code}: mỗi số bằng số dòng danh sách đích ({len(links)} liên kết)", not mismatch, str(mismatch[:3]))
+        check(
+            f"Báo cáo {code}: mỗi số bằng số dòng danh sách đích ({len(links)} liên kết)",
+            not mismatch,
+            str(mismatch[:3]),
+        )
         goto(page, f"/bao-cao/?loai={code}")
         if code == "phong-ban":
-            check("Báo cáo phòng ban có nhóm “Chưa có bộ phận”", "Chưa có bộ phận" in page.content())
+            check(
+                "Báo cáo phòng ban có nhóm “Chưa có bộ phận”", "Chưa có bộ phận" in page.content()
+            )
     ctx.close()
 
 
 # --- Phân quyền các trang mới -------------------------------------------------------------------
 def scenario_quyen(browser):
     matrix = {
-        "admin": {"/nhat-ky/": 200, "/cai-dat/cho-huy/": 200, "/cai-dat/bien-ban-huy/": 200, "/bao-cao/": 200, "/ho-so/nhap-excel/": 200},
-        "quanly": {"/nhat-ky/": 200, "/cai-dat/cho-huy/": 403, "/cai-dat/bien-ban-huy/": 403, "/bao-cao/": 200, "/ho-so/nhap-excel/": 200},
-        "hr": {"/nhat-ky/": 403, "/cai-dat/cho-huy/": 403, "/cai-dat/bien-ban-huy/": 403, "/bao-cao/": 200, "/ho-so/nhap-excel/": 200},
-        "viewer": {"/nhat-ky/": 403, "/cai-dat/cho-huy/": 403, "/cai-dat/bien-ban-huy/": 403, "/bao-cao/": 200, "/ho-so/nhap-excel/": 403},
+        "admin": {
+            "/nhat-ky/": 200,
+            "/cai-dat/cho-huy/": 200,
+            "/cai-dat/bien-ban-huy/": 200,
+            "/bao-cao/": 200,
+            "/ho-so/nhap-excel/": 200,
+        },
+        "quanly": {
+            "/nhat-ky/": 200,
+            "/cai-dat/cho-huy/": 403,
+            "/cai-dat/bien-ban-huy/": 403,
+            "/bao-cao/": 200,
+            "/ho-so/nhap-excel/": 200,
+        },
+        "hr": {
+            "/nhat-ky/": 403,
+            "/cai-dat/cho-huy/": 403,
+            "/cai-dat/bien-ban-huy/": 403,
+            "/bao-cao/": 200,
+            "/ho-so/nhap-excel/": 200,
+        },
+        "viewer": {
+            "/nhat-ky/": 403,
+            "/cai-dat/cho-huy/": 403,
+            "/cai-dat/bien-ban-huy/": 403,
+            "/bao-cao/": 200,
+            "/ho-so/nhap-excel/": 403,
+        },
     }
     for username, pages in matrix.items():
         ctx, page = new_page(browser, SIZE)
@@ -434,7 +581,10 @@ def scenario_quyen(browser):
             check(f"Quyền: {username} {path} → {expected}", status == expected, str(status))
         if username == "viewer":
             goto(page, "/")
-            check("Quyền: Viewer không thấy khối “Chờ duyệt” ở việc cần làm", "Chờ duyệt (" not in page.content())
+            check(
+                "Quyền: Viewer không thấy khối “Chờ duyệt” ở việc cần làm",
+                "Chờ duyệt (" not in page.content(),
+            )
         ctx.close()
 
 
