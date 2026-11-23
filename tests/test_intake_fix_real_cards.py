@@ -334,3 +334,33 @@ def test_man_hinh_doi_chieu_hien_nhan_goi_y_va_bat_tich_da_kiem_tra():
     page = login_client(hr).get(f"/nhap-cccd/{session.pk}/").content.decode()
     assert ">Gợi ý<" in page
     assert 'name="issue_place__checked"' in page  # trường tô vàng buộc tích Đã kiểm tra
+
+
+# ===== zxing-cpp là bộ đọc chính =====
+@pytest.mark.parametrize("name", list(fake_cards.SPECIAL_NAMES.values()) + ["Phạm Thị Thuỷ Ái"])
+def test_zxing_doc_dung_100_phan_tram_qr_khong_eci_ten_nhieu_dau(name):
+    """Ca trước đó mất dữ liệu: QR UTF-8 không ECI; zxing-cpp đọc byte gốc nên phải đúng hết."""
+    import zxingcpp
+
+    payload = f"999000000001|999123456|{name.upper()}|05011995|Nam|Số 1 Đường Mẫu, Xã Ước|20012021"
+    gray = imaging.to_gray(fake_cards._qr_image(payload, eci=False).convert("RGB"))
+    results = zxingcpp.read_barcodes(gray, formats=zxingcpp.BarcodeFormat.QRCode)
+    assert [bytes(r.bytes).decode("utf-8") for r in results] == [payload]
+    reading = qr_reader._zxing_read(gray, 1.0)  # đường chính, không qua pyzbar
+    assert reading is not None and reading.text == payload and len(reading.rect) == 4
+
+
+def test_read_qr_dung_zxing_truoc_pyzbar_va_dung_pyzbar_khi_zxing_loi(monkeypatch):
+    payload = "999000000001|999123456|ĐẶNG VĂN ƯỚC|05011995|Nam|Số 1 Đường Mẫu|20012021"
+    gray = imaging.to_gray(fake_cards._qr_image(payload).convert("RGB"))
+
+    def boom(*a, **k):
+        raise AssertionError("pyzbar không được gọi khi zxing đọc được")
+
+    monkeypatch.setattr(qr_reader.pyzbar, "decode", boom)
+    assert qr_reader.read_qr(gray).text == payload
+    monkeypatch.undo()
+    monkeypatch.setattr(
+        qr_reader.zxingcpp, "read_barcodes", lambda *a, **k: (_ for _ in ()).throw(RuntimeError)
+    )
+    assert qr_reader.read_qr(gray).text == payload  # dự phòng pyzbar vẫn đọc được

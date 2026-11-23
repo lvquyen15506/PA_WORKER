@@ -302,7 +302,8 @@ flowchart TB
 | `whitenoise` | Thư viện Python | Phục vụ `static/` khi `DEBUG = False` | Gunicorn không phục vụ tệp tĩnh; tránh thêm container Nginx |
 | `antiword` | Gói hệ thống (apt) | Trích văn bản CV định dạng `.doc` (Word 97–2003) | Mục V yêu cầu nhận DOC; python-docx chỉ đọc `.docx` |
 | `opencv-python-headless` 5.1.0.95 | Thư viện Python | Kiểm tra ảnh (độ nét, độ sáng), tiền xử lý, xoay (Phase 5) | Bản headless, không cần giao diện; cần gói apt `libglib2.0-0` |
-| `pyzbar` 0.1.9 | Thư viện Python | Đọc mã QR của CCCD | Dùng gói apt `libzbar0` |
+| `zxing-cpp` 3.1.1 | Thư viện Python | Bộ đọc QR **chính** của CCCD (bổ sung 23/11/2026) | Trả byte gốc (`result.bytes`) nên giải UTF-8 đúng, không đoán bảng mã; có wheel sẵn, không cần gói hệ thống, chạy offline. Thẻ thật có QR không ECI bị zbar đọc sai thành chữ Nhật/Trung và mất byte, không sửa lại được |
+| `pyzbar` 0.1.9 | Thư viện Python | Bộ đọc QR **dự phòng** (sau zxing-cpp), cùng `cv2.QRCodeDetector` | Dùng gói apt `libzbar0` |
 | `pytesseract` 0.3.13 | Thư viện Python | Gọi Tesseract `vie`, lấy độ tin cậy từng từ, có timeout | |
 | `Pillow` 13.0.0 | Thư viện Python | Mở ảnh, xoay theo EXIF, xóa EXIF, giới hạn điểm ảnh | |
 | `pdfplumber` 0.11.11, `python-docx` 1.2.0 | Thư viện Python | Trích văn bản CV PDF, DOCX | |

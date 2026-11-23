@@ -1,8 +1,10 @@
-"""Đọc mã QR offline bằng pyzbar (docs/yeu-cau.md mục V bước 2)."""
+"""Đọc mã QR offline (docs/yeu-cau.md mục V bước 2). Bộ đọc chính là zxing-cpp (byte gốc, giải
+UTF-8); pyzbar và OpenCV chỉ là dự phòng vì zbar tự đoán bảng mã và làm mất chữ có dấu."""
 
 from collections import namedtuple
 
 import cv2
+import zxingcpp
 from pyzbar import pyzbar
 from pyzbar.pyzbar import ZBarSymbol
 
@@ -55,12 +57,37 @@ def _attempts(gray):
     yield cv2.resize(gray, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA), 0.5
 
 
+def _zxing_read(variant, scale):
+    """Bộ đọc CHÍNH: zxing-cpp trả byte gốc của QR (không đoán bảng mã như zbar), giải UTF-8.
+    Trả QrReading hoặc None."""
+    try:
+        results = zxingcpp.read_barcodes(variant, formats=zxingcpp.BarcodeFormat.QRCode)
+    except Exception:  # lỗi thư viện không được làm hỏng cả quy trình nhận diện: dùng dự phòng
+        return None
+    for result in results:
+        text = decode_text(bytes(result.bytes))
+        if not text:
+            continue
+        pos = result.position
+        xs = [p.x for p in (pos.top_left, pos.top_right, pos.bottom_left, pos.bottom_right)]
+        ys = [p.y for p in (pos.top_left, pos.top_right, pos.bottom_left, pos.bottom_right)]
+        rect = tuple(
+            round(v / scale) for v in (min(xs), min(ys), max(xs) - min(xs), max(ys) - min(ys))
+        )
+        return QrReading(text, rect)
+    return None
+
+
 def read_qr(gray, budget=None):
-    """Mảng xám -> QrReading hoặc None. Dừng sớm khi hết ngân sách thời gian."""
+    """Mảng xám -> QrReading hoặc None. Dừng sớm khi hết ngân sách thời gian. Mỗi biến thể ảnh thử
+    zxing-cpp (chính) trước, rồi pyzbar và OpenCV (dự phòng)."""
     for variant, scale in _attempts(gray):
         if budget is not None and budget.expired:
             budget.mark_exhausted()
             return None
+        reading = _zxing_read(variant, scale)
+        if reading is not None:
+            return reading
         for symbol in pyzbar.decode(variant, symbols=[ZBarSymbol.QRCODE]):
             text = decode_text(symbol.data)
             if text and not plausible_qr_text(text):

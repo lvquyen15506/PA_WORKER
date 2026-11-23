@@ -77,10 +77,10 @@ Một lượt = kiểm tra ảnh + đọc QR + OCR cả hai mặt. Mỗi thẻ �
 
 | Giai đoạn | Trung vị | Lớn nhất |
 | --- | --- | --- |
-| Kiểm tra ảnh | 0.01 | 0.03 |
-| Đọc QR | 0.08 | 0.15 |
-| OCR (Tesseract vie) | 0.38 | 0.43 |
-| **Cả lượt** | 0.48 | 0.58 |
+| Kiểm tra ảnh | 0.02 | 0.03 |
+| Đọc QR | 0.08 | 0.18 |
+| OCR (Tesseract vie) | 0.39 | 0.43 |
+| **Cả lượt** | 0.48 | 0.64 |
 
 Ngân sách cho cả lượt là 90 giây (Gunicorn timeout 120 giây); hết ngân sách thì trường chưa đọc để trống, tô vàng và có cảnh báo.
 
