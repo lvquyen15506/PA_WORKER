@@ -104,7 +104,8 @@ Trang admin của Django không được bật.
 | `/cai-dat/cho-huy/` | G | ✓ | | Trang phụ: hồ sơ Lưu trữ quá hạn lưu trữ; cột "Căn cứ lưu trữ" (6 căn cứ, câu 2) và "Hết hạn lưu trữ" |
 | `/cai-dat/cho-huy/huy/` | P | ✓ | `ANONYMIZE` (mỗi hồ sơ) | Chọn nhiều hồ sơ, hộp xác nhận; sinh `AnonymizationRecord` |
 | `/cai-dat/bien-ban-huy/` | G | ✓ | | Danh sách biên bản, cột Loại (Hết hạn lưu trữ / Theo yêu cầu của chủ thể) và Số đơn |
-| `/cai-dat/bien-ban-huy/<id>/` | G | ✓ | `PRINT` khi in | Xem và in biên bản: loại, người duyệt, thời điểm, danh sách mã hồ sơ / mã NV, căn cứ lưu trữ. Biên bản loại "Theo yêu cầu của chủ thể" hiện thêm số đơn và dòng "Xóa sớm theo yêu cầu – lẽ ra lưu đến dd/mm/yyyy" |
+| `/cai-dat/bien-ban-huy/<id>/` | G | ✓ | | Xem biên bản: loại, người duyệt, thời điểm, danh sách mã hồ sơ / mã NV, căn cứ lưu trữ. Biên bản loại "Theo yêu cầu của chủ thể" hiện thêm số đơn và dòng "Xóa sớm theo yêu cầu – lẽ ra lưu đến dd/mm/yyyy" |
+| `/cai-dat/bien-ban-huy/<id>/in/` | G | ✓ | `PRINT` | **Phase 7.** Bản in biên bản (ghi `PRINT` khi mở trang, cùng cách với `/ho-so/<id>/dong-y/mau-in/`). Không xuất Excel biên bản |
 
 ### 5.3 Dashboard (`apps/reports`)
 
@@ -114,6 +115,12 @@ Trang admin của Django không được bật.
 
 Khối việc cần làm "Đợt làm việc sắp đủ 12 tháng" liên kết tới `/ho-so/?dot_sap_du_han=1` (số dòng bằng số trong khối).
 
+**Chốt ở Phase 7 (23/11/2026):**
+- Số trên mỗi thẻ được đếm bằng đúng bộ lọc của trang đích với đúng tham số của liên kết (một bảng khai báo `CARDS` ở `apps/reports/stats.py` dùng chung cho số và liên kết), nên số dòng danh sách đích luôn bằng số trên thẻ.
+- Mỗi khối việc cần làm hiện 10 dòng đầu và liên kết "Xem tất cả (n)": Chờ duyệt (chỉ A, Q) → `/duyet-ho-so/`; Cần bổ sung → `/ho-so/?trang_thai_ho_so=NEEDS_INFO`; CCCD sắp hết hạn → `/ho-so/?cccd_sap_het_han=1`; Đợt sắp đủ 12 tháng → `/ho-so/?dot_sap_du_han=1`.
+- Biểu đồ cơ cấu (phòng ban/bộ phận, giới tính, nhóm tuổi, trình độ) tính **công nhân đang làm** (Thử việc + Đang làm việc); biểu đồ vào làm/nghỉ việc 12 tháng theo `start_date`/`resign_date`; biểu đồ trạng thái xác minh tính mọi hồ sơ. Không dùng biểu đồ tròn.
+- Thẻ "Thiếu giấy tờ" không tính hồ sơ Lưu trữ: liên kết `/ho-so/?thieu_giay_to=1&trang_thai_ho_so=chua-luu-tru`. Thẻ "Hồ sơ mới trong tháng" và "Nghỉ việc trong tháng" tính mọi trạng thái hồ sơ.
+
 Bộ lọc của 9 thẻ:
 
 | Thẻ | Liên kết |
@@ -122,7 +129,7 @@ Bộ lọc của 9 thẻ:
 | Đang làm việc | `/ho-so/?trang_thai_lam_viec=PROBATION,ACTIVE` |
 | Hồ sơ mới trong tháng | `/ho-so/?tao_tu=<ngày 1>&tao_den=<cuối tháng>` |
 | Chờ duyệt | `/ho-so/?trang_thai_ho_so=PENDING` |
-| Thiếu giấy tờ | `/ho-so/?thieu_giay_to=1` |
+| Thiếu giấy tờ | `/ho-so/?thieu_giay_to=1&trang_thai_ho_so=chua-luu-tru` (Phase 7: không tính Lưu trữ) |
 | Hoàn thiện | `/ho-so/?hoan_thien=1` |
 | Đang tuyển dụng | `/tuyen-dung/?trang_thai=NEW,SCREENING,INTERVIEW` |
 | Nghỉ việc trong tháng | `/ho-so/?trang_thai_lam_viec=RESIGNED&nghi_tu=<ngày 1>&nghi_den=<cuối tháng>` |
@@ -132,8 +139,8 @@ Bộ lọc của 9 thẻ:
 
 | URL | PT | A | Q | H | V | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/ho-so/` | G | ✓ | ✓ | ✓ | ✓ | | Cột theo mục IV.7; lọc: phòng ban, bộ phận, chức danh, trình độ, 3 bộ trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày tiếp nhận, **công ty khách hàng** (`?cong_ty_khach=<id>`, theo đợt đang diễn ra) và **đợt sắp đủ 12 tháng** (`?dot_sap_du_han=1`) (v1.1); bộ lọc bộ phận có thêm lựa chọn "Chưa có bộ phận" (`?bo_phan=chua-co`; v1.1, câu 48); **cột "Công ty khách" thay cột "Bộ phận"** (vẫn 12 cột; công nhân chưa có đợt đang diễn ra hiện "—"); `q` tìm mã hồ sơ, mã NV, họ tên không dấu, SĐT; `q` 12 chữ số tìm theo băm CCCD **chỉ với A, Q, H**; sắp xếp theo cột; 20 dòng/trang; bộ lọc giữ trong phiên |
-| `/ho-so/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | Cùng tham số lọc với `/ho-so/`; CCCD che theo quyền |
+| `/ho-so/` | G | ✓ | ✓ | ✓ | ✓ | | **Tham số thêm ở Phase 7 (liên kết thẻ Dashboard):** `trang_thai_ho_so=chua-luu-tru` (mọi hồ sơ trừ Lưu trữ), `trang_thai_lam_viec` nhận danh sách cách nhau dấu phẩy (`PROBATION,ACTIVE`), `tao_tu`/`tao_den` (ngày tạo hồ sơ, dd/mm/yyyy hoặc yyyy-mm-dd), `nghi_tu`/`nghi_den` (ngày nghỉ việc), `cccd_sap_het_han=1`. Cột theo mục IV.7; lọc: phòng ban, bộ phận, chức danh, trình độ, 3 bộ trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày tiếp nhận, **công ty khách hàng** (`?cong_ty_khach=<id>`, theo đợt đang diễn ra) và **đợt sắp đủ 12 tháng** (`?dot_sap_du_han=1`) (v1.1); bộ lọc bộ phận có thêm lựa chọn "Chưa có bộ phận" (`?bo_phan=chua-co`; v1.1, câu 48); **cột "Công ty khách" thay cột "Bộ phận"** (vẫn 12 cột; công nhân chưa có đợt đang diễn ra hiện "—"); `q` tìm mã hồ sơ, mã NV, họ tên không dấu, SĐT; `q` 12 chữ số tìm theo băm CCCD **chỉ với A, Q, H**; sắp xếp theo cột; 20 dòng/trang; bộ lọc giữ trong phiên |
+| `/ho-so/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | Cùng tham số lọc và thứ tự sắp xếp với `/ho-so/`. **Chốt Phase 7:** CCCD luôn che (`0791••••2345`); `?cccd_day_du=1` chỉ nhận với A, Q (H gửi tham số này → 403) và nhật ký `EXPORT` ghi "có số CCCD đầy đủ". Cột: 11 cột như màn hình + "Mã hồ sơ" + "Số CCCD"; không có lương. Nhật ký không ghi chữ tìm kiếm `q`. Nút ở `/ho-so/`: H có "Xuất Excel"; A, Q có "Xuất Excel ▾" gồm "Xuất Excel" và "Xuất kèm số CCCD đầy đủ" (qua `_confirm_modal`) |
 | `/ho-so/them/` | G | ✓ | ✓ | ✓ | | | Chọn cách thêm |
 | `/ho-so/them/nhap-tay/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | Lưu Nháp: chỉ cần họ tên + SĐT; sinh mã hồ sơ |
 | `/ho-so/kiem-tra-trung/` | P, H | ✓ | ✓ | ✓ | | | Gọi khi rời ô số CCCD / SĐT / ngày sinh: trùng CCCD → khung lỗi + nút "Mở hồ sơ cũ"; trùng SĐT hoặc họ tên + ngày sinh → cảnh báo |
@@ -212,10 +219,11 @@ Tệp đính kèm hợp đồng (ở tab Quá trình làm việc và form sửa)
 | URL | PT | A | Q | H | V | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/duyet-ho-so/` | G | ✓ | ✓ | | | | Hồ sơ Chờ duyệt, cũ nhất trước; dòng mình tạo/gửi có ghi chú "Bạn không duyệt được hồ sơ này" |
-| `/bao-cao/` | G | ✓ | ✓ | ✓ | ✓ | | Chọn loại báo cáo, khoảng thời gian, phòng ban. v1.1 (câu 45): thêm loại báo cáo "Công nhân đang làm theo công ty khách hàng" (số người theo từng công ty và địa điểm, tính theo đợt làm việc đang diễn ra; số liệu mỗi công ty liên kết tới `/ho-so/?cong_ty_khach=<id>`). Các báo cáo theo phòng ban/bộ phận có nhóm "Chưa có bộ phận" (câu 48) |
-| `/bao-cao/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | |
-| `/bao-cao/in/` | G | ✓ | ✓ | ✓ | | `PRINT` | Bản in: tiêu đề, ngày lập, người lập |
-| `/nhat-ky/` | G | ✓ | ✓ | | | | Lọc theo người, hồ sơ, hành động, khoảng thời gian. Không có nút sửa/xóa. Trường cá nhân hiện "(xem giá trị chi tiết)", bấm mở giá trị trước/sau từ `AuditPersonalValue`, giải mã khi hiển thị, chỉ A, Q (câu 30); số CCCD/CMND cũ vẫn hiện dạng che; hồ sơ đã ẩn danh hiện "(đã ẩn danh)" |
+| `/bao-cao/` | G | ✓ | ✓ | ✓ | ✓ | | Chọn loại báo cáo, khoảng thời gian, phòng ban. v1.1 (câu 45): thêm loại báo cáo "Công nhân đang làm theo công ty khách hàng" (số người theo từng công ty và địa điểm, tính theo đợt làm việc đang diễn ra; số liệu mỗi công ty liên kết tới `/ho-so/?cong_ty_khach=<id>`). Các báo cáo theo phòng ban/bộ phận có nhóm "Chưa có bộ phận" (câu 48). **Chốt Phase 7 – 9 loại báo cáo:** (1) theo phòng ban/bộ phận, (2) giới tính, (3) nhóm tuổi (5 nhóm + "Chưa có ngày sinh"), (4) trình độ cao nhất (có nhóm "Chưa có"), (5) chức danh, (6) hoàn thiện / chưa hoàn thiện, (7) hồ sơ mới theo tháng, (8) vào làm / nghỉ việc theo tháng, (9) công nhân đang làm theo công ty khách. Báo cáo cơ cấu (1–6, 9) tính **công nhân đang làm hiện tại** (Thử việc + Đang làm việc), lọc được theo phòng ban; khoảng thời gian (mặc định 12 tháng gần nhất) chỉ áp cho báo cáo theo tháng (7, 8). Mỗi bảng có dòng Tổng |
+| `/bao-cao/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | Cùng tham số với `/bao-cao/`; mọi ô qua `safe_cell()`; V → 403 (câu 18) |
+| `/bao-cao/in/` | G | ✓ | ✓ | ✓ | | `PRINT` | Bản in: tiêu đề, ngày lập, người lập; V → 403 (câu 18). Nhật ký ghi tên báo cáo, số dòng, bộ lọc (không ghi họ tên) |
+| `/nhat-ky/` | G | ✓ | ✓ | | | | Lọc theo người (kể cả "Hệ thống"), mã hồ sơ/mã NV, hành động, khoảng thời gian. Không có nút sửa/xóa. Trường cá nhân hiện "(xem giá trị chi tiết)", bấm mở giá trị trước/sau từ `AuditPersonalValue`, giải mã khi hiển thị, chỉ A, Q (câu 30); số CCCD/CMND cũ vẫn hiện dạng che; hồ sơ đã ẩn danh hiện "(đã ẩn danh)" |
+| `/nhat-ky/<id>/` | G | ✓ | ✓ | | | | **Phase 7.** Chi tiết một dòng nhật ký: giá trị trước/sau từng trường (dùng chung bộ dựng dòng với tab Lịch sử của hồ sơ). Xem trang này không ghi nhật ký (giống tab Lịch sử). H, V → 403 |
 
 ## 6. Kịch bản nghiệm thu → trang
 

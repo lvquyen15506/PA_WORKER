@@ -213,21 +213,22 @@ Biểu đồ Chart.js (1 hoặc 2 tùy loại, có tiêu đề kết quả + đ�
 ([_empty_state] khi không có dữ liệu trong khoảng đã chọn)
 ```
 
-Viewer xem được, không có nút Xuất Excel và In. Danh mục loại báo cáo chốt ở Phase 7. v1.1: có loại "Công nhân đang làm theo công ty khách hàng": biểu đồ cột (người) + `_table` Công ty | Địa điểm | Số công nhân đang làm; mỗi số liên kết tới `/ho-so/?cong_ty_khach=<id>`.
+Viewer xem được, không có nút Xuất Excel và In. **Đã chốt ở Phase 7:** 9 loại báo cáo (danh sách ở `trang.md` mục 5.9); báo cáo cơ cấu tính công nhân đang làm hiện tại, khoảng ngày chỉ áp cho báo cáo theo tháng; bảng có dòng Tổng. v1.1: có loại "Công nhân đang làm theo công ty khách hàng": biểu đồ cột (người) + `_table` Công ty | Địa điểm | Số công nhân đang làm; mỗi số liên kết tới `/ho-so/?cong_ty_khach=<id>`.
 
 ### 2.10 Nhật ký thao tác `/nhat-ky/` {A,Q}
 
 ```
 [_page_header] Nhật ký thao tác
 [_filter_bar] (Người thực hiện)(Hồ sơ)(Hành động)(Từ ngày)(đến)  [ Lọc ] [ Xóa lọc ]
-[Phỏng đoán – chốt ở Phase 7: cột và bộ lọc]
+[Đã chốt ở Phase 7 (23/11/2026): cột và bộ lọc]
+[_filter_bar] (Người thực hiện, gồm "Hệ thống")(Mã hồ sơ / mã NV)(Hành động)(Từ ngày)(đến)
 [_table]
- Thời điểm | Người thực hiện | Hành động | Đối tượng | Nội dung thay đổi
- (trường cá nhân: "(xem giá trị chi tiết)" -> mở giá trị trước/sau, giải mã, chỉ A, Q)
-[_pagination]    ([_empty_state])
+ Thời điểm | Người thực hiện | Hành động | Đối tượng | Trường thay đổi | Thao tác <bi-eye>
+ (trường cá nhân: "(xem giá trị chi tiết)"; bấm <bi-eye> mở /nhat-ky/<id>/ với giá trị trước/sau, giải mã, chỉ A, Q)
+[_pagination] 20 dòng/trang   ([_empty_state])
 ```
 
-Không có nút sửa, xóa. Hồ sơ đã ẩn danh hiện "(đã ẩn danh)".
+Không có nút sửa, xóa. Hồ sơ đã ẩn danh hiện "(đã ẩn danh)". Số CCCD/CMND cũ luôn hiện dạng che. Trang chi tiết `/nhat-ky/<id>/` dùng `_page_header` + `_table` (Trường | Giá trị trước | Giá trị sau) và dùng chung bộ dựng dòng với tab Lịch sử của hồ sơ.
 
 ### 2.11 Quản lý tài khoản `/tai-khoan/` {A}
 

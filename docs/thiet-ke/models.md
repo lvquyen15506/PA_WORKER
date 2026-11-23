@@ -179,6 +179,8 @@ Khai báo **một chỗ** trong `apps/core/choices.py`. Không viết chuỗi tr
 
 Tên logic mới ở `LOGICAL_TO_ATTR`: `monthly_salary` → `monthly_salary_enc`, `client_unit_price` → `client_unit_price_enc`.
 
+**Phase 7 – lý do do người dùng gõ khi đổi trạng thái xác minh:** là trường cá nhân (có thể chứa tên). `workflow.transition()` ghi qua khóa logic ảo `status_reason` (khai báo trong `PERSONAL_FIELDS["workers.Worker"]`, nhãn "Lý do" ở `history_labels`): `AuditLog.changes` chỉ có "(xem giá trị chi tiết)", giá trị nằm ở `AuditPersonalValue` (bị xóa khi ẩn danh hóa), và `AuditLog.note` **không** chứa lý do người gõ. Lý do hệ thống tự điền (chỉ có mã hồ sơ) vẫn ghi ở `note` như cũ. Không đụng trigger của `AuditLog`.
+
 Ghi nhật ký qua một hàm duy nhất `apps.audit.services.log(...)`, không tạo `AuditLog` trực tiếp ở view. Hàm này tự tách trường cá nhân sang `AuditPersonalValue` theo `PERSONAL_FIELDS`.
 
 Chữ ký (đã cài ở Phase 2, `apps/audit/services.py`):
@@ -361,6 +363,7 @@ Unique (`worker`, `field_name`).
 | `from_status` | `CharField(20, choices=VerificationStatus, blank)` | Có | Trống ở dòng tạo hồ sơ |
 | `to_status` | `CharField(20, choices=VerificationStatus)` | Có | |
 | `reason` | `TextField(blank)` | Theo điều kiện | Xem bảng chuyển trạng thái ở mục 4. Lý do hệ thống tự điền chỉ dùng mã hồ sơ, không họ tên; ô nhập tay có gợi ý "Không ghi họ tên, chỉ dùng mã hồ sơ", không chặn lưu (câu 30) |
+| `reason_by_user` | `BooleanField(default=False)` | Tự động | **Phase 7.** `True` khi lý do do người dùng gõ; `False` khi hệ thống tự điền (kể cả "Sửa trường định danh: …"). `workflow.transition()` đặt giá trị. Migration điền lại dữ liệu cũ: `changed_by` rỗng hoặc lý do bắt đầu bằng "Sửa trường định danh:" thì `False`, còn lại có chữ thì `True`. `anonymize()` chỉ thay lý do của các dòng `True` |
 | `changed_by` | `FK(User, null)` | Tự động | Rỗng = Hệ thống |
 | `changed_at` | `DateTimeField(auto_now_add)` | Tự động | |
 
@@ -571,6 +574,7 @@ Mọi cặp không có trong bảng: từ chối. Viewer: từ chối mọi chuy
 **Cách cài ở Phase 4 (`apps/workers/workflow.py`, `rules.py`):**
 - `transition(worker, to_status, user, reason, *, trigger, identity_fields, request)` khóa dòng hồ sơ (`select_for_update`), đọc lại trạng thái rồi mới kiểm tra, nên hai người bấm cùng lúc chỉ một lần thành công. `trigger` là `MANUAL` (người dùng), `SYSTEM` (tác vụ hằng ngày, `user = None`) hoặc `IDENTITY_EDIT` (sửa họ tên, ngày sinh, số CCCD khi Đã xác minh; chỉ cặp Đã xác minh → Chờ duyệt đi được bằng trigger này, không có đường thủ công).
 - Hai loại lỗi: `TransitionForbidden` (sai vai trò, tự duyệt, tác nhân không được phép) → view trả 403; `TransitionError` (cặp không có trong bảng, thiếu lý do, thiếu trường gửi duyệt, đang Thử việc/Đang làm việc, đã ẩn danh) → không đổi gì, báo lỗi tiếng Việt. Thứ tự kiểm: tác nhân → vai trò → không tự duyệt → điều kiện trạng thái → lý do → trường bắt buộc.
+- **Phase 7 – lý do người gõ:** với `trigger = MANUAL` và `reason` khác rỗng, `transition()` ghi `StatusChange.reason_by_user = True` và đưa lý do vào `log(changes={"status_reason": ("", reason)})` (trường cá nhân, xem 3.2) thay vì `note`. Với `SYSTEM` và `IDENTITY_EDIT`, lý do do hệ thống tự điền nên `reason_by_user = False` và vẫn ghi ở `note`.
 - **Chặn Thử việc/Đang làm việc áp dụng cho MỌI đường chuyển sang Lưu trữ** (thủ công từ Nháp, Cần bổ sung, Bị từ chối, Đã xác minh và tự động), không chỉ dòng Đã xác minh: theo câu 9 (tự Lưu trữ không áp dụng cho người đang làm việc, kể cả hồ sơ nhập từ Excel đang ở Nháp) và câu 38. **[Nội bộ] cần khách xác nhận** cùng mục E của `lam-ro-yeu-cau.md`.
 - Lý do hệ thống tự điền: `Sửa trường định danh: <tên trường>` (không có giá trị), `Hệ thống tự chuyển hồ sơ <mã> sang <trạng thái>`, và với tự Lưu trữ: `Tự Lưu trữ: … (hồ sơ <mã>)`, `Hồ sơ bỏ dở (hồ sơ <mã>)`. Căn cứ "Hồ sơ bỏ dở" của `retention_info` nhận ra bằng lý do bắt đầu bằng "Hồ sơ bỏ dở" **và** người thực hiện là Hệ thống.
 - Ma trận 4.4 ở `apps/workers/rules.py` (`can_edit_profile`, `can_add_document`, `can_replace_document`, `can_verify_document`); hồ sơ đã ẩn danh hóa thì mọi hàm trả `False`.
@@ -650,6 +654,7 @@ Họ tên, SĐT (đã bắt buộc từ Nháp) + ngày sinh, giới tính, quố
 | `SalaryHistory` (v1.1) | **Xóa mọi dòng của hồ sơ** (lương tháng, đơn giá, lý do, ngày áp dụng, người sửa; xóa theo `worker`): ngoại lệ có kiểm soát của bảng chỉ thêm, chỉ trong `anonymize()` (đã ghi vào ngoại lệ "không xóa cứng" của `CLAUDE.md`) | — |
 | `AuditPersonalValue` | **Xóa mọi dòng của hồ sơ** (câu 30) | — |
 | `AuditLog` | Không đổi; thêm một dòng `ANONYMIZE` (`object_repr` = mã hồ sơ, `note` = số biên bản) | Toàn bộ dòng cũ: ai, khi nào, hành động, tên trường thay đổi |
-| `StatusChange`, `LoginHistory` | Giữ nguyên | Toàn bộ |
+| `StatusChange` | **Phase 7:** `reason` của các dòng `reason_by_user = True` (lý do người dùng gõ, có thể chứa tên) được thay bằng "(đã ẩn danh)": ngoại lệ có kiểm soát của bảng chỉ thêm, chỉ trong `anonymize()` (`retention._redact_status_reasons`), có test quét mã nguồn. Lý do hệ thống tự điền (`reason_by_user = False`, chỉ có mã hồ sơ) giữ nguyên | Dòng thời gian trạng thái, người thực hiện, thời điểm, lý do hệ thống |
+| `LoginHistory` | Giữ nguyên | Toàn bộ |
 
 Bảng này áp dụng như nhau cho cả hai loại ẩn danh hóa: hết hạn lưu trữ (`EXPIRED`, Admin duyệt từ danh sách chờ hủy) và theo yêu cầu của chủ thể (`SUBJECT_REQUEST`, câu 38). Dòng `AuditLog` `ANONYMIZE` ghi loại và số biên bản trong `note`.

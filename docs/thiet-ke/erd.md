@@ -227,6 +227,7 @@ erDiagram
         varchar from_status "VerificationStatus"
         varchar to_status "VerificationStatus"
         text reason "bắt buộc: Cần bổ sung, Bị từ chối, Đã xác minh sang Lưu trữ; hệ thống tự điền không họ tên"
+        boolean reason_by_user "Phase 7: true khi lý do do người dùng gõ; ẩn danh hóa thay bằng (đã ẩn danh)"
         bigint changed_by_id FK "rỗng khi Hệ thống"
         datetime changed_at
     }
