@@ -1,8 +1,12 @@
 """Viewer không nhận trường nhạy cảm (câu 13) trong HTML trả về, kể cả mảnh HTMX.
 
 Trường nhạy cảm: số CCCD đầy đủ, CMND cũ, địa chỉ thường trú, quê quán, nơi đăng ký khai sinh,
-ảnh CCCD (liên kết xem/tải tài liệu), mức lương mong muốn. Viewer vẫn thấy SĐT, nơi ở hiện tại và
-số CCCD dạng che. Có nhóm đối chứng HR để chứng minh test không rỗng.
+ảnh CCCD (liên kết xem/tải tài liệu). Viewer vẫn thấy SĐT, nơi ở hiện tại và số CCCD dạng che.
+Có nhóm đối chứng HR để chứng minh test không rỗng.
+
+Đổi theo phiếu thay đổi v1.1 đã ký (câu 13, 42, 48): **mức lương mong muốn không còn ẩn với
+Viewer**, nên đã bỏ khỏi FORBIDDEN và test "không có cột mức lương" đổi thành "có cột". Đây là
+sửa test vì yêu cầu đã đổi, không phải nới kiểm tra: các trường nhạy cảm còn lại giữ nguyên.
 """
 
 import pytest
@@ -24,8 +28,6 @@ FORBIDDEN = [
     SENSITIVE["permanent_address"],
     SENSITIVE["hometown"],
     SENSITIVE["birth_registration_place"],
-    SENSITIVE["salary_text"],
-    str(SENSITIVE["salary"]),
     SENSITIVE["file_name"],
 ]
 TABS = ["ca-nhan", "tuyen-dung", "lam-viec", "tai-lieu", "lich-su"]
@@ -69,10 +71,13 @@ def test_viewer_van_thay_sdt_noi_o_hien_tai_va_so_cccd_da_che(worker):
         assert label not in page
 
 
-def test_viewer_tab_tuyen_dung_khong_co_cot_muc_luong(worker):
+def test_viewer_tab_tuyen_dung_thay_cot_muc_luong_tu_v11(worker):
+    # Câu 13 cũ ẩn cột này với Viewer; v1.1 (câu 42, 48) mở cho mọi vai trò.
     _, page = html(login_client(make_user("VIEWER")), f"/ho-so/{worker.pk}/?tab=tuyen-dung")
-    assert "Mức lương mong muốn" not in page
+    assert "Mức lương mong muốn" in page and SENSITIVE["salary_text"] in page
     assert "Trường Giả" in page  # học vấn vẫn thấy
+    # Viewer chỉ xem: không có nút thêm/sửa/xóa ở tab.
+    assert "Thêm lần ứng tuyển" not in page and "/sua/" not in page and "Xóa dòng" not in page
 
 
 def test_viewer_tab_tai_lieu_thay_loai_ngay_trang_thai_nhung_khong_ten_tep_hay_lien_ket(worker):

@@ -525,53 +525,92 @@ def _personal_tab(request, worker, employment, identity, staff, role):
 
 
 def _recruitment_tab(request, worker, employment, identity, staff, role):
+    # Từ v1.1 (câu 48) mức lương mong muốn hiện với mọi vai trò, kể cả Viewer.
+    can_edit = rules.can_edit_work_tabs(request.user, worker)
     columns = [
         {"key": "position", "label": "Vị trí", "kind": "text"},
         {"key": "source", "label": "Nguồn", "kind": "text"},
         {"key": "applied_date", "label": "Ngày ứng tuyển", "kind": "date"},
+        {"key": "salary", "label": "Mức lương mong muốn", "kind": "num"},
+        {"key": "status", "label": "Trạng thái tuyển dụng", "kind": "badge"},
     ]
-    if staff:  # mức lương mong muốn ẩn với Viewer (câu 13): không có cả cột lẫn giá trị
-        columns.append({"key": "salary", "label": "Mức lương mong muốn", "kind": "num"})
-    columns.append({"key": "status", "label": "Trạng thái tuyển dụng", "kind": "badge"})
+
+    def edit_action(url):
+        return [_link("bi-pencil", "Sửa", url)] if can_edit else []
+
+    def delete_menu(kind, pk, label):
+        return {
+            "kind": "menu",
+            "label": "Thêm",
+            "items": [
+                {
+                    "label": "Xóa dòng",
+                    "post_url": f"/{kind}/{pk}/xoa/",
+                    "title": f"Xóa dòng {label}",
+                    "message": f"Xóa dòng {label} này? Giá trị cũ được ghi vào nhật ký.",
+                    "danger": True,
+                }
+            ],
+        }
+
     applications = []
     for app in worker.applications.select_related("position", "source"):
-        row = {
-            "position": app.position.name,
-            "source": app.source.name,
-            "applied_date": app.applied_date,
-            "status": app.status,
-        }
-        if staff:
-            row["salary"] = _money(app.expected_salary)
-        applications.append(row)
-    education = [
-        {
-            "level": e.education_level.name,
-            "school": e.school_name,
-            "major": e.major,
-            "years": _years(e.start_year, e.end_year),
-        }
-        for e in worker.education.select_related("education_level")
-    ]
-    certificates = [
-        {
-            "name": c.name,
-            "issuer": c.issuer,
-            "issue_date": c.issue_date,
-            "expiry_date": c.expiry_date,
-        }
-        for c in worker.certificates.all()
-    ]
-    experiences = [
-        {
-            "company": x.company_name,
-            "job_title": x.job_title,
-            "start_date": x.start_date,
-            "end_date": x.end_date,
-        }
-        for x in worker.work_experiences.all()
-    ]
+        applications.append(
+            {
+                "position": app.position.name,
+                "source": app.source.name,
+                "applied_date": app.applied_date,
+                "salary": _money(app.expected_salary),
+                "status": app.status,
+                "actions": edit_action(f"/ung-tuyen/{app.pk}/sua/"),
+            }
+        )
+    education, certificates, experiences = [], [], []
+    for e in worker.education.select_related("education_level"):
+        education.append(
+            {
+                "level": e.education_level.name,
+                "school": e.school_name,
+                "major": e.major,
+                "years": _years(e.start_year, e.end_year),
+                "actions": edit_action(f"/hoc-van/{e.pk}/sua/")
+                + ([delete_menu("hoc-van", e.pk, "học vấn")] if can_edit else []),
+            }
+        )
+    for c in worker.certificates.all():
+        certificates.append(
+            {
+                "name": c.name,
+                "issuer": c.issuer,
+                "issue_date": c.issue_date,
+                "expiry_date": c.expiry_date,
+                "actions": edit_action(f"/chung-chi/{c.pk}/sua/")
+                + ([delete_menu("chung-chi", c.pk, "chứng chỉ")] if can_edit else []),
+            }
+        )
+    for x in worker.work_experiences.all():
+        experiences.append(
+            {
+                "company": x.company_name,
+                "job_title": x.job_title,
+                "start_date": x.start_date,
+                "end_date": x.end_date,
+                "actions": edit_action(f"/kinh-nghiem/{x.pk}/sua/")
+                + ([delete_menu("kinh-nghiem", x.pk, "kinh nghiệm")] if can_edit else []),
+            }
+        )
+    actions_col = [{"key": "actions", "label": "Thao tác", "kind": "actions"}] if can_edit else []
+    if can_edit:
+        columns = columns + actions_col
+    wid = worker.pk
     return {
+        "can_edit_work": can_edit,
+        "add_links": [
+            ("Thêm lần ứng tuyển", f"/ho-so/{wid}/ung-tuyen/them/"),
+            ("Thêm học vấn", f"/ho-so/{wid}/hoc-van/them/"),
+            ("Thêm chứng chỉ", f"/ho-so/{wid}/chung-chi/them/"),
+            ("Thêm kinh nghiệm", f"/ho-so/{wid}/kinh-nghiem/them/"),
+        ],
         "app_columns": columns,
         "app_rows": applications,
         "education_columns": [
@@ -579,21 +618,24 @@ def _recruitment_tab(request, worker, employment, identity, staff, role):
             {"key": "school", "label": "Trường", "kind": "text"},
             {"key": "major", "label": "Ngành", "kind": "text"},
             {"key": "years", "label": "Năm", "kind": "text", "nowrap": True},
-        ],
+        ]
+        + actions_col,
         "education_rows": education,
         "certificate_columns": [
             {"key": "name", "label": "Chứng chỉ", "kind": "text"},
             {"key": "issuer", "label": "Nơi cấp", "kind": "text"},
             {"key": "issue_date", "label": "Ngày cấp", "kind": "date"},
             {"key": "expiry_date", "label": "Ngày hết hạn", "kind": "date"},
-        ],
+        ]
+        + actions_col,
         "certificate_rows": certificates,
         "experience_columns": [
             {"key": "company", "label": "Công ty", "kind": "text"},
             {"key": "job_title", "label": "Chức danh", "kind": "text"},
             {"key": "start_date", "label": "Từ ngày", "kind": "date"},
             {"key": "end_date", "label": "Đến ngày", "kind": "date"},
-        ],
+        ]
+        + actions_col,
         "experience_rows": experiences,
         "skills": worker.skills.strip() if worker.skills else "",
     }

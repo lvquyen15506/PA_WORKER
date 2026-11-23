@@ -190,7 +190,7 @@ V thấy danh sách tài liệu (loại, ngày, trạng thái) nhưng không có
 | `/ho-so/<id>/ung-tuyen/them/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | |
 | `/ung-tuyen/<id>/sua/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` | Không đạt bắt buộc lý do |
 | `/ung-tuyen/<id>/tiep-nhan/` | G, P | ✓ | ✓ | ✓ | | `CREATE`, `UPDATE` | Nút chỉ hiện và máy chủ chỉ nhận khi Đạt + Đã xác minh (câu 7); form thông tin làm việc ban đầu |
-| `/ho-so/<id>/hoc-van/`, `/chung-chi/`, `/kinh-nghiem/` (them, `<id>/sua`, `<id>/xoa`) | G, P, H | ✓ | ✓ | ✓ | | `CREATE`, `UPDATE`, `UPDATE` (xóa dòng) | Thêm nhiều dòng. Cho xóa dòng vì không bảng nào trỏ tới các dòng này; giá trị cũ ghi vào nhật ký |
+| `/ho-so/<id>/<loai>/them/`, `/<loai>/<id>/sua/`, `/<loai>/<id>/xoa/` với `<loai>` = `hoc-van`, `chung-chi`, `kinh-nghiem` (xóa chỉ nhận POST; loại khác → 404; chốt ở Phase 6) | G, P, H | ✓ | ✓ | ✓ | | `CREATE`, `UPDATE`, `UPDATE` (xóa dòng) | Thêm nhiều dòng. Cho xóa dòng vì không bảng nào trỏ tới các dòng này; giá trị cũ ghi vào nhật ký |
 
 Từ v1.1 mức lương mong muốn **không còn ẩn** với V ở trang Tuyển dụng và tab Tuyển dụng (câu 48). V vẫn không có nút xuất Excel (câu 18).
 

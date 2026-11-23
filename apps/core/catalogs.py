@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 
 from django import forms
 
+from .formfields import active_or_current
 from .models import (
     ApplicationSource,
     ClientCompany,
@@ -192,16 +193,6 @@ def similar_client_companies(name, exclude_pk=None):
     ]
 
 
-def _active_or_current(queryset, current):
-    """Ô chọn khi tạo/sửa: chỉ mục đang dùng, cộng mục hiện tại của bản ghi (dữ liệu cũ)."""
-    from django.db.models import Q
-
-    condition = Q(is_active=True)
-    if current is not None:
-        condition |= Q(pk=current.pk)
-    return queryset.filter(condition)
-
-
 class CatalogForm(forms.ModelForm):
     catalog = None  # gán khi tạo lớp qua catalog_form_class
 
@@ -210,7 +201,7 @@ class CatalogForm(forms.ModelForm):
         for name, f in self.fields.items():
             if isinstance(f, forms.ModelChoiceField):
                 current = getattr(self.instance, name, None) if self.instance.pk else None
-                f.queryset = _active_or_current(f.queryset, current)
+                f.queryset = active_or_current(f.queryset, current)
                 f.empty_label = "— Chọn —" if f.required else "Không thuộc nhóm nào"
             if name in self.catalog.help_texts:
                 f.help_text = self.catalog.help_texts[name]

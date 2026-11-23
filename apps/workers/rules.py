@@ -57,6 +57,18 @@ def can(user, worker, action):
     return code in allowed
 
 
+def can_edit_work_tabs(user, worker):
+    """Tab Tuyển dụng và Quá trình làm việc thao tác được ở mọi trạng thái trừ Bị từ chối và Lưu trữ
+    (câu 36); vai trò A, Q, H; hồ sơ đã ẩn danh hóa thì không ai sửa. Viewer không có quyền nào."""
+    code = role_code(user)
+    if code not in ALL_STAFF or worker.anonymized_at is not None:
+        return False
+    return worker.verification_status not in (
+        VerificationStatus.REJECTED,
+        VerificationStatus.ARCHIVED,
+    )
+
+
 def can_edit_profile(user, worker):
     return can(user, worker, EDIT_PROFILE)
 

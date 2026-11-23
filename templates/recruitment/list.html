@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Tuyển dụng{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Tuyển dụng" %}
+{% include "components/_filter_bar.html" with form=form reset_url="/tuyen-dung/" %}
+{% include "components/_table.html" with columns=columns rows=rows empty_text="Không có lần ứng tuyển phù hợp." empty_action_label="Xóa lọc" empty_action_url="/tuyen-dung/" %}
+{% include "components/_pagination.html" with page=page query=query %}
+{% endblock %}

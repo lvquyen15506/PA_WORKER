@@ -157,7 +157,121 @@ def part_settings(browser, s, size):
         ctx.close()
 
 
-PARTS = {"cai-dat": part_settings}
+# ===== Tuyển dụng ================================================================================
+UI_WORKER_CODE = "HS-UI-P6"
+
+
+def ensure_ui_worker():
+    """Hồ sơ Nháp dành riêng cho kiểm thử giao diện (tên hư cấu); trả pk."""
+    return int(
+        db(
+            "from apps.workers.models import Worker;from apps.accounts.models import User;"
+            f"w=Worker.objects.filter(worker_code='{UI_WORKER_CODE}').first() or "
+            f"Worker.objects.create(worker_code='{UI_WORKER_CODE}',full_name='Nguyễn Văn Thử Giao Diện',"
+            "phone='0900000666',created_by=User.objects.get(username='admin'));print(w.pk)"
+        )
+    )
+
+
+def part_recruitment(browser, s, size):
+    pk = ensure_ui_worker()
+    tab = f"/ho-so/{pk}/?tab=tuyen-dung"
+    ctx, page = new_page(browser, size)
+    login(page, "hr")
+    goto(page, tab)
+    check(
+        f"[{s}] HR: tab Tuyển dụng có 4 nút thêm",
+        all(
+            page.locator(f"a.btn:has-text('{t}')").count() == 1
+            for t in ("Thêm lần ứng tuyển", "Thêm học vấn", "Thêm chứng chỉ", "Thêm kinh nghiệm")
+        ),
+    )
+    check(f"[{s}] HR: tab Tuyển dụng không cuộn ngang", no_h_scroll(page))
+    pw.shot(OUT, page, s, "10-tab-tuyen-dung")
+
+    # thêm lần ứng tuyển: sai rồi đúng
+    page.click("a.btn:has-text('Thêm lần ứng tuyển')")
+    page.wait_for_load_state("networkidle")
+    page.select_option("select[name=position]", index=1)
+    page.select_option("select[name=source]", index=1)
+    page.fill("input[name=applied_date]", "01/03/2026")
+    page.select_option("select[name=status]", "FAILED")
+    pw.shot(OUT, page, s, "11-them-ung-tuyen")
+    submit(page, "Lưu lần ứng tuyển")
+    check(f"[{s}] HR: Không đạt thiếu lý do bị báo lỗi", "Nhập lý do không đạt." in page.content())
+    pw.shot(OUT, page, s, "12-ung-tuyen-loi")
+    page.fill("textarea[name=reject_reason]", "Không đủ sức khỏe theo khám tuyển")
+    page.fill("input[name=expected_salary]", "8500000")
+    submit(page, "Lưu lần ứng tuyển")
+    check(f"[{s}] HR: thêm lần ứng tuyển thành công", "Đã thêm lần ứng tuyển." in page.content())
+    check(
+        f"[{s}] HR: bảng hiện mức lương 8.500.000 đ và nhãn Không đạt",
+        "8.500.000 đ" in page.content()
+        and page.locator(".pa-badge:has-text('Không đạt')").count() >= 1,
+    )
+
+    # học vấn: thêm, sửa sai, xóa qua hộp xác nhận
+    goto(page, f"/ho-so/{pk}/hoc-van/them/")
+    page.select_option("select[name=education_level]", index=3)
+    page.fill("input[name=school_name]", f"Trường Thử {RUN_ID}")
+    page.fill("input[name=start_year]", "2020")
+    page.fill("input[name=end_year]", "2015")
+    submit(page, "Lưu học vấn")
+    check(
+        f"[{s}] HR: năm kết thúc trước năm bắt đầu bị báo lỗi",
+        "Năm kết thúc phải sau hoặc bằng năm bắt đầu." in page.content(),
+    )
+    page.fill("input[name=end_year]", "2023")
+    submit(page, "Lưu học vấn")
+    check(f"[{s}] HR: thêm học vấn thành công", f"Trường Thử {RUN_ID}" in page.content())
+    pw.shot(OUT, page, s, "13-tab-tuyen-dung-day-du")
+    confirm_menu(page, f"Trường Thử {RUN_ID}", "Xóa dòng")
+    check(
+        f"[{s}] HR: xóa dòng học vấn qua hộp xác nhận",
+        "Đã xóa dòng học vấn." in page.content()
+        and f"Trường Thử {RUN_ID}"
+        not in page.locator("table").first.inner_text()
+        + "".join(t.inner_text() for t in page.locator("table").all()),
+    )
+    ctx.close()
+
+    # Viewer: thấy lương mong muốn (v1.1), không có nút, 403 khi gọi thẳng
+    ctx, page = new_page(browser, size)
+    login(page, "viewer")
+    goto(page, tab)
+    check(
+        f"[{s}] Viewer: thấy mức lương mong muốn, không có nút thêm/sửa",
+        "8.500.000 đ" in page.content()
+        and page.locator("a.btn:has-text('Thêm')").count() == 0
+        and "/sua/" not in page.content(),
+    )
+    check(
+        f"[{s}] Viewer: gọi thẳng URL thêm bị 403",
+        goto(page, f"/ho-so/{pk}/ung-tuyen/them/") == 403,
+    )
+    goto(page, "/tuyen-dung/")
+    check(
+        f"[{s}] Viewer: /tuyen-dung/ mở được, có cột Mức lương",
+        "Mức lương mong muốn" in page.content(),
+    )
+    check(f"[{s}] Viewer: /tuyen-dung/ không cuộn ngang", no_h_scroll(page))
+    pw.shot(OUT, page, s, "14-tuyen-dung-viewer")
+    ctx.close()
+
+    ctx, page = new_page(browser, size)
+    login(page, "quanly")
+    goto(page, "/tuyen-dung/?trang_thai=FAILED")
+    check(f"[{s}] Quản lý: lọc Không đạt thấy hồ sơ thử", UI_WORKER_CODE in page.content())
+    goto(page, "/tuyen-dung/?trang_thai=NEW,SCREENING,INTERVIEW")
+    check(
+        f"[{s}] Quản lý: lọc nhiều trạng thái không thấy hồ sơ Không đạt",
+        UI_WORKER_CODE not in page.content(),
+    )
+    pw.shot(OUT, page, s, "15-tuyen-dung-loc")
+    ctx.close()
+
+
+PARTS = {"cai-dat": part_settings, "tuyen-dung": part_recruitment}
 
 
 def main():

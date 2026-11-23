@@ -1,20 +1,28 @@
+{% if can_edit_work %}
+<div class="mb-3 d-flex flex-wrap gap-2">
+  {% for label, url in add_links %}<a class="btn btn-outline-secondary" href="{{ url }}">{{ label }}</a>{% endfor %}
+</div>
+{% endif %}
 <section class="pa-form-section">
   <h2 class="pa-card-title">Lần ứng tuyển</h2>
   {% include "components/_table.html" with columns=app_columns rows=app_rows empty_text="Chưa có lần ứng tuyển nào." %}
 </section>
 <section class="pa-form-section">
   <h2 class="pa-card-title">Học vấn</h2>
-  {% include "components/_table.html" with columns=education_columns rows=education_rows empty_text="Chưa có thông tin học vấn." %}
+  {% include "components/_table.html" with columns=education_columns rows=education_rows modal_id="child-delete-modal" empty_text="Chưa có thông tin học vấn." %}
 </section>
 <section class="pa-form-section">
   <h2 class="pa-card-title">Chứng chỉ</h2>
-  {% include "components/_table.html" with columns=certificate_columns rows=certificate_rows empty_text="Chưa có chứng chỉ nào." %}
+  {% include "components/_table.html" with columns=certificate_columns rows=certificate_rows modal_id="child-delete-modal" empty_text="Chưa có chứng chỉ nào." %}
 </section>
 <section class="pa-form-section">
   <h2 class="pa-card-title">Kinh nghiệm làm việc</h2>
-  {% include "components/_table.html" with columns=experience_columns rows=experience_rows empty_text="Chưa có kinh nghiệm làm việc nào." %}
+  {% include "components/_table.html" with columns=experience_columns rows=experience_rows modal_id="child-delete-modal" empty_text="Chưa có kinh nghiệm làm việc nào." %}
 </section>
 <section class="pa-form-section">
   <h2 class="pa-card-title">Kỹ năng</h2>
   {% if skills %}<p class="pa-view-value">{{ skills|linebreaksbr }}</p>{% else %}{% include "components/_empty_state.html" with text="Chưa ghi kỹ năng." %}{% endif %}
 </section>
+{% if can_edit_work %}
+  {% include "components/_confirm_modal.html" with id="child-delete-modal" title="Xóa dòng" message="" action="" confirm_label="Xóa dòng" danger=True %}
+{% endif %}
