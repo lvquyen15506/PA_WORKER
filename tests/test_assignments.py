@@ -14,10 +14,11 @@ from django.db import connection
 from django.urls import Resolver404, resolve
 
 from apps.audit.models import AuditLog, AuditPersonalValue
-from apps.core.models import ClientCompany, Position, SystemSetting
+from apps.core.models import ClientCompany, Position, Shift, SystemSetting
 from apps.employment import assignments as svc
 from apps.employment.assignments import AssignmentError
 from apps.employment.models import Employment, SalaryHistory, WorkAssignment
+from apps.employment.services import EmploymentError
 from apps.workers import indicators
 from apps.workers.models import Worker
 from tests.factories import (
@@ -48,6 +49,8 @@ def manager():
 def employee(status="ACTIVE", verification="DRAFT"):
     worker = make_worker_in_status(verification) if verification != "DRAFT" else make_worker()
     make_employment(worker, status)
+    # Bắt đầu làm từ lâu để thử được ngày nghỉ việc trong quá khứ gần.
+    Employment.objects.filter(worker=worker).update(start_date=days(-400))
     Worker.objects.filter(pk=worker.pk).update(employee_code=f"CN-T{worker.pk:05d}")
     worker.refresh_from_db()
     return worker
@@ -706,3 +709,76 @@ def test_viewer_thay_luong_cua_dot_hien_tai_tu_v11():
         login_client(make_user("VIEWER")).get(f"/ho-so/{worker.pk}/?tab=lam-viec").content.decode()
     )
     assert "6.543.210" in page
+
+
+# ----- Hồi quy từ /code-review Phase 6 -----
+def test_nghi_viec_cat_dot_ket_thuc_du_kien_sau_ngay_nghi_luong_hen_het_hieu_luc():
+    from tests.test_employment import change
+
+    worker = employee()
+    a = add(worker, start=days(-60), end=days(200))  # dự kiến kết thúc sau ngày nghỉ
+    pay(a, amount=1_000_000, day=days(-60))
+    pay(a, amount=2_000_000, day=days(-5))
+    change(worker, status="RESIGNED", resign_date=days(-10), resign_reason="SELF")
+    a.refresh_from_db()
+    assert a.end_date == days(-10)
+    entry = AuditLog.objects.filter(
+        action="UPDATE", object_type="employment.WorkAssignment", note__contains="nghỉ việc"
+    ).first()
+    assert entry.changes[f"work_assignments[{a.pk}].end_date"] == [str(days(200)), str(days(-10))]
+    assert svc.current_assignment(worker, TODAY) is None
+    # Dòng lương 2.000.000 áp dụng sau ngày nghỉ vẫn còn trong lịch sử nhưng không có hiệu lực.
+    assert SalaryHistory.objects.filter(assignment=a).count() == 2
+    assert svc.current_salary(a, TODAY).monthly_salary == 1_000_000
+    assert indicators.assignment_due_info(days=3650).get(worker.pk) is None
+
+
+def test_ngay_ap_dung_luong_kiem_lai_tren_dot_vua_sua_o_phien_khac():
+    worker = employee()
+    a = add(worker, start=days(-60), end=days(30))
+    stale = WorkAssignment.objects.get(pk=a.pk)  # phiên A đọc đợt cũ (kết thúc +30)
+    svc.update_assignment(
+        hr(),
+        a,
+        client_company=a.client_company,
+        position=a.position,
+        start_date=days(-60),
+        end_date=days(-20),  # phiên B rút ngắn đợt
+        note="",
+    )
+    with pytest.raises(AssignmentError) as exc:
+        pay(stale, day=days(0))  # ngày 0 hợp lệ với đối tượng cũ nhưng nằm ngoài đợt hiện tại
+    assert "nằm trong đợt làm việc" in exc.value.errors["effective_date"]
+    assert not SalaryHistory.objects.exists()
+
+
+def test_chon_hai_phien_cung_luc_nguoi_quan_ly_khong_tao_vong_va_khong_la_nguoi_da_nghi():
+    from tests.test_employment import change
+
+    a, b, gone = employee(), employee(), employee()
+    change(a, manager=b)
+    with pytest.raises(EmploymentError) as exc:
+        change(b, manager=a)  # a đang là cấp dưới của b: sẽ thành vòng
+    assert "vòng quản lý" in exc.value.errors["manager"]
+    change(gone, status="RESIGNED", resign_date=days(-1), resign_reason="SELF")
+    with pytest.raises(EmploymentError) as exc:
+        change(b, manager=gone)
+    assert "đã nghỉ việc" in exc.value.errors["manager"]
+    # Giữ nguyên người quản lý hiện tại dù người đó nghỉ sau đó: vẫn đổi được trường khác.
+    change(b, status="RESIGNED", resign_date=days(-1), resign_reason="SELF")
+    change(a, shift=Shift.objects.create(name="Ca khác"), manager=b)  # b nghỉ rồi, a vẫn giữ b
+
+
+def test_hai_dot_chong_nhau_trong_du_lieu_cu_lay_dot_bat_dau_som_nhat():
+    worker = employee()
+    base = company("Công ty Cũ", "Cũ 1")
+    WorkAssignment.objects.create(  # dữ liệu cũ chồng lấn (service không cho tạo)
+        worker=worker,
+        client_company=base,
+        position=position(),
+        start_date=days(-400),
+        end_date=None,
+        created_by=hr(),
+    )
+    info = indicators.assignment_due_info(worker_ids=[worker.pk])
+    assert info[worker.pk][1] == days(-400)

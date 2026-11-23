@@ -840,3 +840,80 @@ def test_form_sua_ung_tuyen_hoc_van_chung_chi_kinh_nghiem_dien_san():
     assert 'value="Trường điền sẵn"' in client.get(f"/hoc-van/{edu.pk}/sua/").content.decode()
     assert 'value="Chứng chỉ điền sẵn"' in client.get(f"/chung-chi/{cert.pk}/sua/").content.decode()
     assert 'value="Công ty điền sẵn"' in client.get(f"/kinh-nghiem/{exp.pk}/sua/").content.decode()
+
+
+# ----- Hồi quy từ /code-review Phase 6 -----
+def test_lan_ung_tuyen_cu_van_giu_trang_thai_dat_sau_khi_quay_lai_tiep_nhan_lan_hai():
+    from apps.recruitment import services as recruitment_services
+
+    worker = onboarded("ACTIVE")
+    first_app = Employment.objects.get(worker=worker).application
+    assert recruitment_services.was_onboarded(first_app)
+    # Quay lại làm với lần ứng tuyển thứ hai: lần thứ nhất không còn gắn với Employment.
+    change(worker, status="RESIGNED", resign_date=D(2026, 6, 1), resign_reason="SELF")
+    from apps.core.choices import VerificationStatus as VS
+    from apps.workers import services as worker_services
+    from apps.workers.workflow import transition
+
+    transition(
+        Worker.objects.get(pk=worker.pk), VS.ARCHIVED, make_user("HR_MANAGER"), reason="Nghỉ"
+    )
+    second = worker_services.reopen_worker(
+        hr(),
+        Worker.objects.get(pk=worker.pk),
+        position=Position.objects.first(),
+        source=first_app.source,
+    )
+    assert not recruitment_services.was_onboarded(second)  # lần mới chưa tiếp nhận
+    transition(Worker.objects.get(pk=worker.pk), VS.PENDING, make_user("HR_STAFF"))
+    transition(Worker.objects.get(pk=worker.pk), VS.VERIFIED, make_user("HR_MANAGER"))
+    recruitment_services.update_application(
+        hr(),
+        second,
+        position=second.position,
+        source=second.source,
+        applied_date=second.applied_date,
+        status="PASSED",
+    )
+    second.refresh_from_db()
+    services.onboard(hr(), second, **onboard_data(start_date=D(2026, 9, 1)))
+    first_app.refresh_from_db()
+    assert recruitment_services.was_onboarded(first_app)
+    with pytest.raises(recruitment_services.RecruitmentDataError, match="giữ trạng thái Đạt"):
+        recruitment_services.update_application(
+            hr(),
+            first_app,
+            position=first_app.position,
+            source=first_app.source,
+            applied_date=first_app.applied_date,
+            status="FAILED",
+            reject_reason="Đổi ý",
+        )
+
+
+def test_so_hop_dong_trung_do_dua_nhau_bao_loi_khong_ra_500_va_khong_mo_coi_tep(monkeypatch):
+    from apps.core.storage import private_storage
+
+    worker = onboarded("ACTIVE")
+    services.add_contract(hr(), worker, **contract_data())
+    before_docs = WorkerDocument.objects.count()
+    # Mô phỏng hai phiên cùng thêm một số: kiểm tra trùng ở bước giá trị bị bỏ qua.
+    monkeypatch.setattr(
+        services,
+        "_contract_values",
+        lambda **kw: {
+            "contract_no": "HD-2026-001",
+            "contract_type": "FIXED_TERM",
+            "signed_date": D(2026, 3, 1),
+            "effective_date": D(2026, 3, 5),
+            "expiry_date": D(2027, 3, 4),
+            "note": "",
+        },
+    )
+    stored_before = set(private_storage.listdir("")[1]) if private_storage.exists("") else set()
+    with pytest.raises(EmploymentError) as exc:
+        services.add_contract(hr(), worker, uploaded=pdf(), **contract_data(contract_no="HD-2"))
+    assert exc.value.errors["contract_no"] == "Số hợp đồng này đã được dùng."
+    assert WorkerDocument.objects.count() == before_docs and Contract.objects.count() == 1
+    stored_after = set(private_storage.listdir("")[1]) if private_storage.exists("") else set()
+    assert stored_after == stored_before  # không có tệp nào ghi ra khi trùng số

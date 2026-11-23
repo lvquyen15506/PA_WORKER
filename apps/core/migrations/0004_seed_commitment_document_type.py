@@ -2,7 +2,7 @@
 buộc. Migration riêng vì nơi đã cài đã chạy 0002_seed_catalogs; không ghi đè nếu đã có."""
 
 from django.db import migrations
-from django.db.models import Max
+from django.db.models import F, Max
 
 NAME = "Bản cam kết"
 
@@ -15,7 +15,8 @@ def seed(apps, schema_editor):
     other = DocType.objects.filter(name="Khác").first()
     if other is not None:
         order = other.sort_order
-        DocType.objects.filter(pk=other.pk).update(sort_order=order + 1)
+        # Dồn mọi loại từ vị trí của "Khác" trở đi lên 1 để không có hai loại trùng thứ tự.
+        DocType.objects.filter(sort_order__gte=order).update(sort_order=F("sort_order") + 1)
     else:
         order = (DocType.objects.aggregate(m=Max("sort_order"))["m"] or 0) + 1
     DocType.objects.create(name=NAME, system_code=None, required_group=None, sort_order=order)
@@ -25,8 +26,13 @@ def unseed(apps, schema_editor):
     DocType = apps.get_model("core", "DocumentType")
     WorkerDocument = apps.get_model("documents", "WorkerDocument")
     used = WorkerDocument.objects.filter(document_type__name=NAME).exists()
-    if not used:  # đã có tài liệu loại này thì giữ (không xóa bản ghi có liên kết)
-        DocType.objects.filter(name=NAME, system_code__isnull=True).delete()
+    if used:  # đã có tài liệu loại này thì giữ (không xóa bản ghi có liên kết)
+        return
+    target = DocType.objects.filter(name=NAME, system_code__isnull=True).first()
+    if target is not None:
+        order = target.sort_order
+        target.delete()
+        DocType.objects.filter(sort_order__gt=order).update(sort_order=F("sort_order") - 1)
 
 
 class Migration(migrations.Migration):

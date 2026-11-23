@@ -87,9 +87,11 @@ def assignment_due_info(today=None, days=None, months=None, worker_ids=None):
     scope = WorkAssignment.objects.filter(current_q(today))
     if worker_ids is not None:
         scope = scope.filter(worker_id__in=worker_ids)
-    current = {
-        a.worker_id: a for a in scope.select_related("client_company").order_by("start_date", "id")
-    }
+    current = {}
+    for a in scope.select_related("client_company").order_by("start_date", "id"):
+        # Một công nhân chỉ có một đợt đang diễn ra (service chặn chồng lấn); nếu dữ liệu cũ có
+        # nhiều đợt thì lấy đợt bắt đầu sớm nhất để chuỗi không bị tính muộn.
+        current.setdefault(a.worker_id, a)
     if not current:
         return {}
     by_worker = {}

@@ -12,9 +12,9 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.audit.services import log
-from apps.core.choices import AuditAction, RecruitmentStatus
+from apps.core.choices import AuditAction, EmploymentChangeType, RecruitmentStatus
 from apps.core.models import EducationLevel
-from apps.employment.models import Employment
+from apps.employment.models import Employment, EmploymentHistory
 from apps.workers import rules
 
 from .models import Application, Certificate, Education, WorkExperience
@@ -40,15 +40,28 @@ def _text(value):
     return (value or "").strip()
 
 
+def _lock(user, worker):
+    """Khóa dòng hồ sơ rồi kiểm tra lại quyền trên bản ghi vừa đọc: đối tượng truyền vào có thể đã
+    cũ (hồ sơ vừa chuyển Lưu trữ, hoặc vừa được tiếp nhận ở một phiên khác). Gọi trong giao dịch."""
+    from apps.workers.models import Worker
+
+    locked = Worker.objects.select_for_update().get(pk=worker.pk)
+    if not rules.can_edit_work_tabs(user, locked):
+        raise PermissionDenied
+    return locked
+
+
 def _create(user, worker, model, values, *, note, request):
-    row = model.objects.create(worker=worker, **values)
-    worker.touch()
-    changes = {
-        name: (None, value.name if hasattr(value, "name") else value)
-        for name, value in values.items()
-        if value not in (None, "")
-    }
-    log(AuditAction.CREATE, user=user, obj=row, changes=changes, note=note, request=request)
+    with transaction.atomic():
+        locked = _lock(user, worker)
+        row = model.objects.create(worker=locked, **values)
+        locked.touch()
+        changes = {
+            name: (None, value.name if hasattr(value, "name") else value)
+            for name, value in values.items()
+            if value not in (None, "")
+        }
+        log(AuditAction.CREATE, user=user, obj=row, changes=changes, note=note, request=request)
     return row
 
 
@@ -158,6 +171,8 @@ def _child_update(user, row, validator, noun, data, request):
     _check_editable(user, worker)
     values = validator(**data)
     with transaction.atomic():
+        locked = _lock(user, worker)
+        row = type(row).objects.select_for_update().get(pk=row.pk)
         changes = {}
         for name, new in values.items():
             old = getattr(row, name)
@@ -166,7 +181,7 @@ def _child_update(user, row, validator, noun, data, request):
             setattr(row, name, new)
         if changes:
             row.save()
-            worker.touch()
+            locked.touch()
             log(
                 AuditAction.UPDATE,
                 user=user,
@@ -201,6 +216,7 @@ def delete_child(user, row, request=None):
         if f.name not in {"id", "worker"} and getattr(row, f.name) not in (None, "")
     ]
     with transaction.atomic():
+        locked = _lock(user, worker)
         changes = {name: (_display(getattr(row, name)), None) for name in fields}
         log(
             AuditAction.UPDATE,
@@ -211,7 +227,7 @@ def delete_child(user, row, request=None):
             request=request,
         )
         row.delete()
-        worker.touch()
+        locked.touch()
 
 
 # --- Ứng tuyển (câu 7, mục IV.4) --------------------------------------------------------------
@@ -276,12 +292,29 @@ def _application_values(*, current=None, **data):
     }
 
 
+def was_onboarded(app):
+    """Lần ứng tuyển đã được tiếp nhận vào làm: đang gắn với Employment, hoặc đã từng (người quay
+    lại làm dùng lại dòng Employment nên lần ứng tuyển cũ không còn gắn). Lần Đạt tạo trước một
+    lượt tiếp nhận của cùng hồ sơ coi là đã tiếp nhận (chặt hơn một chút để không sót)."""
+    if Employment.objects.filter(application=app).exists():
+        return True
+    return (
+        app.status == RecruitmentStatus.PASSED
+        and EmploymentHistory.objects.filter(
+            worker_id=app.worker_id,
+            change_type=EmploymentChangeType.ONBOARD,
+            created_at__gte=app.created_at,
+        ).exists()
+    )
+
+
 def add_application(user, worker, *, request=None, **data):
     _check_editable(user, worker)
     values = _application_values(**data)
     with transaction.atomic():
-        app = Application.objects.create(worker=worker, created_by=user, **values)
-        worker.touch()
+        locked = _lock(user, worker)
+        app = Application.objects.create(worker=locked, created_by=user, **values)
+        locked.touch()
         changes = {
             name: (None, _display(value))
             for name, value in values.items()
@@ -303,14 +336,15 @@ def update_application(user, app, *, request=None, **data):
     worker = app.worker
     _check_editable(user, worker)
     values = _application_values(current=app, **data)
-    if (
-        Employment.objects.filter(application=app).exists()
-        and values["status"] != RecruitmentStatus.PASSED
-    ):
-        raise RecruitmentDataError(
-            {"status": "Lần ứng tuyển này đã được tiếp nhận vào làm nên giữ trạng thái Đạt."}
-        )
     with transaction.atomic():
+        # Khóa hồ sơ trước khi kiểm tra: "Tiếp nhận vào làm" cũng khóa dòng này nên hai thao tác
+        # cùng lúc được xếp tuần tự, không để Employment gắn với lần ứng tuyển đã bị đổi trạng thái.
+        locked = _lock(user, worker)
+        app = Application.objects.select_for_update().get(pk=app.pk)
+        if values["status"] != RecruitmentStatus.PASSED and was_onboarded(app):
+            raise RecruitmentDataError(
+                {"status": "Lần ứng tuyển này đã được tiếp nhận vào làm nên giữ trạng thái Đạt."}
+            )
         changes = {}
         for name, new in values.items():
             old = getattr(app, name)
@@ -319,7 +353,7 @@ def update_application(user, app, *, request=None, **data):
             setattr(app, name, new)
         if changes:
             app.save()
-            worker.touch()
+            locked.touch()
             log(
                 AuditAction.UPDATE,
                 user=user,

@@ -9,7 +9,7 @@ Lý do, ghi chú tự điền chỉ dùng mã hồ sơ, không họ tên (câu 3
 """
 
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from apps.audit.services import log
 from apps.core.choices import (
@@ -24,6 +24,7 @@ from apps.core.choices import (
 )
 from apps.core.codes import next_code
 from apps.core.models import DocumentType
+from apps.core.storage import private_storage
 from apps.workers import rules
 from apps.workers.models import Worker
 
@@ -89,6 +90,30 @@ def _check_structure(section, team, position, shift, manager, worker, current, e
             errors["manager"] = "Người quản lý trực tiếp không được là chính mình."
         elif not manager.employee_code or manager.anonymized_at:
             errors["manager"] = "Người quản lý phải là công nhân đã có mã nhân viên."
+        elif not (current is not None and current.manager_id == manager.pk):
+            # Giữ nguyên người quản lý hiện tại thì không kiểm lại (người đó có thể đã nghỉ sau).
+            boss = Employment.objects.filter(worker=manager).first()
+            if boss is None or boss.work_status == WorkStatus.RESIGNED:
+                errors["manager"] = "Người quản lý đã nghỉ việc hoặc chưa có thông tin làm việc."
+            elif _manager_loop(manager, worker):
+                errors["manager"] = (
+                    "Không tạo được vòng quản lý: người này đang là cấp dưới của bạn."
+                )
+
+
+def _manager_loop(manager, worker, limit=50):
+    """Đi ngược chuỗi người quản lý của `manager`; gặp `worker` nghĩa là sẽ thành vòng."""
+    seen, current = set(), manager
+    for _ in range(limit):
+        employment = Employment.objects.filter(worker=current).only("manager_id").first()
+        next_id = employment.manager_id if employment else None
+        if next_id is None or next_id in seen:
+            return False
+        if next_id == worker.pk:
+            return True
+        seen.add(next_id)
+        current = Worker(pk=next_id)
+    return False
 
 
 # --- Tiếp nhận vào làm (câu 6, 7) --------------------------------------------------------------
@@ -431,10 +456,17 @@ def add_contract(user, worker, *, uploaded=None, request=None, **data):
                 message="Hồ sơ chưa có thông tin làm việc nên chưa thêm hợp đồng."
             )
         values = _contract_values(**data)
-        document = _contract_document(user, locked, uploaded, request) if uploaded else None
-        contract = Contract.objects.create(
-            worker=locked, document=document, created_by=user, **values
-        )
+        contract = _create_contract_row(locked, user, values)
+        if uploaded:
+            # Tạo hợp đồng trước rồi mới tải tệp: số hợp đồng trùng (hai phiên cùng lúc) báo lỗi
+            # trước khi có tệp nào ghi ra đĩa; tải tệp lỗi thì giao dịch hủy cả hợp đồng.
+            document = _contract_document(user, locked, uploaded, request)
+            try:
+                contract.document = document
+                contract.save(update_fields=["document"])
+            except Exception:
+                _discard_file(document)
+                raise
         locked.touch()
         log(
             AuditAction.CREATE,
@@ -445,6 +477,20 @@ def add_contract(user, worker, *, uploaded=None, request=None, **data):
             request=request,
         )
     return contract
+
+
+def _create_contract_row(worker, user, values):
+    try:
+        with transaction.atomic():
+            return Contract.objects.create(worker=worker, created_by=user, **values)
+    except IntegrityError as exc:  # hai phiên cùng thêm một số hợp đồng
+        raise EmploymentError({"contract_no": "Số hợp đồng này đã được dùng."}) from exc
+
+
+def _discard_file(document):
+    """Xóa tệp vừa tải khi bước sau lỗi (giao dịch hủy dòng tài liệu, tệp thì không tự mất)."""
+    if document is not None and document.stored_file:
+        private_storage.delete(document.stored_file.name)
 
 
 def update_contract(user, contract, *, uploaded=None, request=None, **data):
@@ -462,11 +508,22 @@ def update_contract(user, contract, *, uploaded=None, request=None, **data):
         }
         for name, value in values.items():
             setattr(contract, name, value)
+        if changes:
+            try:
+                with transaction.atomic():
+                    contract.save()
+            except IntegrityError as exc:  # hai phiên cùng đổi sang một số hợp đồng
+                raise EmploymentError({"contract_no": "Số hợp đồng này đã được dùng."}) from exc
         if uploaded:
-            contract.document = _contract_document(user, locked, uploaded, request)
+            document = _contract_document(user, locked, uploaded, request)
+            try:
+                contract.document = document
+                contract.save(update_fields=["document"])
+            except Exception:
+                _discard_file(document)
+                raise
             changes["document"] = (None, "tệp mới")
         if changes:
-            contract.save()
             locked.touch()
             log(
                 AuditAction.UPDATE,

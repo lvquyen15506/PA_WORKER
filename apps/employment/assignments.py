@@ -9,6 +9,7 @@
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Q
 
 from apps.audit.services import log
 from apps.core.choices import AuditAction, RoleCode, WorkStatus
@@ -73,9 +74,11 @@ def current_assignment(worker, today):
 
 
 def current_salary(assignment, today):
-    """Mức hiện tại của đợt: dòng có ngày áp dụng lớn nhất không quá hôm nay (cùng ngày: sau)."""
+    """Mức hiện tại của đợt: dòng có ngày áp dụng lớn nhất không quá hôm nay (cùng ngày: sau).
+    Đợt đã kết thúc thì dòng hẹn áp dụng sau ngày kết thúc không có hiệu lực."""
+    limit = min(today, assignment.end_date) if assignment.end_date else today
     return (
-        SalaryHistory.objects.filter(assignment=assignment, effective_date__lte=today)
+        SalaryHistory.objects.filter(assignment=assignment, effective_date__lte=limit)
         .order_by("-effective_date", "-id")
         .first()
     )
@@ -255,20 +258,23 @@ def update_assignment(
 
 
 def close_open_on_resign(user, worker, resign_date, *, request=None):
-    """Công nhân chuyển sang Đã nghỉ việc thì đợt đang mở tự kết thúc vào ngày nghỉ việc (câu 40).
-    Gọi trong giao dịch của change_employment. Trả danh sách đợt đã đóng."""
+    """Công nhân chuyển sang Đã nghỉ việc thì đợt đang mở, hoặc đợt có ngày kết thúc dự kiến sau
+    ngày nghỉ, tự kết thúc vào ngày nghỉ việc (câu 40). Gọi trong giao dịch của change_employment.
+    Dòng lương hẹn áp dụng sau ngày nghỉ vẫn còn (lịch sử lương chỉ thêm) nhưng không có hiệu
+    lực (`current_salary`). Trả danh sách đợt đã đóng."""
     closed = []
     for assignment in WorkAssignment.objects.select_for_update().filter(
-        worker=worker, end_date__isnull=True
+        Q(end_date__isnull=True) | Q(end_date__gt=resign_date), worker=worker
     ):
         end = max(resign_date, assignment.start_date)  # ràng buộc: kết thúc không trước bắt đầu
+        old_end = assignment.end_date
         assignment.end_date = end
         assignment.save(update_fields=["end_date", "updated_at"])
         log(
             AuditAction.UPDATE,
             user=user,
             obj=assignment,
-            changes={"end_date": (None, end)},
+            changes={"end_date": (old_end, end)},
             note="Tự kết thúc đợt làm việc khi nghỉ việc",
             request=request,
         )
@@ -306,13 +312,6 @@ def add_salary(
         errors["reason"] = "Nhập lý do thay đổi."
     if not effective_date:
         errors["effective_date"] = "Nhập ngày áp dụng."
-    elif effective_date < assignment.start_date or (
-        assignment.end_date and effective_date > assignment.end_date
-    ):
-        end = f" đến {assignment.end_date:%d/%m/%Y}" if assignment.end_date else ""
-        errors["effective_date"] = (
-            f"Ngày áp dụng phải nằm trong đợt làm việc (từ {assignment.start_date:%d/%m/%Y}{end})."
-        )
     if errors:
         raise AssignmentError(errors)
     with transaction.atomic():
@@ -322,6 +321,17 @@ def add_salary(
         fresh = WorkAssignment.objects.select_for_update().get(pk=assignment.pk)
         if fresh.worker_id != locked.pk:
             raise AssignmentError(message="Đợt làm việc không thuộc hồ sơ này.")
+        # Kiểm tra khoảng ngày trên bản ghi vừa khóa: đợt có thể vừa được sửa ở phiên khác.
+        if effective_date < fresh.start_date or (
+            fresh.end_date and effective_date > fresh.end_date
+        ):
+            end = f" đến {fresh.end_date:%d/%m/%Y}" if fresh.end_date else ""
+            raise AssignmentError(
+                {
+                    "effective_date": "Ngày áp dụng phải nằm trong đợt làm việc "
+                    f"(từ {fresh.start_date:%d/%m/%Y}{end})."
+                }
+            )
         row = SalaryHistory.objects.create(
             assignment=fresh,
             worker=locked,
