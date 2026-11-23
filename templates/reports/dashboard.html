@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tổng quan{% endblock %}
+{% block content %}
+{% include "components/_page_header.html" with title="Tổng quan" %}
+
+<div class="row g-3 mb-4">
+  {% for card in cards %}
+  <div class="col-sm-6 col-lg-4">{% include "components/_stat_card.html" with label=card.label value=card.value sub=card.sub url=card.url %}</div>
+  {% endfor %}
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">{% include "reports/_chart.html" with chart=charts.in_out %}</div>
+  <div class="col-lg-6">{% include "reports/_chart.html" with chart=charts.department %}</div>
+</div>
+<div class="row g-3 mb-3">
+  {% for item in charts.structure %}
+  <div class="col-lg-4">{% include "reports/_chart.html" with chart=item %}</div>
+  {% endfor %}
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-12">{% include "reports/_chart.html" with chart=charts.verification %}</div>
+</div>
+
+<h2 class="pa-section__title">Việc cần làm</h2>
+<div class="row g-3">
+  {% for block in todo %}
+  <div class="{% if block.code == 'assignment_due' %}col-12{% else %}col-lg-6{% endif %}">
+    <div class="pa-form-section">
+      <h3 class="pa-card-title">{{ block.title }} ({{ block.count }})</h3>
+      {% if block.rows %}
+        {% include "components/_table.html" with columns=block.columns rows=block.rows %}
+        {% if block.count > block.rows|length %}<p class="pa-small mb-0"><a href="{{ block.url }}">Xem tất cả ({{ block.count }})</a></p>{% endif %}
+      {% else %}
+        {% include "components/_empty_state.html" with text="Không có việc nào cần làm." %}
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script src="{% static 'js/pa-charts.js' %}"></script>
+{% endblock %}

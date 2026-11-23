@@ -1,4 +1,4 @@
-"""Trang chung: trang chủ tạm, giới thiệu, bộ giao diện mẫu /ui-kit/."""
+"""Trang chung: giới thiệu, bộ giao diện mẫu /ui-kit/ (trang chủ là Dashboard ở apps.reports)."""
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -7,11 +7,6 @@ from apps.accounts.permissions import role_required
 
 from . import ui_kit
 from .choices import RoleCode
-
-
-@login_required
-def home(request):
-    return render(request, "home.html")
 
 
 @login_required

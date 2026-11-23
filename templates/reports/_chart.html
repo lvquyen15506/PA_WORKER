@@ -1,0 +1,6 @@
+{# Một biểu đồ Chart.js (tiêu đề nói kết quả + đơn vị). Tham số: chart = {id, title, aria, cfg}. #}
+<div class="pa-form-section">
+  <h3 class="pa-card-title">{{ chart.title }}</h3>
+  <div class="pa-chart"><canvas data-pa-chart="{{ chart.id }}" aria-label="{{ chart.aria }}" role="img"></canvas></div>
+  {{ chart.cfg|json_script:chart.id }}
+</div>
