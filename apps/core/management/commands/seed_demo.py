@@ -18,8 +18,9 @@ import random
 from contextlib import contextmanager
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 from faker import Faker
@@ -411,6 +412,13 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Bản Thật không bao giờ nạp dữ liệu giả lập (lẫn với dữ liệu doanh nghiệp, tạo tài khoản
+        # mẫu) – docs/lam-ro-yeu-cau.md câu 49, docs/ra-soat-bao-mat.md mục 2.
+        if not settings.DEMO_MODE:
+            raise CommandError(
+                "Đây là bản cài Thật (DEMO_MODE=0 trong tệp .env) nên không nạp dữ liệu giả lập. "
+                "Tạo tài khoản Admin đầu tiên bằng lệnh: python manage.py create_first_admin"
+            )
         today = timezone.localdate()
         with transaction.atomic():
             passwords = self.seed_users(options["reset_passwords"])

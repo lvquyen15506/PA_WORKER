@@ -15,3 +15,5 @@ def khoa_test(settings, tmp_path):
     settings.PRIVATE_MEDIA_ROOT = tmp_path / "private_media"
     # Băm nhanh chỉ trong test để chạy nhanh; cấu hình thật dùng PBKDF2 (có test riêng).
     settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+    # Môi trường test là bản Demo (seed_demo được chạy); test chặn ở bản Thật tự đặt False.
+    settings.DEMO_MODE = True

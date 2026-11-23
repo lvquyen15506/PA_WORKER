@@ -230,6 +230,7 @@ Câu 16 cho lưu người từ 15 đến dưới 18 tuổi, nên Dashboard và b
 ### 31. Cất giữ khóa mã hóa [Nội bộ]
 - `FIELD_ENCRYPTION_KEY` (mã hóa) và `HASH_KEY` (băm) được sinh **một lần khi cài đặt** và nằm trong `.env`.
 - Hai khóa **không nằm trong file sao lưu**. Script sao lưu (Phase 8) nhắc người dùng cất bản sao khóa ở nơi riêng (USB hoặc giấy niêm phong). Mất khóa thì không đọc lại được dữ liệu đã mã hóa từ bản sao lưu.
+- **[Nội bộ, Phase 8, câu 49]** Từ Phase 8 **cả file sao lưu được mã hóa** bằng khóa sinh từ `FIELD_ENCRYPTION_KEY`, nên **mất khóa là mất toàn bộ bản sao lưu** (không chỉ các trường đã mã hóa).
 - Thiếu khóa, khóa sai định dạng, hoặc khóa không khớp dữ liệu hiện có (kiểm tra bằng giá trị kiểm tra lưu trong Cài đặt, xem `docs/thiet-ke/kien-truc.md` mục 7) thì ứng dụng **từ chối khởi động** với thông báo rõ ràng bằng tiếng Việt.
 - **Giới hạn đã biết:** MVP không hỗ trợ đổi khóa.
 
@@ -282,6 +283,7 @@ Các điểm khác:
 - Câu 33–37: "Ứng viên từ chối" lưu 12 tháng; chỉ QL/Admin xác minh tài liệu; Bị từ chối chỉ xem; Chờ duyệt chỉ khóa phần được duyệt; giới tính Nam/Nữ.
 - Câu 9 (làm rõ ở Phase 4) [Nội bộ]: chặn Lưu trữ khi trạng thái làm việc là Thử việc hoặc Đang làm việc áp dụng cho **mọi** đường chuyển sang Lưu trữ (thủ công từ Nháp, Cần bổ sung, Bị từ chối, Đã xác minh, và tự động), không chỉ từ Đã xác minh.
 - Câu 5/9 (làm rõ ở Phase 4) [Nội bộ]: sửa hồ sơ đang Đã xác minh phải giữ đủ các trường bắt buộc khi gửi duyệt (không cho xóa trắng ngày sinh, giới tính, nơi ở, loại giấy tờ, số CCCD...).
+- Câu 49 (Phase 8): hai chế độ cài Demo/Thật; file sao lưu mã hóa, mất khóa thì không phục hồi được bản sao lưu; chỉ hỗ trợ Windows.
 - **v1.1 (mục F) đã ký ngày 23/11/2026: không cần xác nhận lại** các câu 39–47. Riêng các chi tiết thiết kế do đơn vị phát triển điền thêm, đánh dấu [Nội bộ] hoặc [Giả định] trong mục F, vẫn cần xác nhận cùng các điểm trên (danh sách ở cuối mục F).
 
 ## F. Thay đổi v1.1 (đã ký 23/11/2026)
@@ -353,3 +355,16 @@ Do người phụ trách dự án chốt khi rà thiết kế, **chưa xác nh�
 ### Điểm còn mở của mục F
 1. Công ty khách có hai dòng cùng tên khác địa điểm: bộ lọc và báo cáo coi là hai công ty khác nhau (mỗi dòng một công ty). Nếu khách muốn gộp theo tên thì phải đổi thiết kế danh mục.
 2. Đợt có lương rồi thì ngày bắt đầu/kết thúc sửa lại không được làm các dòng lương nằm ngoài khoảng ngày của đợt.
+
+## G. Bàn giao (Phase 8)
+
+### 49. Cài đặt, sao lưu và phạm vi bàn giao [Nội bộ] (24/11/2026)
+Do người phụ trách dự án chốt khi lập kế hoạch Phase 8, **chưa xác nhận với khách hàng**:
+1. **Hai chế độ cài**, chọn bằng `DEMO_MODE` trong `.env` (`make_env.py --mode demo|that`, `PA Worker.bat` hỏi khi cài):
+   - **Demo:** `seed_demo` chạy được (4 tài khoản mẫu, ~500 hồ sơ giả). 17 kịch bản nghiệm thu (mục X) chạy trên chế độ này, vì kịch bản 1 đòi "có sẵn 4 tài khoản mẫu và khoảng 500 hồ sơ giả lập".
+   - **Thật** (mặc định, `DEMO_MODE=0`): `seed_demo` từ chối chạy; Admin đầu tiên tạo bằng `create_first_admin` (mật khẩu tạm in ra màn hình một lần, buộc đổi). Quên mật khẩu Admin: `reset_admin_password`.
+2. **HTTPS tùy chọn, tắt mặc định** (`HTTPS=1` khi có reverse proxy). Bản bàn giao chạy HTTP trong mạng nội bộ; mục VIII "HTTPS khi triển khai thật" là bước nâng cấp, ghi trong hướng dẫn.
+3. **File sao lưu được mã hóa** (AES-GCM theo khúc, khóa sinh bằng HKDF từ `FIELD_ENCRYPTION_KEY`); khóa không nằm trong file. Mất khóa thì không đọc được bản sao lưu (sửa câu 31). Cần khách xác nhận cùng mục E.
+4. **Sao lưu tự động hằng ngày** do container `scheduler` chạy (giữ 14 bản mới nhất, cấu hình được); Task Scheduler của Windows chỉ dùng để chép bản sao lưu ra ổ ngoài.
+5. **Chỉ hỗ trợ Windows**: không làm hướng dẫn macOS, tệp `.command` và phương án không Docker (yêu cầu mục I và `docs/phases.md` có nhắc macOS); macOS cần khách đồng ý bổ sung.
+6. **Bản phát hành** là tệp zip tạo bằng `git archive`; cập nhật = sao lưu → chép bản mới đè lên (giữ `.env`, `backups/`) → build lại (`Cap nhat.bat`).
