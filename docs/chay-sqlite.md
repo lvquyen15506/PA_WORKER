@@ -1,5 +1,7 @@
 # Chạy thử bằng SQLite (không cần Docker)
 
+**Tài liệu này chỉ dành cho người phát triển, không phải cho người dùng cuối (khách hàng).** Người cài đặt dùng hướng dẫn Windows trong `docs/huong-dan-cai-dat.md`.
+
 Chỉ để chạy thử nhanh trên máy chưa có Docker. Bản chạy thật dùng Docker + PostgreSQL (xem `docs/chay-dev.md`). Hướng dẫn đầy đủ cho người không chuyên IT làm ở Phase 8.
 
 **Giới hạn của bản SQLite:** không có trigger chặn sửa/xóa nhật ký ở CSDL (vẫn chặn ở tầng ứng dụng), không có khóa chống chạy chồng của tác vụ định kỳ, và **không chạy `pytest` trên SQLite** (toàn bộ test bắt buộc dùng PostgreSQL).
