@@ -8,3 +8,6 @@
 *.woff2 binary
 *.png binary
 *.jpg binary
+
+# Không đưa vào bản phát hành (git archive)
+/docker-compose.dev.yml export-ignore
