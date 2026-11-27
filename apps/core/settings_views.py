@@ -4,6 +4,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -96,9 +97,19 @@ def catalog_home(request):
     return redirect(f"/cai-dat/danh-muc/{CATALOGS[0].slug}/")
 
 
-@admin_only
+CLIENT_COMPANY_SLUG = "cong-ty-khach"
+
+
+@role_required(RoleCode.ADMIN, RoleCode.HR_MANAGER)
 def catalog_list(request, loai):
     catalog = _catalog_or_404(loai)
+    # v1.1.1: Quản lý nhân sự chỉ xem danh mục công ty khách (mục "Công ty khách" ở sidebar);
+    # các danh mục khác và mọi thao tác thêm/sửa/ngừng vẫn chỉ Admin.
+    can_edit = request.user.role.code == RoleCode.ADMIN
+    if not can_edit:
+        if catalog.slug != CLIENT_COMPANY_SLUG:
+            raise PermissionDenied
+        return _catalog_readonly(request, catalog)
     picked = request.GET.get("loai")
     if picked and picked != catalog.slug and picked in BY_SLUG:
         return redirect(f"/cai-dat/danh-muc/{picked}/")
@@ -146,6 +157,27 @@ def catalog_list(request, loai):
         "header_actions": [
             {"label": f"Thêm {catalog.noun}", "kind": "primary", "url": f"{base}/them/"}
         ],
+    }
+    return render(request, "core/settings_catalog.html", context)
+
+
+def _catalog_readonly(request, catalog):
+    """Danh sách chỉ xem (Q): không tab Cài đặt, không nút thêm/sửa/ngừng."""
+    page = Paginator(catalog.model.objects.all(), PAGE_SIZE).get_page(request.GET.get("trang"))
+    columns = [{"key": key, "label": label, "kind": "text"} for key, label, _ in catalog.columns]
+    columns.append({"key": "status", "label": "Trạng thái", "kind": "badge"})
+    rows = []
+    for obj in page:
+        row = {key: getter(obj) for key, _, getter in catalog.columns}
+        row["status"] = badges.CATALOG_ACTIVE if obj.is_active else badges.CATALOG_STOPPED
+        rows.append(row)
+    context = {
+        "catalog": catalog,
+        "crumbs": [(catalog.title, None)],
+        "columns": columns,
+        "rows": rows,
+        "page": page,
+        "readonly": True,
     }
     return render(request, "core/settings_catalog.html", context)
 

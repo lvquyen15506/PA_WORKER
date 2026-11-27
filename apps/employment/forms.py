@@ -117,9 +117,58 @@ class OnboardForm(_StructureMixin, forms.Form):
             ]
         )
 
+        # v1.1.1: phần không bắt buộc "Gán công ty khách ngay" (đợt làm việc đầu tiên).
+        self.fields["assign_client_company"] = forms.ModelChoiceField(
+            label="Công ty khách hàng",
+            required=False,
+            queryset=ClientCompany.objects.filter(is_active=True).order_by("name", "location"),
+            empty_label="Chưa gán",
+            help_text="Không bắt buộc. Để trống nếu chưa biết công nhân làm cho công ty nào.",
+        )
+        self.fields["assign_position"] = forms.ModelChoiceField(
+            label="Vị trí tại công ty khách",
+            required=False,
+            queryset=Position.objects.filter(is_active=True).order_by("name"),
+            empty_label="— Chọn —",
+        )
+        self.fields["assign_start_date"] = date_field("Ngày bắt đầu tại công ty khách")
+
+    ASSIGN_FIELDS = ("assign_client_company", "assign_position", "assign_start_date")
+
+    def main_fields(self):
+        return [f for f in self.visible_fields() if f.name not in self.ASSIGN_FIELDS]
+
+    def assign_fields(self):
+        return [self[name] for name in self.ASSIGN_FIELDS]
+
+    def clean(self):
+        cleaned = super().clean()
+        company = cleaned.get("assign_client_company")
+        position = cleaned.get("assign_position")
+        start = cleaned.get("assign_start_date")
+        if company is None:
+            if position is not None or start is not None:
+                self.add_error(
+                    "assign_client_company",
+                    "Chọn công ty khách hàng, hoặc xóa vị trí và ngày bắt đầu nếu chưa gán.",
+                )
+            return cleaned
+        if position is None:
+            self.add_error("assign_position", "Chọn vị trí tại công ty khách.")
+        if start is None:
+            self.add_error("assign_start_date", "Nhập ngày bắt đầu tại công ty khách.")
+        return cleaned
+
     def service_data(self):
         data = {k: self.cleaned_data[k] for k in ("received_date", "start_date")}
         data.update(self.structure_data())
+        company = self.cleaned_data.get("assign_client_company")
+        if company is not None:
+            data["assignment"] = {
+                "client_company": company,
+                "position": self.cleaned_data["assign_position"],
+                "start_date": self.cleaned_data["assign_start_date"],
+            }
         return data
 
 

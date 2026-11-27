@@ -12,7 +12,7 @@ from playwright.sync_api import sync_playwright
 from pw_phase5 import check, db, goto, login, new_page, no_h_scroll
 
 OUT = pw.ROOT / "docs" / "screenshots" / "phase-8"
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 # Trang 400 được gọi cố ý (sai địa chỉ) và kiểm tra riêng ở bước "400 sai địa chỉ".
 pw.EXPECTED_NOISE = pw.EXPECTED_NOISE + ("status of 400",)
 

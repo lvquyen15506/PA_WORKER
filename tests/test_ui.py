@@ -85,8 +85,9 @@ def test_ui_kit_hien_moi_component_va_moi_trang_thai():
 @pytest.mark.parametrize(
     "role,expected",
     [
-        ("ADMIN", 9),
-        ("HR_MANAGER", 7),
+        # v1.1.1: thêm mục "Công ty khách" cho A, Q (docs/thiet-ke/trang.md mục 2)
+        ("ADMIN", 10),
+        ("HR_MANAGER", 8),
         ("HR_STAFF", 5),
         ("VIEWER", 4),
     ],
@@ -114,7 +115,7 @@ def test_khung_trang_co_sidebar_thanh_tren_chan_trang():
     body = login(make_user("HR_STAFF")).get("/").content.decode()
     assert "pa-sidebar" in body and "pa-topbar" in body
     # Phase 8: phiên bản lấy từ settings.APP_VERSION (bàn giao v1.1.0), không viết cứng "1.0".
-    assert "PA Worker v1.1.0 · Phát triển bởi QQIT" in body
+    assert "PA Worker v1.1.1 · Phát triển bởi QQIT" in body
     assert "Đổi mật khẩu" in body and "Đăng xuất" in body
     assert "pa-page-header" in body
     assert "Nhật ký thao tác" not in body  # H không có mục này

@@ -164,7 +164,8 @@ def worker_list(request):
                 "date_of_birth": worker.date_of_birth,
                 "gender": _label(Gender, worker.gender),
                 "phone": worker.phone,
-                "client": str(clients[worker.pk]) if worker.pk in clients else None,
+                # v1.1.1: chưa có đợt đang diễn ra thì ghi rõ "Chưa gán" (không để "—").
+                "client": str(clients[worker.pk]) if worker.pk in clients else "Chưa gán",
                 "position": employment.position.name if employment else None,
                 "start_date": employment.start_date if employment else None,
                 "status": worker.verification_status,
@@ -900,8 +901,24 @@ def _employment_tab(request, worker, employment, identity, staff, role):
             row["actions"].append(_link("bi-pencil", "Sửa hợp đồng", f"/hop-dong/{c.pk}/sua/"))
         contracts.append(row)
     assignment_context = _assignment_context(request, worker, employment, staff, can_edit)
+    # v1.1.1: chưa có mã NV thì chưa gán được công ty khách; nêu điều kiện và lối tới bước
+    # Tiếp nhận vào làm (nút chỉ khi người xem được sửa và đã đủ điều kiện, máy chủ kiểm tra lại).
+    onboard_url = None
+    if not worker.employee_code and can_edit:
+        ready = next(
+            (
+                app
+                for app in worker.applications.all()
+                if employment_services.can_onboard(app, worker)
+            ),
+            None,
+        )
+        if ready is not None:
+            onboard_url = f"/ung-tuyen/{ready.pk}/tiep-nhan/"
     return {
         "can_edit_work": can_edit,
+        "needs_onboard": not worker.employee_code,
+        "onboard_url": onboard_url,
         "work_links": [
             ("Ghi nhận thay đổi", f"/ho-so/{worker.pk}/lam-viec/thay-doi/", employment is not None),
             ("Thêm hợp đồng", f"/ho-so/{worker.pk}/hop-dong/them/", employment is not None),

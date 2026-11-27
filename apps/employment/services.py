@@ -143,9 +143,14 @@ def onboard(
     team=None,
     shift=None,
     manager=None,
+    assignment=None,
     request=None,
 ):
-    """Tiếp nhận một lần ứng tuyển Đạt vào làm. Trả Employment (trạng thái Chờ nhận việc)."""
+    """Tiếp nhận một lần ứng tuyển Đạt vào làm. Trả Employment (trạng thái Chờ nhận việc).
+
+    `assignment` (v1.1.1, không bắt buộc): {client_company, position, start_date} để gán công ty
+    khách ngay; đợt tạo qua `add_assignment` trong CÙNG giao dịch, lỗi đợt thì hủy cả tiếp nhận.
+    """
     worker = application.worker
     _check_editable(user, worker)
     errors = {}
@@ -251,6 +256,16 @@ def onboard(
             ),
             request=request,
         )
+        if assignment:
+            from .assignments import AssignmentError, add_assignment
+
+            try:
+                add_assignment(user, locked, request=request, **assignment)
+            except AssignmentError as exc:
+                # Đổi tên trường sang ô của form tiếp nhận; ngoại lệ làm hủy cả giao dịch.
+                raise EmploymentError(
+                    {f"assign_{k}": v for k, v in exc.errors.items()}, message=exc.message
+                ) from exc
     return employment
 
 

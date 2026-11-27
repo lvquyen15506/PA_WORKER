@@ -3,6 +3,10 @@
   {% for label, url, shown in work_links %}{% if shown %}<a class="btn btn-outline-secondary" href="{{ url }}">{{ label }}</a>{% endif %}{% endfor %}
 </div>
 {% endif %}
+{% if needs_onboard %}
+{% include "components/_alert.html" with kind="info" text="Muốn gán công ty khách, cần Tiếp nhận vào làm trước. Điều kiện: có lần ứng tuyển ở trạng thái Đạt và hồ sơ Đã xác minh. Khi tiếp nhận, hệ thống cấp mã nhân viên và có thể gán công ty khách ngay." %}
+{% if onboard_url %}<div class="mb-3"><a class="btn btn-outline-secondary" href="{{ onboard_url }}">Tiếp nhận vào làm</a></div>{% endif %}
+{% endif %}
 {% if assignment_warning %}{% include "components/_alert.html" with kind="warning" text=assignment_warning %}{% endif %}
 {% if employment_items %}
   {% include "components/_form_section.html" with title="Thông tin hiện tại" items=employment_items %}

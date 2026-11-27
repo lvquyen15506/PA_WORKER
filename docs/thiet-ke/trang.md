@@ -24,6 +24,7 @@ Phase 1 · Ngày 21/11/2026 · Cập nhật v1.1 ngày 23/11/2026 · Dựa trên
 | Duyệt hồ sơ | `bi-check2-square` | `/duyet-ho-so/` | ✓ | ✓ | | |
 | Báo cáo | `bi-bar-chart` | `/bao-cao/` | ✓ | ✓ | ✓ | ✓ |
 | Nhật ký thao tác | `bi-clock-history` | `/nhat-ky/` | ✓ | ✓ | | |
+| Công ty khách | `bi-building` | `/cai-dat/danh-muc/cong-ty-khach/` | ✓ | ✓ | | |
 | Tài khoản | `bi-person-gear` | `/tai-khoan/` | ✓ | | | |
 | Cài đặt | `bi-gear` | `/cai-dat/` | ✓ | | | |
 
@@ -95,7 +96,7 @@ Trang admin của Django không được bật.
 | URL | PT | A | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- |
 | `/cai-dat/` | G | ✓ | | Chuyển tới tab đầu tiên đang có (Phase 5: OCR và QR; Phase 6 đổi về Danh mục). Danh sách tab khai báo một chỗ: `SETTINGS_TABS` ở `apps/core/settings_views.py` |
-| `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu`, `cong-ty-khach` (v1.1, câu 39: 10 loại; bảng có cột Tên và Địa điểm; hai dòng không trùng cả tên lẫn địa điểm; ngừng sử dụng thay cho xóa) |
+| `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu`, `cong-ty-khach` (v1.1, câu 39: 10 loại; bảng có cột Tên và Địa điểm; hai dòng không trùng cả tên lẫn địa điểm; ngừng sử dụng thay cho xóa). **v1.1.1:** riêng `cong-ty-khach` Q được **xem** danh sách (không tab Cài đặt, không nút Thêm/Sửa/Ngừng); thêm/sửa/ngừng vẫn chỉ A |
 | `/cai-dat/danh-muc/<loai>/them/`, `/<id>/sua/` | G, P | ✓ | `CREATE`, `UPDATE` | |
 | `/cai-dat/danh-muc/<loai>/<id>/ngung/`, `/<id>/dung-lai/` | P | ✓ | `UPDATE` | Không có nút xóa |
 | `/cai-dat/sinh-ma/` | G, P | ✓ | `UPDATE` | Tiền tố, có năm, số chữ số cho mã hồ sơ và mã NV; xem trước mã kế tiếp |
@@ -139,7 +140,7 @@ Bộ lọc của 9 thẻ:
 
 | URL | PT | A | Q | H | V | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/ho-so/` | G | ✓ | ✓ | ✓ | ✓ | | **Tham số thêm ở Phase 7 (liên kết thẻ Dashboard):** `trang_thai_ho_so=chua-luu-tru` (mọi hồ sơ trừ Lưu trữ), `trang_thai_lam_viec` nhận danh sách cách nhau dấu phẩy (`PROBATION,ACTIVE`), `tao_tu`/`tao_den` (ngày tạo hồ sơ, dd/mm/yyyy), `nghi_tu`/`nghi_den` (ngày nghỉ việc), `cccd_sap_het_han=1`. Cột theo mục IV.7; lọc: phòng ban, bộ phận, chức danh, trình độ, 3 bộ trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày tiếp nhận, **công ty khách hàng** (`?cong_ty_khach=<id>`, theo đợt đang diễn ra) và **đợt sắp đủ 12 tháng** (`?dot_sap_du_han=1`) (v1.1); bộ lọc bộ phận có thêm lựa chọn "Chưa có bộ phận" (`?bo_phan=chua-co`; v1.1, câu 48); **cột "Công ty khách" thay cột "Bộ phận"** (vẫn 12 cột; công nhân chưa có đợt đang diễn ra hiện "—"); `q` tìm mã hồ sơ, mã NV, họ tên không dấu, SĐT; `q` 12 chữ số tìm theo băm CCCD **chỉ với A, Q, H**; sắp xếp theo cột; 20 dòng/trang; bộ lọc giữ trong phiên |
+| `/ho-so/` | G | ✓ | ✓ | ✓ | ✓ | | **Tham số thêm ở Phase 7 (liên kết thẻ Dashboard):** `trang_thai_ho_so=chua-luu-tru` (mọi hồ sơ trừ Lưu trữ), `trang_thai_lam_viec` nhận danh sách cách nhau dấu phẩy (`PROBATION,ACTIVE`), `tao_tu`/`tao_den` (ngày tạo hồ sơ, dd/mm/yyyy), `nghi_tu`/`nghi_den` (ngày nghỉ việc), `cccd_sap_het_han=1`. Cột theo mục IV.7; lọc: phòng ban, bộ phận, chức danh, trình độ, 3 bộ trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày tiếp nhận, **công ty khách hàng** (`?cong_ty_khach=<id>`, theo đợt đang diễn ra) và **đợt sắp đủ 12 tháng** (`?dot_sap_du_han=1`) (v1.1); bộ lọc bộ phận có thêm lựa chọn "Chưa có bộ phận" (`?bo_phan=chua-co`; v1.1, câu 48); **cột "Công ty khách" thay cột "Bộ phận"** (vẫn 12 cột; công nhân chưa có đợt đang diễn ra hiện "Chưa gán" (v1.1.1)); `q` tìm mã hồ sơ, mã NV, họ tên không dấu, SĐT; `q` 12 chữ số tìm theo băm CCCD **chỉ với A, Q, H**; sắp xếp theo cột; 20 dòng/trang; bộ lọc giữ trong phiên |
 | `/ho-so/xuat-excel/` | G | ✓ | ✓ | ✓ | | `EXPORT` | Cùng tham số lọc và thứ tự sắp xếp với `/ho-so/`. **Chốt Phase 7:** CCCD luôn che (`0791••••2345`); số CCCD đầy đủ chỉ qua **POST có CSRF** với `cccd_day_du=1` (bộ lọc vẫn nằm trên URL), chỉ nhận với A, Q (H gửi → 403; GET luôn ra bản che) và nhật ký `EXPORT` ghi "có số CCCD đầy đủ". Cột: 11 cột như màn hình + "Mã hồ sơ" + "Số CCCD"; không có lương. Nhật ký không ghi chữ tìm kiếm `q`. Nút ở `/ho-so/`: H có "Xuất Excel"; A, Q có "Xuất Excel ▾" gồm "Xuất Excel" và "Xuất kèm số CCCD đầy đủ" (qua `_confirm_modal`) |
 | `/ho-so/them/` | G | ✓ | ✓ | ✓ | | | Chọn cách thêm |
 | `/ho-so/them/nhap-tay/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | Lưu Nháp: chỉ cần họ tên + SĐT; sinh mã hồ sơ |
@@ -196,7 +197,7 @@ V thấy danh sách tài liệu (loại, ngày, trạng thái) nhưng không có
 | `/tuyen-dung/` | G | ✓ | ✓ | ✓ | ✓ | | Danh sách lần ứng tuyển, lọc theo trạng thái tuyển dụng, vị trí, nguồn, khoảng ngày. Cột "Mức lương mong muốn" hiện với mọi vai trò kể cả V (v1.1, câu 48) |
 | `/ho-so/<id>/ung-tuyen/them/` | G, P | ✓ | ✓ | ✓ | | `CREATE` | |
 | `/ung-tuyen/<id>/sua/` | G, P | ✓ | ✓ | ✓ | | `UPDATE` | Không đạt bắt buộc lý do |
-| `/ung-tuyen/<id>/tiep-nhan/` | G, P | ✓ | ✓ | ✓ | | `CREATE`, `UPDATE` | Nút chỉ hiện và máy chủ chỉ nhận khi Đạt + Đã xác minh (câu 7); form thông tin làm việc ban đầu |
+| `/ung-tuyen/<id>/tiep-nhan/` | G, P | ✓ | ✓ | ✓ | | `CREATE`, `UPDATE` | Nút chỉ hiện và máy chủ chỉ nhận khi Đạt + Đã xác minh (câu 7); form thông tin làm việc ban đầu. **v1.1.1:** phần không bắt buộc "Gán công ty khách ngay" (công ty, vị trí, ngày bắt đầu); có điền thì tạo đợt qua `add_assignment` trong cùng giao dịch |
 | `/ho-so/<id>/<loai>/them/`, `/<loai>/<id>/sua/`, `/<loai>/<id>/xoa/` với `<loai>` = `hoc-van`, `chung-chi`, `kinh-nghiem` (xóa chỉ nhận POST; loại khác → 404; chốt ở Phase 6) | G, P, H | ✓ | ✓ | ✓ | | `CREATE`, `UPDATE`, `UPDATE` (xóa dòng) | Thêm nhiều dòng. Cho xóa dòng vì không bảng nào trỏ tới các dòng này; giá trị cũ ghi vào nhật ký |
 
 Từ v1.1 mức lương mong muốn **không còn ẩn** với V ở trang Tuyển dụng và tab Tuyển dụng (câu 48). V vẫn không có nút xuất Excel (câu 18).

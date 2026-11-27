@@ -167,9 +167,9 @@ Thử từ máy khác: mở Chrome/Edge, gõ `http://<IP máy chủ>:8000`. Th�
 3. Hệ thống chuyển ngay tới trang **Đổi mật khẩu**: nhập mật khẩu tạm, rồi mật khẩu mới hai lần. Mật khẩu mới tối thiểu 8 ký tự, có cả chữ và số.
 4. Admin vào **Tài khoản** để tạo tài khoản cho Quản lý nhân sự, Nhân viên HR, Viewer (xem [Hướng dẫn sử dụng](huong-dan-su-dung.md#admin)).
 
-![Trang đăng nhập](screenshots/phase-8/01-dang-nhap-1366x768.png)
+![Trang đăng nhập](ban-giao/anh/dang-nhap.png)
 
-![Đổi mật khẩu lần đầu](screenshots/phase-3/doi-mat-khau-1366x768.png)
+![Đổi mật khẩu lần đầu](ban-giao/anh/doi-mat-khau.png)
 
 Đăng nhập sai 5 lần liên tiếp thì tài khoản bị khóa tạm 15 phút. Không thao tác 30 phút thì tự đăng xuất.
 
@@ -194,6 +194,8 @@ PA Worker **tự sao lưu mỗi ngày một lần**, khi máy chủ đang bật:
 ### 9.2 Sao lưu ngay
 
 Bấm đúp **`Sao luu.bat`**: hệ thống tạo ngay một bản sao lưu, báo dung lượng và nhắc cất khóa. Nên chạy trước khi làm việc lớn (nhập Excel hàng loạt, cập nhật phiên bản).
+
+![Cửa sổ Sao luu.bat (minh họa): dòng tên file sao lưu](ban-giao/anh/sao-luu-cua-so.png)
 
 ```
 Đang sao lưu…

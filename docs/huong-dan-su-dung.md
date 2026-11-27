@@ -1,8 +1,8 @@
 # Hướng dẫn sử dụng PA Worker
 
-Phiên bản 1.1.0 · Dành cho người dùng hằng ngày: Admin, Quản lý nhân sự, Nhân viên HR, Viewer.
+Phiên bản 1.1.1 · Dành cho người dùng hằng ngày: Admin, Quản lý nhân sự, Nhân viên HR, Viewer.
 
-Mở trình duyệt Chrome hoặc Edge, vào địa chỉ do Admin cung cấp (ví dụ `http://192.168.1.20:8000`). Ảnh minh họa chụp trên bản Demo; mọi tên người và số CCCD trong ảnh là **giả lập**.
+Mở trình duyệt Chrome hoặc Edge, vào địa chỉ do Admin cung cấp (ví dụ `http://192.168.1.20:8000`). Ảnh minh họa chụp trên bản Demo; mọi tên người và số CCCD trong ảnh là **giả lập**. **Khung đỏ** trên ảnh đánh dấu chỗ cần bấm hoặc cần nhập.
 
 ## Mục lục
 
@@ -22,7 +22,15 @@ Mở trình duyệt Chrome hoặc Edge, vào địa chỉ do Admin cung cấp (v
 - Đăng xuất: bấm tên của bạn → **Đăng xuất**. Không thao tác 30 phút thì tự đăng xuất.
 - Nhập sai mật khẩu 5 lần liên tiếp: tài khoản bị khóa tạm 15 phút. Cần gấp thì nhờ Admin mở khóa.
 
-![Đăng nhập](screenshots/phase-8/01-dang-nhap-1366x768.png)
+![Đăng nhập: nhập tên đăng nhập, mật khẩu rồi bấm Đăng nhập](ban-giao/anh/dang-nhap.png)
+
+![Đổi mật khẩu lần đầu](ban-giao/anh/doi-mat-khau.png)
+
+![Nhập sai 5 lần: thông báo khóa tạm](ban-giao/anh/thong-bao-khoa-tam.png)
+
+Mở một trang không thuộc quyền của bạn (ví dụ gõ thẳng địa chỉ) thì hệ thống hiện trang **Không có quyền truy cập**; bấm **Về trang tổng quan**.
+
+![Trang không có quyền (403)](ban-giao/anh/403-khong-quyen.png)
 
 ### Màn hình chính
 
@@ -30,7 +38,9 @@ Mở trình duyệt Chrome hoặc Edge, vào địa chỉ do Admin cung cấp (v
 - **Ô tìm nhanh** ở thanh trên: gõ mã hồ sơ, mã nhân viên, họ tên (có dấu hoặc không dấu, ví dụ `nguyen van an`) hoặc số điện thoại rồi nhấn Enter.
 - **Tổng quan (Dashboard):** 9 thẻ số liệu (bấm vào thẻ để mở danh sách đã lọc, số dòng đúng bằng số trên thẻ), biểu đồ, và **việc cần làm**: hồ sơ chờ duyệt, cần bổ sung, CCCD sắp hết hạn, đợt làm việc sắp đủ 12 tháng.
 
-![Tổng quan](screenshots/phase-7/kt-dashboard-1366x768.png)
+![Tổng quan: bấm vào thẻ số liệu để mở danh sách](ban-giao/anh/dashboard.png)
+
+![Ô tìm nhanh ở thanh trên](ban-giao/anh/tinh-nhan.png)
 
 ### Ba loại trạng thái
 
@@ -48,7 +58,9 @@ Tài liệu trong tab Tài liệu có thêm trạng thái xác minh riêng: Chư
 
 Menu **Hồ sơ công nhân**: thanh lọc gồm phòng ban, bộ phận (có lựa chọn "Chưa có bộ phận"), chức danh, trình độ, công ty khách, ba loại trạng thái, thiếu giấy tờ, hoàn thiện, khoảng ngày. Bấm **Lọc**; **Xóa lọc** để bỏ. Danh sách 20 dòng mỗi trang; bộ lọc được giữ khi bạn quay lại.
 
-![Danh sách hồ sơ](screenshots/phase-4/02-danh-sach-loc-tim-1366x768.png)
+Cột **Công ty khách** hiện công ty của đợt làm việc đang diễn ra; công nhân chưa có đợt nào đang diễn ra thì hiện **Chưa gán**.
+
+![Danh sách hồ sơ: chọn điều kiện rồi bấm Lọc](ban-giao/anh/danh-sach-loc.png)
 
 ### Chi tiết hồ sơ
 
@@ -74,16 +86,20 @@ Nếu số CCCD đã có trong hệ thống, màn hình báo trùng và có nút
 
 Kết quả máy đọc **không bao giờ tự lưu** khi bạn chưa bấm Lưu hồ sơ. Phiên bỏ dở tự xóa sau 24 giờ; bấm **Hủy phiên** để xóa ngay.
 
-![Màn hình đối chiếu](screenshots/phase-5/07-doi-chieu-qr-1366x768.png)
+![Chọn ảnh mặt trước, mặt sau rồi bấm Nhận diện](ban-giao/anh/nhap-cccd-tai-anh.png)
 
-![Trường tô vàng](screenshots/phase-5/09-doi-chieu-to-vang-1366x768.png)
+![Màn hình đối chiếu: ảnh bên trái, thông tin bên phải](ban-giao/anh/doi-chieu-cccd.png)
+
+![Tích Đã kiểm tra ở các trường tô vàng rồi bấm Lưu hồ sơ](ban-giao/anh/doi-chieu-da-kiem-tra.png)
 
 ### 2. Nhập tay hoặc từ file Excel
 
 - **Thêm hồ sơ → Nhập tay:** lưu Nháp chỉ cần họ tên và số điện thoại. Khi nhập số CCCD, hệ thống kiểm tra trùng ngay. Người dưới 15 tuổi bị chặn; từ 15 đến dưới 18 tuổi có cảnh báo.
 - **Thêm hồ sơ → Từ file Excel:** bấm **Tải file Excel mẫu**, điền sheet "Hồ sơ", chọn tệp, bấm **Nhập hồ sơ**. Dòng đúng được nhập, dòng sai được liệt kê kèm lý do để sửa và nhập lại. Tối đa 1.000 dòng mỗi lần. HR chỉ nhập phần thông tin cá nhân; phần thông tin làm việc do Admin hoặc Quản lý nhập.
 
-![Nhập Excel](screenshots/phase-7/kt-nhap-excel-1366x768.png)
+![Thêm hồ sơ nhập tay: điền rồi bấm Lưu hồ sơ](ban-giao/anh/them-nhap-tay.png)
+
+![Kết quả nhập Excel: dòng sai kèm lý do](ban-giao/anh/nhap-excel-ket-qua.png)
 
 ### 3. Bổ sung tài liệu, ghi nhận đồng ý, gửi duyệt
 
@@ -94,22 +110,70 @@ Kết quả máy đọc **không bao giờ tự lưu** khi bạn chưa bấm Lư
 
 Bạn **không tự duyệt** được hồ sơ do mình nhập hoặc mình gửi duyệt.
 
+![Tải tài liệu lên](ban-giao/anh/tao-tai-lieu.png)
+
+![Nút Gửi duyệt ở đầu trang hồ sơ](ban-giao/anh/gui-duyet.png)
+
 ### 4. Tuyển dụng và quá trình làm việc
 
 - Tab **Tuyển dụng & CV**: **Thêm lần ứng tuyển**; cập nhật trạng thái (Không đạt bắt buộc ghi lý do); thêm học vấn, chứng chỉ, kinh nghiệm.
-- Khi lần ứng tuyển **Đạt** và hồ sơ **Đã xác minh**: bấm **Tiếp nhận vào làm** để cấp mã nhân viên tự động. Người quay lại làm giữ mã cũ.
+- Khi lần ứng tuyển **Đạt** và hồ sơ **Đã xác minh**: ở dòng lần ứng tuyển bấm **Thêm ▾** → **Tiếp nhận vào làm** để cấp mã nhân viên tự động. Người quay lại làm giữ mã cũ. Trong form có phần không bắt buộc **Gán công ty khách ngay** (xem mục 6).
 - Tab **Quá trình làm việc**: **Ghi nhận thay đổi** (điều chuyển bộ phận, đổi chức danh, ca, trạng thái làm việc; lịch sử giữ dòng cũ), **Thêm hợp đồng**, **Thêm đợt làm việc** (công ty khách hàng, vị trí, ngày bắt đầu/kết thúc; mỗi lúc chỉ một công ty). HR xem được lịch sử lương nhưng không thêm lương.
 - Menu **Tuyển dụng**: danh sách mọi lần ứng tuyển, lọc theo trạng thái, vị trí, nguồn, ngày.
 
-![Quá trình làm việc](screenshots/phase-6/26-lam-viec-day-du-1366x768.png)
+![Tab Tuyển dụng & CV: Thêm → Tiếp nhận vào làm](ban-giao/anh/ung-tuyen-tiep-nhan.png)
 
-### 5. Xuất Excel, báo cáo, in
+![Form Tiếp nhận vào làm](ban-giao/anh/tiep-nhan-vao-lam.png)
+
+### 5. Thêm công ty khách
+
+Công ty khách hàng là nơi công nhân được cung ứng tới làm. Phải có công ty trong danh mục thì mới gán được cho công nhân.
+
+1. Menu trái → **Công ty khách** (Admin và Quản lý nhân sự thấy mục này; Quản lý chỉ xem danh sách).
+2. Admin bấm **Thêm công ty khách**, nhập **Tên công ty** và **Địa điểm** (tỉnh hoặc thành phố). Cùng một công ty ở hai địa điểm thì nhập thành hai dòng.
+3. Bấm **Lưu**. Tên gần giống một công ty đã có (chỉ khác dấu) thì hệ thống cảnh báo để bạn kiểm tra lại; trùng cả tên lẫn địa điểm thì không lưu được.
+4. Công ty không còn hợp tác: bấm **Thêm ▾** → **Ngừng sử dụng** (không xóa, đợt làm việc cũ vẫn giữ tên công ty).
+
+Nhân viên HR không thêm được công ty khách: báo Admin thêm.
+
+![Mục Công ty khách ở menu trái](ban-giao/anh/cong-ty-khach-menu.png)
+
+![Danh sách công ty khách, nút Thêm công ty khách](ban-giao/anh/cong-ty-khach-danh-sach.png)
+
+![Form thêm công ty khách](ban-giao/anh/cong-ty-khach-them.png)
+
+### 6. Gán công ty khách cho công nhân
+
+Chỉ gán được cho công nhân **đã có mã nhân viên** (đã Tiếp nhận vào làm). Hồ sơ chưa có mã nhân viên thì tab **Quá trình làm việc** hiện thông báo "Muốn gán công ty khách, cần Tiếp nhận vào làm trước", kèm điều kiện (lần ứng tuyển Đạt và hồ sơ Đã xác minh) và nút **Tiếp nhận vào làm** khi đã đủ điều kiện.
+
+Có hai cách gán:
+
+- **Ngay khi tiếp nhận:** trong form Tiếp nhận vào làm, phần **Gán công ty khách ngay (không bắt buộc)**, chọn công ty, vị trí và ngày bắt đầu tại công ty khách. Hệ thống tiếp nhận và tạo đợt làm việc đầu tiên cùng lúc; nếu đợt có lỗi thì không lưu gì cả, sửa rồi bấm lại.
+- **Sau khi tiếp nhận:** tab **Quá trình làm việc** → **Thêm đợt làm việc** → chọn **Công ty khách hàng**, **Vị trí**, **Ngày bắt đầu** (ngày kết thúc để trống nếu chưa kết thúc) → **Lưu đợt làm việc**. Đang có đợt chưa kết thúc thì nhập thêm **Ngày kết thúc của đợt hiện tại**: đợt cũ được đóng, đợt mới được mở.
+
+Danh mục chưa có công ty nào thì form Thêm đợt làm việc hiện hướng dẫn; Admin có nút **Thêm công ty khách** ngay tại đó.
+
+Sau khi có đợt, Admin hoặc Quản lý thêm lương cho đợt (Quản lý nhân sự, mục 3).
+
+![Tab Quá trình làm việc khi chưa tiếp nhận vào làm](ban-giao/anh/tab-lam-viec-chua-tiep-nhan.png)
+
+![Phần Gán công ty khách ngay trong form Tiếp nhận vào làm](ban-giao/anh/tiep-nhan-gan-cong-ty.png)
+
+![Nút Thêm đợt làm việc ở tab Quá trình làm việc](ban-giao/anh/tab-lam-viec-them-dot.png)
+
+![Form Thêm đợt làm việc: chọn công ty khách hàng](ban-giao/anh/them-dot-lam-viec.png)
+
+### 7. Xuất Excel, báo cáo, in
 
 - Danh sách hồ sơ: bấm **Xuất Excel** để tải đúng danh sách đang lọc. Số CCCD trong file luôn được che.
 - Menu **Báo cáo**: chọn loại báo cáo (theo phòng ban, giới tính, nhóm tuổi, trình độ, công ty khách…), bấm **In báo cáo** hoặc **Xuất Excel**.
 - Mọi lần xuất, in, xem số CCCD đầy đủ, xem/tải tài liệu đều được ghi nhật ký.
 
-### 6. Lưu trữ và mở lại
+![Nút Xuất Excel ở danh sách hồ sơ](ban-giao/anh/xuat-excel.png)
+
+![Báo cáo: In báo cáo hoặc Xuất Excel](ban-giao/anh/bao-cao.png)
+
+### 8. Lưu trữ và mở lại
 
 - **Lưu trữ** hồ sơ Nháp, Cần bổ sung, Bị từ chối không dùng nữa (có hộp xác nhận). HR không lưu trữ hồ sơ Đã xác minh.
 - Người cũ quay lại làm: mở hồ sơ Lưu trữ, bấm **Mở lại hồ sơ**; hồ sơ về Nháp và có lần ứng tuyển mới.
@@ -129,9 +193,11 @@ Có mọi quyền của Nhân viên HR, và thêm các quyền sau.
 3. Ô lý do: **không ghi họ tên**, chỉ dùng mã hồ sơ.
 4. Hồ sơ bạn tạo hoặc bạn gửi duyệt thì không duyệt được (dòng có ghi chú "Bạn không duyệt được hồ sơ này"); người khác phải duyệt.
 
-![Duyệt hồ sơ](screenshots/phase-4/17-duyet-ho-so-1366x768.png)
+![Hàng đợi Duyệt hồ sơ](ban-giao/anh/duyet-ho-so.png)
 
-![Trả lại có lý do](screenshots/phase-4/19-hop-tra-lai-1366x768.png)
+![Nút Duyệt hồ sơ ở đầu trang hồ sơ Chờ duyệt](ban-giao/anh/nut-duyet.png)
+
+![Trả lại: bắt buộc ghi lý do](ban-giao/anh/tra-lai-ho-so.png)
 
 Sửa họ tên, ngày sinh hoặc số CCCD của hồ sơ Đã xác minh thì hồ sơ tự về **Chờ duyệt**.
 
@@ -142,6 +208,8 @@ Tab **Tài liệu**: đổi trạng thái từng tài liệu thành **Đã đố
 ### 3. Lương và đơn giá
 
 Tab **Quá trình làm việc** → đợt làm việc → **Thêm dòng lương**: lương tháng, đơn giá tháng cho công ty khách (được để trống), ngày áp dụng, lý do. Không sửa, không xóa dòng cũ; nhập sai thì thêm dòng mới. Chỉ Admin và Quản lý thêm lương; mọi vai trò xem được.
+
+![Form ghi nhận lương của đợt làm việc](ban-giao/anh/them-luong.png)
 
 ![Lịch sử lương](screenshots/phase-6/34-lich-su-luong-1366x768.png)
 
@@ -167,7 +235,9 @@ Menu **Tài khoản**:
 - Admin không tự khóa và không tự đổi vai trò của chính mình. Hệ thống luôn phải còn ít nhất một Admin đang hoạt động.
 - Tab **Lịch sử đăng nhập**: các lần đăng nhập thành công và thất bại.
 
-![Tài khoản](screenshots/phase-3/tai-khoan-1366x768.png)
+![Danh sách tài khoản, nút Thêm ở mỗi dòng](ban-giao/anh/khoa-tai-khoan.png)
+
+![Menu Khóa / Mở khóa / Đặt lại mật khẩu](ban-giao/anh/mo-khoa-tai-khoan.png)
 
 Admin quên mật khẩu của chính mình: xem [Xử lý sự cố](xu-ly-su-co.md#quên-mật-khẩu-admin).
 
@@ -177,7 +247,7 @@ Menu **Cài đặt** có các tab:
 
 | Tab | Dùng để |
 | --- | --- |
-| Danh mục | Phòng ban, bộ phận, tổ, chức danh, ca, nguồn ứng tuyển, trình độ, nhóm tài liệu, loại tài liệu, công ty khách hàng. Không xóa; dùng **Ngừng** thay cho xóa |
+| Danh mục | Phòng ban, bộ phận, tổ, chức danh, ca, nguồn ứng tuyển, trình độ, nhóm tài liệu, loại tài liệu, công ty khách hàng (cũng mở nhanh bằng menu **Công ty khách**). Không xóa; dùng **Ngừng** thay cho xóa |
 | Sinh mã | Tiền tố, năm, số chữ số của mã hồ sơ và mã nhân viên; xem trước mã kế tiếp. Mã đã cấp giữ nguyên |
 | Ngưỡng và thời hạn | Số ngày cảnh báo sắp hết hạn; thời hạn lưu trữ (ứng viên không đạt 12 tháng, công nhân đã nghỉ 10 năm); số ngày tự Lưu trữ; thời hạn phiên nhận diện |
 | OCR và QR | Ngưỡng tin cậy OCR; cấu hình QR từng mẫu thẻ (khi thử thẻ thật mà QR đọc sai thứ tự trường thì sửa ở đây). API OCR ngoài **tắt**, không bật (ảnh sẽ gửi ra Internet) |
@@ -194,6 +264,8 @@ Khi người lao động có đơn yêu cầu xóa dữ liệu: chuyển hồ s�
 
 - Theo dõi **sao lưu**: hệ thống tự sao lưu mỗi ngày; Admin kiểm tra bằng `Kiem tra.bat` và chép bản sao lưu ra ổ ngoài (xem [Hướng dẫn cài đặt, mục 9](huong-dan-cai-dat.md#9-sao-lưu)).
 - Giữ USB khóa mã hóa ở nơi an toàn.
+
+![Cửa sổ Sao luu.bat (minh họa)](ban-giao/anh/sao-luu-cua-so.png)
 - Khi có người nghỉ việc: khóa tài khoản của họ.
 
 ## Viewer
@@ -218,5 +290,8 @@ Chỉ xem, không sửa:
 | Xuất Excel, in báo cáo | ✓ | ✓ | ✓ | |
 | Xuất kèm số CCCD đầy đủ | ✓ | ✓ | | |
 | Thêm lương | ✓ | ✓ | | |
+| Xem danh mục công ty khách (menu Công ty khách) | ✓ | ✓ | | |
+| Thêm, sửa, ngừng công ty khách | ✓ | | | |
+| Gán công ty khách (Tiếp nhận vào làm, Thêm đợt làm việc) | ✓ | ✓ | ✓ | |
 | Nhật ký thao tác, chi tiết giá trị trước/sau | ✓ | ✓ | | |
 | Tài khoản, Cài đặt, hủy hồ sơ hết hạn, ẩn danh hóa theo yêu cầu | ✓ | | | |

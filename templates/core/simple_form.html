@@ -4,11 +4,22 @@
 {% include "components/_page_header.html" with title=page_title breadcrumbs=crumbs %}
 {% for e in form.non_field_errors %}{% include "components/_alert.html" with kind="danger" text=e %}{% endfor %}
 {% if form.errors %}{% include "components/_alert.html" with kind="danger" text="Chưa lưu được. Kiểm tra các ô báo lỗi bên dưới." %}{% endif %}
+{% if notice %}
+{% include "components/_alert.html" with kind="warning" text=notice.text %}
+{% if notice.url %}<div class="mb-3"><a class="btn btn-outline-secondary" href="{{ notice.url }}">{{ notice.label }}</a></div>{% endif %}
+{% endif %}
 <form method="post" {% if multipart %}enctype="multipart/form-data" {% endif %}novalidate>
   {% csrf_token %}
   <div class="row"><div class="col-lg-8">
     {% if intro %}<p class="pa-small pa-muted">{{ intro }}</p>{% endif %}
-    {% include "components/_form_section.html" with fields=form.visible_fields %}
+    {% if sections %}
+      {% for s in sections %}
+        {% if s.intro %}<p class="pa-small pa-muted">{{ s.intro }}</p>{% endif %}
+        {% include "components/_form_section.html" with title=s.title fields=s.fields %}
+      {% endfor %}
+    {% else %}
+      {% include "components/_form_section.html" with fields=form.visible_fields %}
+    {% endif %}
     <div class="pa-form-actions">
       <a class="btn btn-outline-secondary" href="{{ cancel_url }}">Hủy</a>
       <button class="btn btn-primary" type="submit">{{ submit_label }}</button>

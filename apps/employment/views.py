@@ -7,6 +7,8 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.accounts.permissions import role_required
+from apps.core.choices import RoleCode
+from apps.core.models import ClientCompany
 from apps.recruitment.models import Application
 from apps.workers import rules
 from apps.workers.models import Worker
@@ -20,7 +22,19 @@ STAFF = tuple(ALL_STAFF)
 TAB_URL = "/ho-so/{}/?tab=lam-viec"
 
 
-def _page(request, form, *, title, crumbs, cancel_url, submit_label, intro="", multipart=False):
+def _page(
+    request,
+    form,
+    *,
+    title,
+    crumbs,
+    cancel_url,
+    submit_label,
+    intro="",
+    multipart=False,
+    sections=None,
+    notice=None,
+):
     return render(
         request,
         "core/simple_form.html",
@@ -32,6 +46,8 @@ def _page(request, form, *, title, crumbs, cancel_url, submit_label, intro="", m
             "submit_label": submit_label,
             "intro": intro,
             "multipart": multipart,
+            "sections": sections,
+            "notice": notice,
         },
     )
 
@@ -86,6 +102,15 @@ def onboard(request, pk):
         submit_label="Tiếp nhận vào làm",
         intro="Hệ thống cấp mã nhân viên theo cấu hình (người đã có mã nhân viên giữ mã cũ). "
         "Trạng thái làm việc ban đầu là Chờ nhận việc.",
+        sections=[
+            {"title": "Thông tin làm việc", "fields": form.main_fields()},
+            {
+                "title": "Gán công ty khách ngay (không bắt buộc)",
+                "intro": "Chọn công ty thì hệ thống tạo đợt làm việc đầu tiên cùng lúc với tiếp "
+                "nhận. Để trống thì gán sau ở tab Quá trình làm việc, nút Thêm đợt làm việc.",
+                "fields": form.assign_fields(),
+            },
+        ],
     )
 
 
@@ -147,7 +172,26 @@ def assignment_add(request, pk):
         submit_label="Lưu đợt làm việc",
         intro="Mỗi lúc một công nhân chỉ làm cho một công ty khách hàng; các đợt không chồng lấn "
         "ngày và được giữ lại làm lịch sử.",
+        notice=_no_client_notice(request.user),
     )
+
+
+def _no_client_notice(user):
+    """v1.1.1: danh mục công ty khách trống thì hướng dẫn; liên kết tới trang thêm chỉ cho Admin
+    (trang đó máy chủ chỉ cho Admin)."""
+    if ClientCompany.objects.filter(is_active=True).exists():
+        return None
+    if user.role.code == RoleCode.ADMIN:
+        return {
+            "text": "Danh mục công ty khách hàng chưa có công ty nào đang sử dụng. "
+            "Thêm công ty khách trước, rồi quay lại thêm đợt làm việc.",
+            "url": "/cai-dat/danh-muc/cong-ty-khach/them/",
+            "label": "Thêm công ty khách",
+        }
+    return {
+        "text": "Danh mục công ty khách hàng chưa có công ty nào đang sử dụng. "
+        "Liên hệ Admin để thêm công ty khách (menu Công ty khách), rồi quay lại thêm đợt làm việc."
+    }
 
 
 @role_required(*STAFF)

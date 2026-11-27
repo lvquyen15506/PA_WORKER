@@ -34,7 +34,7 @@ def _env_list(name, default):
     return [item.strip() for item in _env(name, default).split(",") if item.strip()]
 
 
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 
 DEBUG = _env("DEBUG", "0") == "1"
 # Bản Demo (dữ liệu giả lập, nghiệm thu, trình diễn) hay bản Thật (dữ liệu của doanh nghiệp).
