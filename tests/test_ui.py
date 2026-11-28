@@ -85,9 +85,9 @@ def test_ui_kit_hien_moi_component_va_moi_trang_thai():
 @pytest.mark.parametrize(
     "role,expected",
     [
-        # v1.1.1: thêm mục "Công ty khách" cho A, Q (docs/thiet-ke/trang.md mục 2)
-        ("ADMIN", 10),
-        ("HR_MANAGER", 8),
+        # v1.1.1 (sửa lại): bỏ mục "Công ty khách" ở sidebar, quản lý ở Cài đặt → Danh mục
+        ("ADMIN", 9),
+        ("HR_MANAGER", 7),
         ("HR_STAFF", 5),
         ("VIEWER", 4),
     ],

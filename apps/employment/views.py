@@ -190,7 +190,8 @@ def _no_client_notice(user):
         }
     return {
         "text": "Danh mục công ty khách hàng chưa có công ty nào đang sử dụng. "
-        "Liên hệ Admin để thêm công ty khách (menu Công ty khách), rồi quay lại thêm đợt làm việc."
+        "Liên hệ Admin để thêm công ty khách (Cài đặt → Danh mục → Công ty khách), rồi quay lại "
+        "thêm đợt làm việc."
     }
 
 

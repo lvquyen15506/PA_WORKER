@@ -1,6 +1,7 @@
 """Sau bàn giao v1.1.1: làm dễ thấy chức năng công ty khách (Phase 6).
 
-1. Sidebar có mục "Công ty khách" (A, Q); Q chỉ xem danh mục này, thêm/sửa/ngừng chỉ A.
+1. (Sửa lại 28/11/2026) Sidebar KHÔNG có mục "Công ty khách": công ty khách quản lý ở
+   Cài đặt → Danh mục → Công ty khách, chỉ Admin (như v1.1.0).
 2. Tab Quá trình làm việc: chưa có mã NV thì hướng dẫn Tiếp nhận vào làm (+ nút khi đủ điều kiện).
 3. Form Tiếp nhận vào làm: phần không bắt buộc "Gán công ty khách ngay", tạo đợt trong cùng
    giao dịch qua add_assignment.
@@ -56,26 +57,26 @@ def onboard_post(**extra):
     return data
 
 
-# ----- 1. Sidebar và quyền xem danh mục công ty khách -----
-@pytest.mark.parametrize(
-    ("role", "shown"),
-    [("ADMIN", True), ("HR_MANAGER", True), ("HR_STAFF", False), ("VIEWER", False)],
-)
-def test_sidebar_co_muc_cong_ty_khach_cho_a_va_q(role, shown):
-    urls = [item["url"] for item in build_menu(role, "/")]
-    assert (CC_URL in urls) == shown
+# ----- 1. Không có mục sidebar; danh mục công ty khách chỉ Admin qua Cài đặt -----
+# Sửa lại 28/11/2026 theo yêu cầu khách: bỏ mục "Công ty khách" khỏi sidebar, quản lý ở
+# Cài đặt → Danh mục như v1.1.0; bỏ luôn quyền xem chỉ-đọc của Quản lý nhân sự.
+@pytest.mark.parametrize("role", ["ADMIN", "HR_MANAGER", "HR_STAFF", "VIEWER"])
+def test_sidebar_khong_co_muc_cong_ty_khach(role):
+    menu = build_menu(role, "/")
+    assert CC_URL not in [item["url"] for item in menu]
+    assert "Công ty khách" not in [item["label"] for item in menu]
 
 
-def test_muc_cong_ty_khach_dang_chon_khi_mo_trang_do_khong_phai_cai_dat():
+def test_mo_danh_muc_cong_ty_khach_thi_muc_cai_dat_dang_chon():
     menu = {i["url"]: i["active"] for i in build_menu("ADMIN", CC_URL)}
-    assert menu[CC_URL] is True and menu["/cai-dat/"] is False
+    assert menu["/cai-dat/"] is True
 
 
 @pytest.mark.parametrize(
     ("role", "status"),
-    [("ADMIN", 200), ("HR_MANAGER", 200), ("HR_STAFF", 403), ("VIEWER", 403)],
+    [("ADMIN", 200), ("HR_MANAGER", 403), ("HR_STAFF", 403), ("VIEWER", 403)],
 )
-def test_xem_danh_muc_cong_ty_khach_theo_vai_tro(role, status):
+def test_xem_danh_muc_cong_ty_khach_chi_admin(role, status):
     company()
     response = login_client(make_user(role)).get(CC_URL)
     assert response.status_code == status
@@ -83,20 +84,11 @@ def test_xem_danh_muc_cong_ty_khach_theo_vai_tro(role, status):
         assert "Công ty Mẫu A" in response.content.decode()
 
 
-def test_quan_ly_chi_xem_khong_co_nut_them_sua_ngung_va_tab_cai_dat():
-    obj = company()
-    page = login_client(make_user("HR_MANAGER")).get(CC_URL).content.decode()
-    assert "Công ty Mẫu A" in page and "Danh sách chỉ xem" in page
-    assert f"{CC_URL}them/" not in page
-    assert f"{CC_URL}{obj.pk}/sua/" not in page
-    assert f"{CC_URL}{obj.pk}/ngung/" not in page
-    assert "/cai-dat/sinh-ma/" not in page  # không có tab Cài đặt
-
-
-def test_admin_van_thay_day_du_thao_tac():
+def test_admin_thay_day_du_thao_tac_trong_tab_danh_muc_cai_dat():
     obj = company()
     page = login_client(make_user("ADMIN")).get(CC_URL).content.decode()
     assert f"{CC_URL}them/" in page and f"{CC_URL}{obj.pk}/sua/" in page
+    assert "/cai-dat/sinh-ma/" in page  # trang nằm trong Cài đặt, có các tab Cài đặt
 
 
 def test_quan_ly_khong_xem_duoc_danh_muc_khac():

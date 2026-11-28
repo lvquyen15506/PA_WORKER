@@ -129,14 +129,14 @@ Bạn **không tự duyệt** được hồ sơ do mình nhập hoặc mình g�
 
 Công ty khách hàng là nơi công nhân được cung ứng tới làm. Phải có công ty trong danh mục thì mới gán được cho công nhân.
 
-1. Menu trái → **Công ty khách** (Admin và Quản lý nhân sự thấy mục này; Quản lý chỉ xem danh sách).
-2. Admin bấm **Thêm công ty khách**, nhập **Tên công ty** và **Địa điểm** (tỉnh hoặc thành phố). Cùng một công ty ở hai địa điểm thì nhập thành hai dòng.
+1. Admin vào menu **Cài đặt** → tab **Danh mục** → ô **Loại danh mục** chọn **Công ty khách hàng** (chỉ Admin có menu Cài đặt).
+2. Bấm **Thêm công ty khách**, nhập **Tên công ty** và **Địa điểm** (tỉnh hoặc thành phố). Cùng một công ty ở hai địa điểm thì nhập thành hai dòng.
 3. Bấm **Lưu**. Tên gần giống một công ty đã có (chỉ khác dấu) thì hệ thống cảnh báo để bạn kiểm tra lại; trùng cả tên lẫn địa điểm thì không lưu được.
 4. Công ty không còn hợp tác: bấm **Thêm ▾** → **Ngừng sử dụng** (không xóa, đợt làm việc cũ vẫn giữ tên công ty).
 
-Nhân viên HR không thêm được công ty khách: báo Admin thêm.
+Quản lý nhân sự và Nhân viên HR không thêm được công ty khách: báo Admin thêm.
 
-![Mục Công ty khách ở menu trái](ban-giao/anh/cong-ty-khach-menu.png)
+![Cài đặt → Danh mục: chọn loại Công ty khách hàng](ban-giao/anh/cong-ty-khach-cai-dat.png)
 
 ![Danh sách công ty khách, nút Thêm công ty khách](ban-giao/anh/cong-ty-khach-danh-sach.png)
 
@@ -247,7 +247,7 @@ Menu **Cài đặt** có các tab:
 
 | Tab | Dùng để |
 | --- | --- |
-| Danh mục | Phòng ban, bộ phận, tổ, chức danh, ca, nguồn ứng tuyển, trình độ, nhóm tài liệu, loại tài liệu, công ty khách hàng (cũng mở nhanh bằng menu **Công ty khách**). Không xóa; dùng **Ngừng** thay cho xóa |
+| Danh mục | Phòng ban, bộ phận, tổ, chức danh, ca, nguồn ứng tuyển, trình độ, nhóm tài liệu, loại tài liệu, công ty khách hàng. Không xóa; dùng **Ngừng** thay cho xóa |
 | Sinh mã | Tiền tố, năm, số chữ số của mã hồ sơ và mã nhân viên; xem trước mã kế tiếp. Mã đã cấp giữ nguyên |
 | Ngưỡng và thời hạn | Số ngày cảnh báo sắp hết hạn; thời hạn lưu trữ (ứng viên không đạt 12 tháng, công nhân đã nghỉ 10 năm); số ngày tự Lưu trữ; thời hạn phiên nhận diện |
 | OCR và QR | Ngưỡng tin cậy OCR; cấu hình QR từng mẫu thẻ (khi thử thẻ thật mà QR đọc sai thứ tự trường thì sửa ở đây). API OCR ngoài **tắt**, không bật (ảnh sẽ gửi ra Internet) |
@@ -290,8 +290,7 @@ Chỉ xem, không sửa:
 | Xuất Excel, in báo cáo | ✓ | ✓ | ✓ | |
 | Xuất kèm số CCCD đầy đủ | ✓ | ✓ | | |
 | Thêm lương | ✓ | ✓ | | |
-| Xem danh mục công ty khách (menu Công ty khách) | ✓ | ✓ | | |
-| Thêm, sửa, ngừng công ty khách | ✓ | | | |
+| Xem, thêm, sửa, ngừng công ty khách (Cài đặt → Danh mục → Công ty khách) | ✓ | | | |
 | Gán công ty khách (Tiếp nhận vào làm, Thêm đợt làm việc) | ✓ | ✓ | ✓ | |
 | Nhật ký thao tác, chi tiết giá trị trước/sau | ✓ | ✓ | | |
 | Tài khoản, Cài đặt, hủy hồ sơ hết hạn, ẩn danh hóa theo yêu cầu | ✓ | | | |

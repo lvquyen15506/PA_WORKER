@@ -18,8 +18,6 @@ MENU = [
     ("Duyệt hồ sơ", "bi-check2-square", "/duyet-ho-so/", {A, Q}),
     ("Báo cáo", "bi-bar-chart", "/bao-cao/", {A, Q, H, V}),
     ("Nhật ký thao tác", "bi-clock-history", "/nhat-ky/", {A, Q}),
-    # v1.1.1: lối tắt tới danh mục công ty khách (Q chỉ xem, A thêm/sửa)
-    ("Công ty khách", "bi-building", "/cai-dat/danh-muc/cong-ty-khach/", {A, Q}),
     ("Tài khoản", "bi-person-gear", "/tai-khoan/", {A}),
     ("Cài đặt", "bi-gear", "/cai-dat/", {A}),
 ]

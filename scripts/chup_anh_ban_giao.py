@@ -336,12 +336,12 @@ def main():
         page.keyboard.press("Escape")
         ctx.close()
 
-        # ===== v1.1.1: thêm công ty khách (Admin) =====
+        # ===== v1.1.1: thêm công ty khách (Admin, Cài đặt → Danh mục → Công ty khách) =====
         ctx, page = new_page(browser, (1366, 768))
         login(page, "admin")
         page.goto(f"{BASE}/cai-dat/danh-muc/cong-ty-khach/")
-        cap(page, "cong-ty-khach-menu", "a.pa-nav__link[href='/cai-dat/danh-muc/cong-ty-khach/']",
-            "mục Công ty khách ở menu trái")  # fmt: skip
+        cap(page, "cong-ty-khach-cai-dat", "select[name=loai]",
+            "Cài đặt → Danh mục, chọn loại Công ty khách")  # fmt: skip
         cap(page, "cong-ty-khach-danh-sach", "a:has-text('Thêm công ty khách')",
             "danh sách công ty khách, nút Thêm")  # fmt: skip
         page.goto(f"{BASE}/cai-dat/danh-muc/cong-ty-khach/them/")

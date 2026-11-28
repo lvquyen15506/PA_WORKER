@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Danh mục – {{ catalog.title }}{% endblock %}
 {% block content %}
-{% if readonly %}
-{% include "components/_page_header.html" with title=catalog.title breadcrumbs=crumbs %}
-<section class="pa-form-section">
-  <h2 class="pa-card-title">{{ catalog.title }}</h2>
-  <p class="pa-small pa-muted">Danh sách chỉ xem. Muốn thêm hoặc sửa công ty khách, liên hệ Admin.</p>
-  {% include "components/_table.html" with columns=columns rows=rows empty_text="Danh mục này chưa có mục nào." %}
-  {% include "components/_pagination.html" with page=page %}
-</section>
-{% else %}
 {% include "components/_page_header.html" with title="Cài đặt" breadcrumbs=crumbs actions=header_actions %}
 {% include "components/_tabs.html" with tabs=tabs %}
 {% include "components/_filter_bar.html" with form=pick_form reset_url="/cai-dat/danh-muc/" %}
@@ -20,5 +11,4 @@
   {% include "components/_pagination.html" with page=page %}
 </section>
 {% include "components/_confirm_modal.html" with id="catalog-confirm" title="Xác nhận" message="" action="" confirm_label="Xác nhận" danger=True %}
-{% endif %}
 {% endblock %}

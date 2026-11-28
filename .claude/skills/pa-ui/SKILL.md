@@ -122,7 +122,6 @@ Nhãn trạng thái: nền màu nhạt (màu chính ở độ đậm 12%), chữ
 | Duyệt hồ sơ | `bi-check2-square` |
 | Báo cáo | `bi-bar-chart` |
 | Nhật ký thao tác | `bi-clock-history` |
-| Công ty khách | `bi-building` |
 | Tài khoản | `bi-person-gear` |
 | Cài đặt | `bi-gear` |
 

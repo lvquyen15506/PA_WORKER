@@ -24,7 +24,6 @@ Phase 1 · Ngày 21/11/2026 · Cập nhật v1.1 ngày 23/11/2026 · Dựa trên
 | Duyệt hồ sơ | `bi-check2-square` | `/duyet-ho-so/` | ✓ | ✓ | | |
 | Báo cáo | `bi-bar-chart` | `/bao-cao/` | ✓ | ✓ | ✓ | ✓ |
 | Nhật ký thao tác | `bi-clock-history` | `/nhat-ky/` | ✓ | ✓ | | |
-| Công ty khách | `bi-building` | `/cai-dat/danh-muc/cong-ty-khach/` | ✓ | ✓ | | |
 | Tài khoản | `bi-person-gear` | `/tai-khoan/` | ✓ | | | |
 | Cài đặt | `bi-gear` | `/cai-dat/` | ✓ | | | |
 
@@ -96,7 +95,7 @@ Trang admin của Django không được bật.
 | URL | PT | A | Nhật ký | Ghi chú |
 | --- | --- | --- | --- | --- |
 | `/cai-dat/` | G | ✓ | | Chuyển tới tab đầu tiên đang có (Phase 5: OCR và QR; Phase 6 đổi về Danh mục). Danh sách tab khai báo một chỗ: `SETTINGS_TABS` ở `apps/core/settings_views.py` |
-| `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu`, `cong-ty-khach` (v1.1, câu 39: 10 loại; bảng có cột Tên và Địa điểm; hai dòng không trùng cả tên lẫn địa điểm; ngừng sử dụng thay cho xóa). **v1.1.1:** riêng `cong-ty-khach` Q được **xem** danh sách (không tab Cài đặt, không nút Thêm/Sửa/Ngừng); thêm/sửa/ngừng vẫn chỉ A |
+| `/cai-dat/danh-muc/<loai>/` | G | ✓ | | `<loai>`: `phong-ban`, `bo-phan`, `to`, `chuc-danh`, `ca`, `nguon-ung-tuyen`, `trinh-do`, `nhom-tai-lieu`, `loai-tai-lieu`, `cong-ty-khach` (v1.1, câu 39: 10 loại; bảng có cột Tên và Địa điểm; hai dòng không trùng cả tên lẫn địa điểm; ngừng sử dụng thay cho xóa). Thêm công ty khách: Cài đặt → Danh mục → Công ty khách (chỉ A; v1.1.1 sửa lại 28/11/2026: không có mục sidebar riêng, Q không xem) |
 | `/cai-dat/danh-muc/<loai>/them/`, `/<id>/sua/` | G, P | ✓ | `CREATE`, `UPDATE` | |
 | `/cai-dat/danh-muc/<loai>/<id>/ngung/`, `/<id>/dung-lai/` | P | ✓ | `UPDATE` | Không có nút xóa |
 | `/cai-dat/sinh-ma/` | G, P | ✓ | `UPDATE` | Tiền tố, có năm, số chữ số cho mã hồ sơ và mã NV; xem trước mã kế tiếp |
